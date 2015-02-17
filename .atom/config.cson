@@ -1,0 +1,42 @@
+"*":
+  core:
+    themes: [
+      "graphite-ui"
+      "behave-theme"
+    ]
+  "exception-reporting":
+    userId: "a2f89b50-36c0-2a0e-e092-a10b50c840af"
+  welcome:
+    showOnStartup: false
+  editor:
+    softWrap: true
+    invisibles: {}
+  "atom-beautify":
+    _analyticsUserId: "fde1eea4-ad2e-412c-b0f4-6ec7445c8fd1"
+  "autocomplete-plus": {}
+  minimap:
+    plugins:
+      selection: true
+    scrollAnimation: true
+  linter:
+    lintOnChange: false
+    lintOnEditorFocus: false
+    showInfoMessages: true
+  "linter-coffeelint":
+    coffeelintExecutablePath: "/usr/local/bin"
+  "linter-scalac": {}
+  "linter-rubocop":
+    rubocopExecutablePath: "/Users/ianhattendorf/.rbenv/shims"
+  "linter-javac":
+    javaExecutablePath: "/usr/bin/java"
+  "linter-scss-lint":
+    scssLintExecutablePath: "/Users/ianhattendorf/.rbenv/shims"
+    scssLintExcludedLinters: []
+  "linter-csslint":
+    csslintExecutablePath: "/usr/local/bin"
+  "linter-shellcheck":
+    shellcheckExecutablePath: "/usr/local/bin"
+  "linter-js-yaml":
+    jsYamlExecutablePath: "/usr/local/bin"
+  "project-palette-finder": {}
+  "project-manager": {}

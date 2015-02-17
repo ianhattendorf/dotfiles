@@ -1,0 +1,31 @@
+## java specific ##
+*.class
+
+## ant ##
+dist/
+
+## eclipse ##
+bin/*
+.settings/
+.classpath
+.project
+*.tmp
+*.bak
+*.swp
+
+## generic files to ignore ##
+*~
+*.lock
+*.swp
+*.out
+
+# Folder view configuration files #
+.DS_Store
+Desktop.ini
+
+# Thumbnail cache files #
+._*
+Thumbs.db
+
+# CMake #
+build/*
