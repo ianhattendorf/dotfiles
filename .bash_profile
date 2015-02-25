@@ -32,3 +32,6 @@ fi
 # aliases
 alias bu='bundle'
 alias be='bundle exec'
+
+alias e='exa -lg'
+alias ea='exa -alg'

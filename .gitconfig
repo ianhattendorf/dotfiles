@@ -12,6 +12,7 @@
 	a = !git add . && git status
 	au = !git add -u . && git status
 	aa = !git add . && git add -u . && git status
+	c = commit
 	cm = commit -m
 	l = log --graph --all --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %C(yellow)(%ar) %Creset<%an>%Creset'
 	ucm = reset --soft HEAD~1
