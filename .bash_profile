@@ -29,6 +29,12 @@ if [ -f $(brew --prefix)/etc/bash_completion ]; then
   . $(brew --prefix)/etc/bash_completion
 fi
 
+# z
+. `brew --prefix`/etc/profile.d/z.sh
+
+# Java
+export JAVA_HOME=$(/usr/libexec/java_home)
+
 # aliases
 alias bu='bundle'
 alias be='bundle exec'
