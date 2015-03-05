@@ -11,6 +11,7 @@
   editor:
     softWrap: true
     invisibles: {}
+    preferredLineLength: 100
   "atom-beautify":
     _analyticsUserId: "fde1eea4-ad2e-412c-b0f4-6ec7445c8fd1"
   "autocomplete-plus": {}
@@ -38,5 +39,7 @@
     shellcheckExecutablePath: "/usr/local/bin"
   "linter-js-yaml":
     jsYamlExecutablePath: "/usr/local/bin"
+  "linter-ruby":
+    rubyExecutablePath: "/Users/ianhattendorf/.rbenv/shims"
   "project-palette-finder": {}
   "project-manager": {}

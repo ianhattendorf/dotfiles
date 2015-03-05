@@ -45,11 +45,11 @@ COMPLETION_WAITING_DOTS="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(atom brew brew-cask bundler colored-man colorize encode64 gem git git-extras gpg-agent heroku npm osx rails rake rbenv)
+plugins=(atom brew brew-cask bundler colored-man colorize encode64 gem git git-extras heroku npm osx rails rake)
 
 # User configuration
 
-export PATH="/Users/ianhattendorf/.rbenv/shims:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/texbin"
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/texbin"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -77,7 +77,22 @@ eval "$(rbenv init -)"
 export JAVA_HOME=$(/usr/libexec/java_home)
 
 #ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
+export SSH_KEY_PATH="~/.ssh/ianhattendorf"
+
+# gpg
+# Script for ensuring only one instance of gpg-agent is running
+# and if there is not one, start an instance of gpg-agent.
+if test -f $HOME/.gpg-agent-info && kill -0 `cut -d: -f 2 $HOME/.gpg-agent-info` 2>/dev/null; then
+	GPG_AGENT_INFO=`cat $HOME/.gpg-agent-info`
+	export GPG_AGENT_INFO SSH_AUTH_SOCK SSH_AGENT_PID
+else
+	eval `gpg-agent --daemon`
+	echo $GPG_AGENT_INFO >$HOME/.gpg-agent-info
+fi
+# Imperative that this environment variable always reflects the output
+# of the tty command.
+GPG_TTY=`tty`
+export GPG_TTY
 
 # aliases
 alias bu='bundle'
@@ -85,3 +100,6 @@ alias be='bundle exec'
 
 alias e='exa -lg'
 alias ea='exa -alg'
+
+# added by travis gem
+[ -f /Users/ianhattendorf/.travis/travis.sh ] && source /Users/ianhattendorf/.travis/travis.sh
