@@ -20,3 +20,6 @@ Thumbs.db
 
 # CMake #
 build/*
+
+# Ruby #
+!Gemfile.lock
