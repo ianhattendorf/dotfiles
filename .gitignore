@@ -1,9 +1,3 @@
-## java specific ##
-*.class
-
-## ant ##
-dist/
-
 ## generic files to ignore ##
 *~
 *.lock
@@ -17,9 +11,3 @@ Desktop.ini
 # Thumbnail cache files #
 ._*
 Thumbs.db
-
-# CMake #
-build/*
-
-# Ruby #
-!Gemfile.lock

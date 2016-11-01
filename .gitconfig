@@ -1,18 +1,18 @@
+[user]
+	name = Ian Hattendorf
+	email = ianhattendorf@gmail.com
+	signingkey = 1617DE70
+
 [core]
 	excludesfile = /Users/ianhattendorf/.gitignore
 	# Treat spaces before tabs, lines that are indented with 8 or more spaces, and all kinds of trailing whitespace as an error
 	whitespace = space-before-tab,indent-with-non-tab,trailing-space
 	autocrlf = input
 
-[color]
-	ui = auto
-	interactive = auto
-
 [alias]
 	a = !git add . && git status
 	au = !git add -u . && git status
 	aa = !git add . && git add -u . && git status
-	c = commit
 	cm = commit -m
 	l = log --graph --all --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %C(yellow)(%ar) %Creset<%an>%Creset'
 	ucm = reset --soft HEAD~1
@@ -24,35 +24,8 @@
 	# Show the diff between the latest commit and the current state
 	dlc = !"git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
 	st = status -sb
-	vdiff = difftool --dir-diff
 	incoming = "!git remote update -p; git log ..@{u}"
 	outgoing = log @{u}..
 
-[user]
-	name = Ian Hattendorf
-	email = ianhattendorf@gmail.com
-	signingkey = 1617DE70
-
-# URL shorthands
-[url "git@github.com:"]
-	insteadOf = "gh:"
-	pushInsteadOf = "github:"
-	pushInsteadOf = "git://github.com/"
-
-[url "git@bitbucket.org:"]
-	insteadOf = "bb:"
-	pushInsteadOf = "bitbucket:"
-	pushInsteadOf = "git://bitbucket.org/"
-
 [push]
 	default = simple
-
-[commit]
-	gpgsign = true
-
-[difftool "sourcetree"]
-	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
-
-[mergetool "sourcetree"]
-	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
-	trustExitCode = true
