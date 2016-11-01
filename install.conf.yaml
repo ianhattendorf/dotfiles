@@ -10,6 +10,7 @@
 - clean: ['~', '~/.config/fish']
 
 - link:
+    ~/.editorconfig: .editorconfig
     ~/.gemrc: .gemrc
     ~/.gitconfig: .gitconfig
     ~/.gitignore: .gitignore
