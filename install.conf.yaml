@@ -4,7 +4,10 @@
       create: true
       force: true
 
-- clean: ['~']
+- shell:
+  - mkdir -p ~/.config/fish
+
+- clean: ['~', '~/.config/fish']
 
 - link:
     ~/.gemrc: .gemrc
@@ -13,3 +16,4 @@
     ~/.irbrc: .irbrc
     ~/.nethackrc: .nethackrc
     ~/.vimrc: .vimrc
+    ~/.config/fish/config.fish: config.fish
