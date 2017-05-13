@@ -7,6 +7,6 @@ charset = utf-8
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[*.{coffee,js,jsx,rb,yml,yaml}]
+[*.{coffee,js,jsx,rb,yml,yaml,yml.example,yaml.example}]
 indent_style = space
 indent_size = 2
