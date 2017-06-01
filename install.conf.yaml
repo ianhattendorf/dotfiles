@@ -6,14 +6,17 @@
 
 - shell:
   - mkdir -p ~/.config/fish
+  - mkdir -p ~/.gnupg
 
-- clean: ['~', '~/.config/fish']
+- clean: ['~', '~/.config/fish', '~/.gnupg']
 
 - link:
     ~/.editorconfig: .editorconfig
     ~/.gemrc: .gemrc
     ~/.gitconfig: .gitconfig
     ~/.gitignore: .gitignore
+    ~/.gnupg/gpg.conf: .gnupg/gpg.conf
+    ~/.gnupg/dirmngr.conf: .gnupg/dirmngr.conf
     ~/.irbrc: .irbrc
     ~/.nethackrc: .nethackrc
     ~/.vimrc: .vimrc
