@@ -11,6 +11,8 @@
 - clean: ['~', '~/.config/fish', '~/.gnupg']
 
 - link:
+    ~/.bash_profile: .bash_profile
+    ~/.bashrc: .bashrc
     ~/.editorconfig: .editorconfig
     ~/.gemrc: .gemrc
     ~/.gitconfig: .gitconfig
@@ -20,5 +22,6 @@
     ~/.gnupg/gpg-agent.conf: .gnupg/gpg-agent.conf
     ~/.irbrc: .irbrc
     ~/.nethackrc: .nethackrc
+    ~/.profile: .profile
     ~/.vimrc: .vimrc
     ~/.config/fish/config.fish: config.fish
