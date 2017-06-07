@@ -1,6 +1,7 @@
 [user]
 	name = Ian Hattendorf
 	email = ianhattendorf@gmail.com
+	signingKey = 97923DF85C294A7AE4058B253A7EA46F568616DC
 
 [core]
 	# Treat spaces before tabs, lines that are indented with 8 or more spaces, and all kinds of trailing whitespace as an error
@@ -27,3 +28,9 @@
 
 [push]
 	default = simple
+[gpg]
+	program = gpg2
+[commit]
+	gpgSign = true
+[tag]
+	forceSignAnnotated = true
