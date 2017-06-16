@@ -49,6 +49,15 @@ if has("gui_running")
     set guitablabel=%M\ %t
 endif
 
+colorscheme seoul256
+
+" Use dark background in TTY
+if exists('$DISPLAY')
+    set background=light
+else
+    set background=dark
+endif
+
 " Set utf8 as standard encoding and en_US as the standard language
 set encoding=utf8
 
