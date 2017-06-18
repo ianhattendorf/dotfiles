@@ -1,0 +1,2 @@
+%_topdir	%{getenv:HOME}/rpmbuild
+%_gpg_name	97923DF85C294A7AE4058B253A7EA46F568616DC

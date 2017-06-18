@@ -23,6 +23,7 @@
     ~/.irbrc: .irbrc
     ~/.nethackrc: .nethackrc
     ~/.profile: .profile
+    ~/.rpmmacros: .rpmmacros
     ~/.vim/colors/seoul256.vim: .vim/colors/seoul256.vim
     ~/.vimrc: .vimrc
     ~/.config/fish/config.fish: config.fish
