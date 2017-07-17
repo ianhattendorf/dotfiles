@@ -6,9 +6,15 @@
 
 - shell:
   - mkdir -p ~/.config/fish
+  - mkdir -p ~/.config/mpv
+  - mkdir -p ~/.config/mpv/scripts
   - mkdir -p ~/.gnupg
 
-- clean: ['~', '~/.config/fish', '~/.gnupg']
+- clean:
+  - '~'
+  - '~/.config/fish'
+  - '~/.config/mpv'
+  - '~/.gnupg'
 
 - link:
     ~/.bash_profile: .bash_profile
@@ -27,3 +33,6 @@
     ~/.vim/colors/seoul256.vim: .vim/colors/seoul256.vim
     ~/.vimrc: .vimrc
     ~/.config/fish/config.fish: config.fish
+    ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
+    ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
+    ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
