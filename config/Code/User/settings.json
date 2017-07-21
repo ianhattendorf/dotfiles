@@ -1,0 +1,5 @@
+{
+    "workbench.iconTheme": "vscode-icons",
+    "editor.fontLigatures": true,
+    "editor.fontFamily": "'Fira Code', 'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace, 'Droid Sans Fallback'"
+}

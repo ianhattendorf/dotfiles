@@ -5,6 +5,7 @@
       force: true
 
 - shell:
+  - mkdir -p ~/.config/Code/User
   - mkdir -p ~/.config/fish
   - mkdir -p ~/.config/mpv
   - mkdir -p ~/.config/mpv/scripts
@@ -12,6 +13,7 @@
 
 - clean:
   - '~'
+  - '~/.config/Code/User'
   - '~/.config/fish'
   - '~/.config/mpv'
   - '~/.gnupg'
@@ -32,6 +34,7 @@
     ~/.rpmmacros: .rpmmacros
     ~/.vim/colors/seoul256.vim: .vim/colors/seoul256.vim
     ~/.vimrc: .vimrc
+    ~/.config/Code/User/settings.json: config/Code/User/settings.json
     ~/.config/fish/config.fish: config.fish
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
     ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
