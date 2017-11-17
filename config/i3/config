@@ -93,17 +93,18 @@ bindsym $mod+a focus parent
 #bindsym $mod+d focus child
 
 # Workspaces
-set $workspace1 "1"
-set $workspace2 "2"
+set $workspace1 ""
+set $workspace2 ""
 set $workspace3 "3"
 set $workspace4 "4"
+set $workspace5 "5"
 
 # switch to workspace
 bindsym $mod+1 workspace $workspace1
 bindsym $mod+2 workspace $workspace2
 bindsym $mod+3 workspace $workspace3
 bindsym $mod+4 workspace $workspace4
-bindsym $mod+5 workspace 5
+bindsym $mod+5 workspace $workspace5
 bindsym $mod+6 workspace 6
 bindsym $mod+7 workspace 7
 bindsym $mod+8 workspace 8
@@ -182,3 +183,4 @@ hide_edge_borders smart
 new_window pixel 3
 exec --no-startup-id feh --bg-fill /home/ian/Downloads/saitama-wallpaper.jpg
 exec --no-startup-id ~/.config/i3/scripts/nala.sh
+exec --no-startup-id i3-msg 'workspace $workspace1; exec firefox; workspace $workspace2; exec gnome-terminal; exec gnome-terminal; workspace $workspace1'
