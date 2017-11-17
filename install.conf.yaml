@@ -7,7 +7,7 @@
 - shell:
   - mkdir -p ~/.config/Code/User
   - mkdir -p ~/.config/fish
-  - mkdir -p ~/.config/i3
+  - mkdir -p ~/.config/i3/scripts
   - mkdir -p ~/.config/i3status
   - mkdir -p ~/.config/mpv
   - mkdir -p ~/.config/mpv/scripts
@@ -39,9 +39,10 @@
     ~/.vim/colors/seoul256.vim: .vim/colors/seoul256.vim
     ~/.vimrc: .vimrc
     ~/.config/Code/User/settings.json: config/Code/User/settings.json
-    ~/.config/fish/config.fish: config.fish
-    ~/.config/i3/config: config
-    ~/.config/i3status/config: config
+    ~/.config/fish/config.fish: config/fish/config.fish
+    ~/.config/i3/config: config/i3/config
+    ~/.config/i3/scripts/nala.sh: config/i3/scripts/nala.sh
+    ~/.config/i3status/config: config/i3status/config
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
     ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
     ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua

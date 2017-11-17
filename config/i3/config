@@ -30,7 +30,7 @@ font pango:Fira Mono, Font Awesome 12
 floating_modifier $mod
 
 # start a terminal
-bindsym $mod+Return exec i3-sensible-terminal
+bindsym $mod+Return exec gnome-terminal
 
 # kill focused window
 bindsym $mod+Shift+q kill
@@ -177,7 +177,8 @@ bindsym XF86AudioPause exec playerctl pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
-hide_edge_borders none
+hide_edge_borders smart
 
 new_window pixel 3
 exec --no-startup-id feh --bg-fill /home/ian/Downloads/saitama-wallpaper.jpg
+exec --no-startup-id ~/.config/i3/scripts/nala.sh
