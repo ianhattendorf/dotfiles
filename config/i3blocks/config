@@ -1,0 +1,72 @@
+#[Weather]
+#command=~/.config/i3/scripts/weather3.sh "san-miguel-de-tucuman"
+#interval=1800
+#color=#c9c9ff
+#border=#535353
+
+#[audio]
+#label=
+#interval=once
+#command=~/.config/i3/scripts/audio1.sh
+#color=#f19950
+
+[disk-root]
+label=
+command=df -h -P -l / | awk '/\/.*/ { print $4"/"$2; exit 0 }'
+interval=30
+
+[disk-home]
+label=
+command=df -h -P -l $HOME | awk '/\/.*/ { print $4"/"$2; exit 0 }'
+interval=30
+
+[temperature]
+label=
+command=/usr/local/libexec/i3blocks/temperature
+interval=10
+separator=false
+# color=#dcedc1
+# separator=true
+
+[memory]
+label=
+command=/usr/local/libexec/i3blocks/memory
+interval=1
+separator=false
+# color=#dfe3ee
+
+[cpu_usage]
+label=
+command=mpstat 1 1 | awk '$3 ~ /CPU/ { for(i=1;i<=NF;++i) { if ($i ~ /%idle/) field=i } } $3 ~ /all/ { printf("%3d%%",100 - $field) }'
+interval=1
+separator=false
+min_width=100%
+
+[cpu_load]
+label=
+command=/usr/local/libexec/i3blocks/load_average
+interval=1
+# color=#00ff7f
+
+[bandwidth]
+label=
+command=/usr/local/libexec/i3blocks/bandwidth
+interval=1
+# color=#83d0c9
+min_width=IN 10K OUT 10K
+
+[battery]
+label=
+command=/usr/local/libexec/i3blocks/battery
+interval=60
+
+[kb-lang]
+command=xkb-switch -p
+label=
+# TODO event update?
+interval=1
+
+[time]
+command=date '+%d/%m/%Y %H:%M'
+label=
+interval=1

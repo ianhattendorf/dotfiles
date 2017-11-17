@@ -8,7 +8,7 @@
   - mkdir -p ~/.config/Code/User
   - mkdir -p ~/.config/fish
   - mkdir -p ~/.config/i3/scripts
-  - mkdir -p ~/.config/i3status
+  - mkdir -p ~/.config/i3blocks/scripts
   - mkdir -p ~/.config/mpv
   - mkdir -p ~/.config/mpv/scripts
   - mkdir -p ~/.gnupg
@@ -18,7 +18,7 @@
   - '~/.config/Code/User'
   - '~/.config/fish'
   - '~/.config/i3'
-  - '~/.config/i3status'
+  - '~/.config/i3blocks'
   - '~/.config/mpv'
   - '~/.gnupg'
 
@@ -42,7 +42,8 @@
     ~/.config/fish/config.fish: config/fish/config.fish
     ~/.config/i3/config: config/i3/config
     ~/.config/i3/scripts/nala.sh: config/i3/scripts/nala.sh
-    ~/.config/i3status/config: config/i3status/config
+    ~/.config/i3blocks/config: config/i3blocks/config
+    ~/.config/i3blocks/scripts: config/i3blocks/scripts
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
     ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
     ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
