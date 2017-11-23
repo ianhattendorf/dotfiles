@@ -10,6 +10,11 @@
 #command=~/.config/i3/scripts/audio1.sh
 #color=#f19950
 
+[volume-pulseaudio]
+command=$SCRIPT_DIR/$BLOCK_NAME -a
+interval=once
+signal=1
+
 [disk-root]
 label=
 command=df -h -P -l / | awk '/\/.*/ { print $4"/"$2; exit 0 }'
