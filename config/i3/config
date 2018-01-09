@@ -198,6 +198,19 @@ bindsym XF86AudioPause exec playerctl pause
 bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
+# scrot
+bindsym Print exec gnome-screenshot
+# scrot - clipboard
+bindsym Control+Print exec gnome-screenshot -c
+# scrot - select window
+bindsym Mod1+Print exec gnome-screenshot -w
+# scrot - select window clipboard
+bindsym Control+Mod1+Print exec gnome-screenshot -w -c
+# scrot - select area
+bindsym Shift+Print exec gnome-screenshot -a
+# scrot - select area clipboard
+bindsym Control+Shift+Print exec gnome-screenshot -a -c
+
 # Resizing windows in i3 using keyboard only
 # https://unix.stackexchange.com/q/255344/150597
 
