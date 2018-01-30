@@ -10,3 +10,7 @@ insert_final_newline = true
 [*.{bash,coffee,js,json,jsx,rb,sh,toml,yml,yaml,yml.j2,yaml.j2,yml.example,yaml.example}]
 indent_style = space
 indent_size = 2
+
+[*.{py}]
+indent_style = space
+indent_size = 4
