@@ -13,7 +13,7 @@
 [volume-pulseaudio]
 command=$SCRIPT_DIR/$BLOCK_NAME -a
 interval=once
-signal=1
+signal=10
 
 [disk-root]
 label=
@@ -28,7 +28,7 @@ interval=30
 [temperature]
 label=
 command=/usr/local/libexec/i3blocks/temperature
-interval=10
+interval=30
 separator=false
 # color=#dcedc1
 # separator=true
@@ -36,27 +36,27 @@ separator=false
 [memory]
 label=
 command=/usr/local/libexec/i3blocks/memory
-interval=1
+interval=10
 separator=false
 # color=#dfe3ee
 
 [cpu_usage]
 label=
 command=mpstat 1 1 | awk '$3 ~ /CPU/ { for(i=1;i<=NF;++i) { if ($i ~ /%idle/) field=i } } $3 ~ /all/ { printf("%3d%%",100 - $field) }'
-interval=1
+interval=2
 separator=false
 min_width=100%
 
 [cpu_load]
 label=
 command=/usr/local/libexec/i3blocks/load_average
-interval=1
+interval=2
 # color=#00ff7f
 
 [bandwidth]
 label=
 command=/usr/local/libexec/i3blocks/bandwidth
-interval=1
+interval=2
 # color=#83d0c9
 min_width=IN 10K OUT 10K
 
@@ -66,12 +66,11 @@ command=/usr/local/libexec/i3blocks/battery
 interval=60
 
 [kb-lang]
-command=xkb-switch -p
+command=xkb-switch -p;xkb-switch -W
 label=
-# TODO event update?
-interval=1
+interval=persistent
 
 [time]
-command=date '+%d/%m/%Y %H:%M'
+command=while true; do date '+%d/%m/%Y %H:%M'; sleep $((60 - 10#$(date +%S) )); done 
 label=
-interval=1
+interval=persistent
