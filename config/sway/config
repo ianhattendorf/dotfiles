@@ -273,9 +273,10 @@ mode "$mode_gaps_outer" {
         bindsym Escape mode "default"
 }
 
-exec --no-startup-id feh --bg-fill /home/ian/Downloads/saitama-wallpaper.jpg
+# Sway handles wallpaper
+# exec --no-startup-id feh --bg-fill /home/ian/Downloads/saitama-wallpaper.jpg
 # nm-applet not currently supported
-exec --no-startup-id nm-applet
+# exec --no-startup-id nm-applet
 exec --no-startup-id swaymsg 'workspace $workspace1; exec firefox; workspace $workspace2; exec gnome-terminal; exec gnome-terminal; workspace $workspace1'
 exec --no-startup-id gpg2 --card-status # Will start gpg-agent
 
