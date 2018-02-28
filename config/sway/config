@@ -36,8 +36,7 @@ bindsym $mod+Return exec gnome-terminal
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-# Wayland is not yet supported by rofi
-# bindsym $mod+d exec --no-startup-id "rofi -show drun"
+bindsym $mod+d exec rofi -show drun
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -277,7 +276,10 @@ mode "$mode_gaps_outer" {
 # exec --no-startup-id feh --bg-fill /home/ian/Downloads/saitama-wallpaper.jpg
 # nm-applet not currently supported
 # exec --no-startup-id nm-applet
-exec --no-startup-id swaymsg 'workspace $workspace1; exec firefox; workspace $workspace2; exec gnome-terminal; exec gnome-terminal; workspace $workspace1'
+# swaymsg doesn't currently expand variables
+# see: https://github.com/swaywm/sway/issues/548
+# exec --no-startup-id swaymsg 'workspace $workspace1; exec firefox; workspace $workspace2; exec gnome-terminal; exec gnome-terminal; workspace $workspace1'
+exec --no-startup-id swaymsg "workspace ; exec firefox; workspace ; exec gnome-terminal; exec gnome-terminal; workspace "
 exec --no-startup-id gpg2 --card-status # Will start gpg-agent
 
 input "2:14:ETPS/2_Elantech_Touchpad" {
