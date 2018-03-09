@@ -36,8 +36,7 @@ bindsym $mod+Return exec gnome-terminal
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-# Wayland is not yet supported by rofi
-# bindsym $mod+d exec --no-startup-id "rofi -show drun"
+bindsym $mod+d exec rofi -show drun
 # There also is the (new) i3-dmenu-desktop which only displays applications
 # shipping a .desktop file. It is a wrapper around dmenu, so you need that
 # installed.
@@ -165,7 +164,7 @@ bar {
 }
 
 # Lock/Logout/Suspend/Hibernate/Reboot/Shutdown
-set $Locker i3lock && sleep 1
+set $Locker swaylock -f && sleep 1
 
 set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
 mode "$mode_system" {
@@ -201,17 +200,17 @@ bindsym XF86AudioNext exec playerctl next
 bindsym XF86AudioPrev exec playerctl previous
 
 # scrot
-bindsym Print exec gnome-screenshot
+bindsym Print exec swaygrab
 # scrot - clipboard
-bindsym Control+Print exec gnome-screenshot -c
+#bindsym Control+Print exec gnome-screenshot -c
 # scrot - select window
-bindsym Mod1+Print exec gnome-screenshot -w
+#bindsym Mod1+Print exec gnome-screenshot -w
 # scrot - select window clipboard
-bindsym Control+Mod1+Print exec gnome-screenshot -w -c
+#bindsym Control+Mod1+Print exec gnome-screenshot -w -c
 # scrot - select area
-bindsym Shift+Print exec gnome-screenshot -a
+#bindsym Shift+Print exec gnome-screenshot -a
 # scrot - select area clipboard
-bindsym Control+Shift+Print exec gnome-screenshot -a -c
+#bindsym Control+Shift+Print exec gnome-screenshot -a -c
 
 # Resizing windows in i3 using keyboard only
 # https://unix.stackexchange.com/q/255344/150597
@@ -277,7 +276,11 @@ mode "$mode_gaps_outer" {
 # exec --no-startup-id feh --bg-fill /home/ian/Downloads/saitama-wallpaper.jpg
 # nm-applet not currently supported
 # exec --no-startup-id nm-applet
-exec --no-startup-id swaymsg 'workspace $workspace1; exec firefox; workspace $workspace2; exec gnome-terminal; exec gnome-terminal; workspace $workspace1'
+# swaymsg doesn't currently expand variables
+# see: https://github.com/swaywm/sway/issues/548
+# exec --no-startup-id swaymsg 'workspace $workspace1; exec firefox; workspace $workspace2; exec gnome-terminal; exec gnome-terminal; workspace $workspace1'
+exec swaymsg 'workspace '
+exec firefox
 exec --no-startup-id gpg2 --card-status # Will start gpg-agent
 
 input "2:14:ETPS/2_Elantech_Touchpad" {
