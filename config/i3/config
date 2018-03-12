@@ -274,5 +274,6 @@ mode "$mode_gaps_outer" {
 exec --no-startup-id feh --bg-fill /home/ian/Downloads/saitama-wallpaper.jpg
 exec --no-startup-id ~/.config/i3/scripts/nala.sh
 exec --no-startup-id nm-applet
+exec --no-startup-id /usr/libexec/polkit-gnome-authentication-agent-1
 exec --no-startup-id i3-msg 'workspace $workspace1; exec firefox; workspace $workspace2; exec gnome-terminal; exec gnome-terminal; workspace $workspace1'
 exec --no-startup-id gpg2 --card-status # Will start gpg-agent

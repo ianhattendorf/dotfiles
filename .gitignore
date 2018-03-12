@@ -1,3 +1,7 @@
+# Intellij
+.idea
+cmake-build-*/
+
 ## generic files to ignore ##
 *~
 *.lock
