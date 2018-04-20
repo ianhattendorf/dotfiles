@@ -65,6 +65,11 @@ label=
 command=/usr/local/libexec/i3blocks/battery
 interval=60
 
+[optimus]
+label=
+command=awk '{print $2}' /proc/acpi/bbswitch
+interval=2
+
 [kb-lang]
 command=xkb-switch -p;xkb-switch -W
 label=
