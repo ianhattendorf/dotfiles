@@ -271,6 +271,7 @@ mode "$mode_gaps_outer" {
         bindsym Escape mode "default"
 }
 
+exec --no-startup-id compton -b --backend glx --vsync opengl-swc --glx-no-stencil --glx-no-rebind-pixmap --glx-swap-method 3
 exec --no-startup-id feh --bg-fill /home/ian/Downloads/saitama-wallpaper.jpg
 exec --no-startup-id ~/.config/i3/scripts/nala.sh
 exec --no-startup-id nm-applet
