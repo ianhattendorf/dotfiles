@@ -44,6 +44,7 @@
     ~/.config/i3/config: config/i3/config
     ~/.config/sway/config: config/sway/config
     ~/.config/i3/scripts/nala.sh: config/i3/scripts/nala.sh
+    ~/.config/i3/scripts/work-vm.sh: config/i3/scripts/work-vm.sh
     ~/.config/i3blocks/config: config/i3blocks/config
     ~/.config/i3blocks/scripts: config/i3blocks/scripts
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
