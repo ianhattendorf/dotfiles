@@ -22,7 +22,7 @@
 	d = diff --color-words
 	dh = diff --color-words head
 	# Show the diff between the latest commit and the current state
-	dlc = !"git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
+	dlc = "!git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
 	st = status -sb
 	incoming = "!git remote update -p; git log ..@{u}"
 	outgoing = log @{u}..
@@ -40,3 +40,5 @@
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
 	required = true
+[gc]
+	autoDetach = false
