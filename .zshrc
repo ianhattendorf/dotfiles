@@ -12,3 +12,14 @@ EOBUNDLES
 antigen theme bira
 
 antigen apply
+
+# Start WM if on tty1
+if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
+  short_hostname=`hostname --short`
+  if [ "$short_hostname" = 'nala' ]; then
+    exec sway
+  else
+    exec startx
+  fi
+fi
+

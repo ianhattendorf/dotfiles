@@ -40,6 +40,7 @@
     ~/.rpmmacros: .rpmmacros
     ~/.vim/colors/seoul256.vim: .vim/colors/seoul256.vim
     ~/.vimrc: .vimrc
+    ~/.Xclients: .Xclients
     ~/.zshrc: .zshrc
     ~/.config/Code/User/settings.json: config/Code/User/settings.json
     ~/.config/fish/config.fish: config/fish/config.fish

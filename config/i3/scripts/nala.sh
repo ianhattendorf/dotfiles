@@ -1,6 +1,6 @@
 #!/bin/sh
 
-HOSTNAME=`hostname`
+HOSTNAME=`hostname --short`
 
 if [ "$HOSTNAME" = 'nala' ]; then
   # get touchpad xinput id
