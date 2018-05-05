@@ -273,7 +273,7 @@ mode "$mode_gaps_outer" {
 }
 
 # Sway handles wallpaper
-# exec --no-startup-id feh --bg-fill /home/ian/Downloads/saitama-wallpaper.jpg
+output "*" background ~/Pictures/wallpaper.png
 # nm-applet not currently supported
 # exec --no-startup-id nm-applet
 # swaymsg doesn't currently expand variables
