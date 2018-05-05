@@ -12,7 +12,7 @@
   - mkdir -p ~/.config/mpv
   - mkdir -p ~/.config/mpv/scripts
   - mkdir -p ~/.gnupg
-  - sh -c 'if [ "$HOSTNAME" = ''nala'' ]; then echo ''hwdec=vaapi''; else echo ''hwdec=auto''; fi > ~/.config/mpv/hwdec.conf'
+  - sh mpv-hwdec.sh
   - sh antigen-install.sh 2.2.3
 
 - clean:
