@@ -1,0 +1,18 @@
+#!/bin/sh
+
+if [ -f /proc/acpi/bbswitch ]; then
+  # bbswitch
+  awk '{print $2}' /proc/acpi/bbswitch
+else
+  # PRIME
+  # NOTE: grep command needs to be allowed passwordless sudo access
+  # user ALL=(root) NOPASSWD: /usr/bin/grep -q DynOff /sys/kernel/debug/vgaswitcheroo/switch
+  # Probably should handle case where vgaswitcheroo doesn't exist
+  if sudo grep -q DynOff /sys/kernel/debug/vgaswitcheroo/switch; then
+    echo OFF
+  else
+    echo ON
+  fi
+fi
+
+
