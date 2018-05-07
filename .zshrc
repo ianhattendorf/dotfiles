@@ -17,7 +17,8 @@ antigen apply
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   short_hostname=`hostname --short`
   if [ "$short_hostname" = 'nala' ]; then
-    exec sway
+    # Default to i3/X11 until Sway v1.0
+    exec startx
   else
     exec startx
   fi
