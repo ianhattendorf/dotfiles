@@ -11,6 +11,7 @@
   - mkdir -p ~/.config/i3blocks/scripts
   - mkdir -p ~/.config/mpv
   - mkdir -p ~/.config/mpv/scripts
+  - mkdir -p ~/.config/dunst
   - mkdir -p ~/.gnupg
   - sh mpv-hwdec.sh
   - sh antigen-install.sh 2.2.3
@@ -44,6 +45,7 @@
     ~/.zshrc: .zshrc
     ~/.zshenv: .zshenv
     ~/.config/Code/User/settings.json: config/Code/User/settings.json
+    ~/.config/dunst/dunstrc: config/dunst/dunstrc
     ~/.config/fish/config.fish: config/fish/config.fish
     ~/.config/i3/config: config/i3/config
     ~/.config/sway/config: config/sway/config
