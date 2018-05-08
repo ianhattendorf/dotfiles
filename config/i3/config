@@ -163,7 +163,7 @@ bar {
 }
 
 # Lock/Logout/Suspend/Hibernate/Reboot/Shutdown
-set $Locker i3lock && sleep 1
+set $Locker ~/bin/betterlockscreen -u ~/Pictures/wallpaper.png && i3lock -ef -i ~/.cache/i3lock/resized.png && sleep 1
 
 set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
 mode "$mode_system" {
