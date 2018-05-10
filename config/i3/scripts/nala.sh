@@ -8,6 +8,6 @@ if [ "$HOSTNAME" = 'nala' ]; then
   # set touchpad Tapping Enabled
   xinput set-prop $TOUCHPAD_ID 'libinput Tapping Enabled' 1
   # launch compton
-  compton -b --backend glx --vsync opengl-swc --glx-no-stencil --glx-no-rebind-pixmap --glx-swap-method 0
+  compton -b --backend glx --vsync opengl-swc --glx-no-stencil --glx-no-rebind-pixmap --glx-swap-method 0 --fading --no-fading-openclose --dbus
 fi
 
