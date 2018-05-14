@@ -230,6 +230,7 @@ hide_edge_borders smart
 
 new_window pixel 3
 
+exec --no-startup-id /usr/libexec/polkit-mate-authentication-agent-1
 exec --no-startup-id feh --bg-fill /home/ian/Pictures/wallpaper.png
 exec --no-startup-id ~/.config/i3/scripts/nala.sh
 exec --no-startup-id ~/.config/i3/scripts/work-vm.sh
