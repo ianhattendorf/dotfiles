@@ -242,5 +242,5 @@ exec --no-startup-id pasystray
 exec --no-startup-id i3-msg 'workspace $workspace1; exec firefox; workspace $workspace2; exec gnome-terminal; exec gnome-terminal; workspace $workspace1'
 # Will start gpg-agent
 # Use instead of gpg-connect-agent to initialize smart card support
-exec --no-startup-id gpg2 --card-status 1>/dev/null
+exec --no-startup-id gpg2 --batch --card-status 1>/dev/null
 
