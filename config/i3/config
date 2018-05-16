@@ -181,7 +181,9 @@ mode "$mode_system" {
 
 bindsym $mod+Pause mode "$mode_system"
 
-exec --no-startup-id xautolock -time 10 -locker "$Locker" -notify 30 -notifier "notify-send -u critical -t 10000 -- 'LOCKING screen in 30 seconds'"
+exec --no-startup-id xss-lock -n 'notify-send -u critical -t 14000 -- "LOCKING screen in 15 seconds"' -- /usr/bin/i3-locker
+exec --no-startup-id xset s 285 15
+exec --no-startup-id xset dpms 240 330 360
 
 # Pulse Audio controls
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% && pkill -RTMIN+10 i3blocks
