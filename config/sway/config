@@ -84,7 +84,8 @@ input "2:14:ETPS/2_Elantech_Touchpad" {
     # Despite the name, also works for non-floating windows.
     # Change normal to inverse to use left mouse button for resizing and right
     # mouse button for dragging.
-    floating_modifier $mod normal
+    # TODO floating_modifier not currently supported by Sway 1.0-alpha
+    #floating_modifier $mod normal
 
     # reload the configuration file
     bindsym $mod+Shift+c reload
