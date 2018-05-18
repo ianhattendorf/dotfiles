@@ -243,12 +243,8 @@ bindsym Print exec swaygrab
 #
 # Read `man 5 sway-bar` for more information about this section.
 bar {
-    position top
-    colors {
-        statusline #ffffff
-        background #323232
-        inactive_workspace #32323200 #32323200 #5c5c5c
-    }
+    status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
+    separator_symbol "|"
 }
 
 exec gpg2 --batch --card-status # Will start gpg-agent
