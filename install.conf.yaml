@@ -30,6 +30,7 @@
     ~/.bash_profile: .bash_profile
     ~/.bashrc: .bashrc
     ~/.editorconfig: .editorconfig
+    ~/.emacs.el: .emacs.el
     ~/.gemrc: .gemrc
     ~/.gitconfig: .gitconfig
     ~/.gitignore: .gitignore
