@@ -9,9 +9,9 @@
   - mkdir -p ~/.config/fish
   - mkdir -p ~/.config/i3/scripts
   - mkdir -p ~/.config/i3blocks/scripts
-  - mkdir -p ~/.config/mpv
   - mkdir -p ~/.config/mpv/scripts
   - mkdir -p ~/.config/dunst
+  - mkdir -p ~/.emacs.d
   - mkdir -p ~/.gnupg
   - sh mpv-hwdec.sh
   - sh antigen-install.sh 2.2.3
@@ -22,15 +22,20 @@
   - '~/.config/Code/User'
   - '~/.config/fish'
   - '~/.config/i3'
+  - '~/.config/i3/scripts'
   - '~/.config/i3blocks'
+  - '~/.config/i3blocks/scripts'
   - '~/.config/mpv'
+  - '~/.config/mpv/scripts'
+  - '~/.config/dunst'
+  - '~/.emacs.d'
   - '~/.gnupg'
 
 - link:
     ~/.bash_profile: .bash_profile
     ~/.bashrc: .bashrc
     ~/.editorconfig: .editorconfig
-    ~/.emacs.el: .emacs.el
+    ~/.emacs.d/init.el: .emacs.d/init.el
     ~/.gemrc: .gemrc
     ~/.gitconfig: .gitconfig
     ~/.gitignore: .gitignore
