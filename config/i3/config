@@ -158,8 +158,7 @@ bindsym $mod+r mode "resize"
 
 # Start i3bar to display a workspace bar
 bar {
-        status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
-	separator_symbol "|"
+	status_command i3status
 }
 
 # Lock/Logout/Suspend/Hibernate/Reboot/Shutdown
