@@ -259,5 +259,27 @@
 
 ;;; Magit
 (use-package magit
+  :bind (
+	 ("C-x g" . magit-status)
+	 )
   :ensure t
+  :config
+  ; Yubikey support
+  (setq magit-process-password-prompt-regexps
+      '("^\\(Enter \\)?[Pp]assphrase\\( for \\(RSA \\)?key '.*'\\)?: ?$"
+        ;; match-group 99 is used to identify a host
+        "^\\(Enter \\)?[Pp]assword\\( for '\\(?99:.*\\)'\\)?: ?$"
+        "^.*'s password: ?$"
+        "^Yubikey for .*: ?$"
+        "^Enter PIN for '.*': ?$"))
+  )
+
+;;; Magit Repositories
+(use-package magit-repos
+  :defer t
+  :config
+  (setq magit-repository-directories '(
+				       ("~/dotfiles" . 0)
+				       ("~/dev/repos" . 1)
+				       ))
   )
