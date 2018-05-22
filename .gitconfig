@@ -29,6 +29,8 @@
 
 [push]
 	default = simple
+[pull]
+	rebase = preserve
 [gpg]
 	program = gpg2
 [commit]
