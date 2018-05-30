@@ -1,6 +1,8 @@
-;;; package --- Summary
+;;; init.el --- Initialization file for Emacs
 
 ;;; Commentary:
+
+;; Emacs startup file
 
 ;;; Code:
 
@@ -283,3 +285,6 @@
 				       ("~/dev/repos" . 1)
 				       ))
   )
+
+(provide 'init)
+;;; init.el ends here
