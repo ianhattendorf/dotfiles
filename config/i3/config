@@ -239,6 +239,7 @@ exec --no-startup-id ~/.config/i3/scripts/work-vm.sh
 exec --no-startup-id nm-applet
 exec --no-startup-id pasystray
 exec --no-startup-id i3-msg 'workspace $workspace1; exec firefox; workspace $workspace2; exec gnome-terminal; exec gnome-terminal; workspace $workspace3; exec emacs; workspace $workspace4; exec evolution; workspace $workspace1'
+exec --no-startup-id /usr/libexec/gsd-clipboard # gnome-screenshot requires this
 # Will start gpg-agent
 # Use instead of gpg-connect-agent to initialize smart card support
 exec --no-startup-id gpg2 --batch --card-status 1>/dev/null
