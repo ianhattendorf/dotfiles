@@ -180,6 +180,7 @@
   (setq company-idle-delay 0)
   (add-to-list 'company-backends 'company-ansible)
   (add-to-list 'company-backends 'company-rtags)
+  (add-to-list 'company-backends 'company-jedi)
 
   ;; Delete unused backends
   (setq company-backends (delete 'company-bbdb company-backends))
@@ -197,6 +198,13 @@
 
 (use-package company-ansible
   :ensure t
+  )
+
+(use-package company-jedi
+  :ensure t
+  :config
+  (setq jedi:environment-virtualenv
+	(list "virtualenv-3" "--system-site-packages"))
   )
 
 ;;; flycheck
