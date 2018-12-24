@@ -1,0 +1,15 @@
+#/bin/sh
+
+if [ -z "$SWAYSOCK" ]; then
+  # X11
+  xkb-switch -p
+else
+  # Sway
+  swaymsg -t get_inputs | grep -q Brazil
+
+  if [ $? -eq 0 ]; then
+    echo 'br'
+  else
+    echo 'us'
+  fi
+fi

@@ -66,9 +66,9 @@ command=$SCRIPT_DIR/$BLOCK_NAME
 interval=2
 
 [kb-lang]
-command=xkb-switch -p;xkb-switch -W
+command=$SCRIPT_DIR/$BLOCK_NAME
 label=
-interval=persistent
+interval=2
 
 [time]
 command=while true; do date '+%d/%m/%Y %H:%M'; sleep $((60 - 10#$(date +%S) )); done 
