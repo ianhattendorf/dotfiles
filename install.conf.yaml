@@ -11,7 +11,7 @@
   - mkdir -p ~/.config/i3blocks/scripts
   - mkdir -p ~/.config/mpv/scripts
   - mkdir -p ~/.config/dunst
-  - mkdir -p ~/.emacs.d
+  - mkdir -p ~/.emacs.d/user-lisp
   - mkdir -p ~/.gnupg
   - sh mpv-hwdec.sh
   - sh antigen-install.sh 2.2.3
@@ -29,6 +29,7 @@
   - '~/.config/mpv/scripts'
   - '~/.config/dunst'
   - '~/.emacs.d'
+  - '~/.emacs.d/user-lisp'
   - '~/.gnupg'
 
 - link:
@@ -36,6 +37,7 @@
     ~/.bashrc: .bashrc
     ~/.editorconfig: .editorconfig
     ~/.emacs.d/init.el: .emacs.d/init.el
+    ~/.emacs.d/user-lisp/setup-ligatures.el: .emacs.d/user-lisp/setup-ligatures.el
     ~/.gemrc: .gemrc
     ~/.gitconfig: .gitconfig
     ~/.gitignore: .gitignore
