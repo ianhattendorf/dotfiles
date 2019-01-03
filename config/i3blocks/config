@@ -50,7 +50,7 @@ interval=2
 
 [bandwidth]
 label=
-command=/usr/local/libexec/i3blocks/bandwidth
+command=$SCRIPT_DIR/$BLOCK_NAME
 interval=2
 # color=#83d0c9
 min_width=IN 10K OUT 10K
@@ -71,6 +71,6 @@ label=
 interval=2
 
 [time]
-command=while true; do date '+%d/%m/%Y %H:%M'; sleep $((60 - 10#$(date +%S) )); done 
+command=while true; do date '+%d/%m/%Y %H:%M'; sleep $((60 - 10#$(date +%S) )); done
 label=
 interval=persistent
