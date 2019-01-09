@@ -112,7 +112,7 @@
   ;; (add-hook 'before-save-hook #'whitespace-cleanup)
   :config
   (setq whitespace-line-column 120)
-  (setq whitespace-style '(face spaces tabs space-mark tab-mark empty trailing lines-tail))
+  (setq whitespace-style '(face tabs tab-mark empty trailing lines-tail))
   )
 
 ;;; Projectile
