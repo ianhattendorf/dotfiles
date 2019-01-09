@@ -101,9 +101,7 @@
          ("<C-s-right>" . buf-move-right)))
 
 (use-package whitespace
-  :init
-  (dolist (hook '(prog-mode-hook text-mode-hook))
-    (add-hook hook #'whitespace-mode))
+  :hook ((prog-mode text-mode) . whitespace-mode)
   :config
   (setq whitespace-line-column 120)
   (setq whitespace-style '(face tabs tab-mark empty trailing lines-tail)))
@@ -139,9 +137,7 @@
 (use-package neotree
   :defer t
   :ensure t
-  :bind (
-         ("<f7>" . neotree-project-dir)
-         )
+  :bind ("<f7>" . neotree-project-dir)
   :config
   (setq neo-autorefresh nil))
 
