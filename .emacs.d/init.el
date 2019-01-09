@@ -75,15 +75,8 @@
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
 
 (setq package-archive-priorities
-      '(("melpa-stable" . 100)
-	("melpa" . 10)))
-
-(setq package-pinned-packages
-      '(
-	(use-package . "melpa")
-        (web-mode . "melpa")
-        (forge . "melpa")
-	))
+      '(("melpa-stable" . 10)
+	      ("melpa" . 100)))
 
 (package-initialize)
 
