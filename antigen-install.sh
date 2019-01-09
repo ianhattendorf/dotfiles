@@ -6,6 +6,11 @@ then
   exit 1
 fi
 
+if [ `uname` == 'Darwin' ]; then
+  >&2 echo "Not available on macOS"
+  exit 0
+fi
+
 antigen_version="$1"
 antigen_dir="$HOME/bin"
 

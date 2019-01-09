@@ -4,8 +4,13 @@ set -eu
 
 if [ "$#" -ne 1 ]
 then
-  echo "Usage: $0 <version>"
+  >&2 echo "Usage: $0 <version>"
   exit 1
+fi
+
+if [ `uname` == 'Darwin' ]; then
+  >&2 echo "Not available on macOS"
+  exit 0
 fi
 
 version="$1"

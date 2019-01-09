@@ -1,0 +1,8 @@
+[user]
+	name = Ian Hattendorf
+	email = ian@ianhattendorf.com
+	signingKey = 97923DF85C294A7AE4058B253A7EA46F568616DC
+[tag]
+	forceSignAnnotated = true
+[commit]
+	gpgSign = true

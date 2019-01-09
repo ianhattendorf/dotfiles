@@ -16,6 +16,7 @@
   - sh mpv-hwdec.sh
   - sh antigen-install.sh 2.2.3
   - sh betterlockscreen-install.sh update-cache
+  - sh gitconfig-local.sh
 
 - clean:
   - '~'
@@ -35,7 +36,6 @@
 - link:
     ~/.bash_profile: .bash_profile
     ~/.bashrc: .bashrc
-    ~/.editorconfig: .editorconfig
     ~/.emacs.d/init.el: .emacs.d/init.el
     ~/.emacs.d/user-lisp/setup-ligatures.el: .emacs.d/user-lisp/setup-ligatures.el
     ~/.gemrc: .gemrc
