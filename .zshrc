@@ -13,6 +13,10 @@ antigen theme bira
 
 antigen apply
 
+if [ -f ~/.cargo/env ]; then
+  . ~/.cargo/env
+fi
+
 # Start WM if on tty1
 if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
   exec startx
