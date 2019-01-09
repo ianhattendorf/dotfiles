@@ -57,10 +57,17 @@ function initOs {
   case `uname` in
     Darwin)
       macOsPathSetup
+
+      export SSH_AUTH_SOCK=$HOME/.gnupg/S.gpg-agent.ssh
+      gpg-connect-agent updatestartuptty /bye > /dev/null
+
       initAntigen /usr/local/share/antigen/antigen.zsh
       ;;
     Linux)
+      export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+
       initAntigen ~/bin/antigen-2.2.3.zsh
+
       # Start i3 on tty1, Sway on tty2
       if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
         exec startx

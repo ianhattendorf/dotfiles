@@ -21,6 +21,12 @@
 (if (fboundp 'mac-auto-operator-composition-mode)
     (mac-auto-operator-composition-mode))
 
+(if (eq system-type 'darwin)
+    (setenv "SSH_AUTH_SOCK"
+            (concat
+             (getenv "HOME")
+             "/.gnupg/S.gpg-agent.ssh")))
+
 ;;; Fira Code ligatures (requires Fira Code Symbol font, see: https://github.com/tonsky/FiraCode/issues/211#issuecomment-239058632)
 (require 'setup-ligatures)
 
