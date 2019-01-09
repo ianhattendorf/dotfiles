@@ -137,6 +137,7 @@
       (message "Could not find git project root."))))
 
 (use-package neotree
+  :defer t
   :ensure t
   :bind (
          ("<f7>" . neotree-project-dir)
@@ -166,6 +167,7 @@
 
 (use-package counsel
   :ensure t
+  :after ivy
   :config
   (counsel-mode 1)
   (if (executable-find "rg")
@@ -226,6 +228,7 @@
   (setq sh-basic-offset 2))
 
 (use-package markdown-mode
+  :defer t
   :ensure t
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
@@ -233,16 +236,19 @@
   :init (setq markdown-command "multimarkdown"))
 
 (use-package yaml-mode
+  :defer t
   :ensure t
   :mode (".yml" ".yaml"))
 
 (use-package json-mode
+  :defer t
   :ensure t
   :mode (".json"))
 
 ; Disabled, https://github.com/wentasah/meson-mode/issues/16
 (use-package meson-mode
   :disabled
+  :defer t
   :ensure t
   :mode "\\meson\\.build\\'"
   :hook (meson-mode . company-mode))
@@ -301,6 +307,7 @@
   (setq js-indent-level 2))
 
 (use-package web-mode
+  :defer t
   :ensure t
   :mode ("\\.jsx?\\'" "\\.hbs\\'")
   :config
@@ -336,6 +343,7 @@
   (rtags-enable-standard-keybindings))
 
 (use-package rpm-spec-mode
+  :defer t
   :ensure t)
 
 (use-package diff-hl
