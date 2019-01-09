@@ -215,6 +215,10 @@
 (use-package flyspell-correct-ivy
   :ensure t)
 
+(use-package flymake
+  :bind (("M-n" . flymake-goto-next-error)
+         ("M-p" . flymake-goto-prev-error)))
+
 (use-package yasnippet
   :ensure t
   :config
@@ -245,62 +249,58 @@
   :ensure t
   :mode (".json"))
 
-; Disabled, https://github.com/wentasah/meson-mode/issues/16
 (use-package meson-mode
-  :disabled
   :defer t
   :ensure t
-  :mode "\\meson\\.build\\'"
-  :hook (meson-mode . company-mode))
+  :mode "\\meson\\.build\\'")
+
+(use-package cmake-mode
+  :defer t
+  :ensure t)
+
+(use-package go-mode
+  :defer t
+  :ensure t)
 
 (use-package company
   :ensure t
+  :hook (prog-mode . company-mode)
   :config
-  (global-company-mode)
-  (setq company-idle-delay 0)
   (add-to-list 'company-backends 'company-ansible)
-  (add-to-list 'company-backends 'company-rtags)
-  (add-to-list 'company-backends 'company-jedi)
-  (add-to-list 'company-backends 'company-flow)
-
   ;; Delete unused backends
-  (setq company-backends (delete 'company-bbdb company-backends))
-  (setq company-backends (delete 'company-clang company-backends))
-  (setq company-backends (delete 'company-eclim company-backends))
-  (setq company-backends (delete 'company-oddmuse company-backends))
-  (setq company-backends (delete 'company-xcode company-backends))
-
-  (define-key company-mode-map (kbd "C-;") #'company-complete))
-
-(use-package company-rtags
-  :ensure t)
+  (setq company-backends
+        (cl-set-difference
+         company-backends
+         '(company-bbdb
+           company-clang
+           company-eclim
+           company-oddmuse
+           company-xcode))))
 
 (use-package company-ansible
   :ensure t)
 
-(use-package company-jedi
+(use-package eglot
   :ensure t
-  :config
-  (setq jedi:environment-virtualenv
-        (list "virtualenv-3" "--system-site-packages")))
+  :bind ("C-c C-f" . eglot-format)
+  :hook ((rust-mode . eglot-ensure)
+         (c-mode . eglot-ensure)
+         (c++-mode . eglot-ensure)))
 
-(use-package flycheck
+(use-package rust-mode
+  :defer t
   :ensure t
-  :config
-  (global-flycheck-mode)
-  (use-package flycheck-rtags
-    :config
-    (defun my-flycheck-rtags-setup ()
-      "Configure flycheck-rtags for better experience."
-      (flycheck-select-checker 'rtags)
-      (setq-local flycheck-check-syntax-automatically nil)
-      (setq-local flycheck-highlighting-mode nil))
-    (add-hook 'c-mode-hook #'my-flycheck-rtags-setup)
-    (add-hook 'c++-mode-hook #'my-flycheck-rtags-setup)
-    (add-hook 'objc-mode-hook #'my-flycheck-rtags-setup)))
+  :mode ("\\.rs\\'" . rust-mode))
 
-(use-package flycheck-rtags
-  :ensure t)
+(use-package toml-mode
+  :defer t
+  :ensure t
+  :mode ("\\.toml\\'" . toml-mode))
+
+(use-package cargo
+  :defer t
+  :ensure t
+  :hook (rust-mode . cargo-minor-mode))
 
 (use-package js
   :config
@@ -321,26 +321,10 @@
   (add-to-list 'web-mode-indentation-params '("lineup-quotes" . nil))
   (add-to-list 'web-mode-indentation-params '("case-extra-offset" . nil)))
 
-(use-package clang-format
-  :ensure t
-  :config
-  (setq clang-format-style-option "file")
-  (use-package cc-mode
-    :config
-    (define-key c-mode-base-map (kbd "C-c C-f") 'clang-format-region)))
-
 (use-package modern-cpp-font-lock
   :ensure t
   :config
   (modern-c++-font-lock-global-mode t))
-
-(use-package rtags
-  :ensure t
-  :config
-  (setq rtags-autostart-diagnostics t)
-  (rtags-diagnostics)
-  (setq rtags-completions-enabled t)
-  (rtags-enable-standard-keybindings))
 
 (use-package rpm-spec-mode
   :defer t
