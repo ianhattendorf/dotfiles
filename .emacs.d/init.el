@@ -17,7 +17,7 @@
 
 ;; Enable ligature support on MacOS (mituharu fork only)
 (if (fboundp 'mac-auto-operator-composition-mode)
-    (mac-auto-operator-composition-mode))
+  (mac-auto-operator-composition-mode))
 
 ;;; Fira Code ligatures (requires Fira Code Symbol font, see: https://github.com/tonsky/FiraCode/issues/211#issuecomment-239058632)
 
@@ -39,7 +39,7 @@
 ;; Increase GC size during init
 (setq gc-cons-threshold (* 64 1000 1000))
 (add-hook 'after-init-hook #'(lambda ()
-			       (setq gc-cons-threshold (car (get 'gc-cons-threshold 'standard-value)))))
+                               (setq gc-cons-threshold (car (get 'gc-cons-threshold 'standard-value)))))
 
 ;; Scratch customization
 (customize-set-variable 'initial-scratch-message nil)
@@ -75,8 +75,8 @@
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
 
 (setq package-archive-priorities
-      '(("melpa-stable" . 10)
-	      ("melpa" . 100)))
+  '(("melpa-stable" . 10)
+     ("melpa" . 100)))
 
 (package-initialize)
 
@@ -87,7 +87,6 @@
 ;;; use-package
 (eval-when-compile
   (require 'use-package))
-;(require 'diminish)
 (require 'bind-key)
 
 ;;; Theme
@@ -97,11 +96,11 @@
 (use-package buffer-move
   :ensure t
   :bind (
-	 ("<C-s-up>" . buf-move-up)
-	 ("<C-s-down>" . buf-move-down)
-	 ("<C-s-left>" . buf-move-left)
-	 ("<C-s-right>" . buf-move-right)
-	 )
+          ("<C-s-up>" . buf-move-up)
+          ("<C-s-down>" . buf-move-down)
+          ("<C-s-left>" . buf-move-left)
+          ("<C-s-right>" . buf-move-right)
+          )
   )
 
 ;;; whitespace-mode
@@ -137,21 +136,21 @@
   "Open NeoTree using the git root."
   (interactive)
   (let ((project-dir (projectile-project-root))
-        (file-name (buffer-file-name)))
+         (file-name (buffer-file-name)))
     (neotree-toggle)
     (if project-dir
-        (if (neo-global--window-exists-p)
-            (progn
-              (neotree-dir project-dir)
-              (neotree-find file-name)))
+      (if (neo-global--window-exists-p)
+        (progn
+          (neotree-dir project-dir)
+          (neotree-find file-name)))
       (message "Could not find git project root."))))
 
 ;;; NeoTree
 (use-package neotree
   :ensure t
   :bind (
-         ("<f7>" . neotree-project-dir)
-         )
+          ("<f7>" . neotree-project-dir)
+          )
   :config
   (setq neo-autorefresh nil)
   )
@@ -190,21 +189,21 @@
   :config
   (counsel-mode 1)
   (if (executable-find "rg")
-      ;; Use ripgrep instead of grep
-      (setq counsel-grep-base-command
-            "rg -i -M 120 --no-heading --line-number --color never '%s' %s"
-            counsel-rg-base-command
-            "rg -i -M 120 --no-heading --line-number --color never %s ."
-            )
+    ;; Use ripgrep instead of grep
+    (setq counsel-grep-base-command
+      "rg -i -M 120 --no-heading --line-number --color never '%s' %s"
+      counsel-rg-base-command
+      "rg -i -M 120 --no-heading --line-number --color never %s ."
+      )
     (warn "\nWARNING: Could not find ripgrep executable, defaulting to grep.")
     )
   )
 
 (use-package ivy
   :bind (
-	 ("C-c C-r" . ivy-resume)
-	 ("<f6>" . ivy-resume)
-	 )
+          ("C-c C-r" . ivy-resume)
+          ("<f6>" . ivy-resume)
+          )
   :config
   (setq ivy-use-virtual-buffers t)
   (setq ivy-count-format "(%d/%d) ")
@@ -212,9 +211,9 @@
 
 (use-package swiper
   :bind (
-	 ("C-s" . swiper)
-	 ("C-r" . swiper)
-	 )
+          ("C-s" . swiper)
+          ("C-r" . swiper)
+          )
   )
 
 ;;; Drag Stuff
@@ -228,10 +227,10 @@
 ;;; flyspell
 (use-package flyspell
   :bind (("<f8>" . flyspell-correct-word-generic)
-	 ("C-<f8>" . flyspell-correct-previous-word-generic)
-	 ("M-<f8>" . flyspell-check-next-highlighted-word))
+          ("C-<f8>" . flyspell-correct-previous-word-generic)
+          ("M-<f8>" . flyspell-check-next-highlighted-word))
   :hook ((text-mode . turn-on-flyspell)
-	 (prog-mode . flyspell-prog-mode))
+          (prog-mode . flyspell-prog-mode))
   :init
   (setq flyspell-issue-welcome-flag nil)
   (setq ispell-program-name "aspell")
@@ -266,8 +265,8 @@
 (use-package markdown-mode
   :ensure t
   :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
+          ("\\.md\\'" . markdown-mode)
+          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown")
   )
 
@@ -325,7 +324,7 @@
   :ensure t
   :config
   (setq jedi:environment-virtualenv
-	(list "virtualenv-3" "--system-site-packages"))
+    (list "virtualenv-3" "--system-site-packages"))
   )
 
 ;;; flycheck
@@ -352,7 +351,7 @@
 
 ;;; todo/fixme/etc. highlighting
 (font-lock-add-keywords 'prog-mode
-			'(("\\<\\(FIXME\\|TODO\\|BUG\\|XXX\\)" 1 font-lock-warning-face prepend)))
+  '(("\\<\\(FIXME\\|TODO\\|BUG\\|XXX\\)" 1 font-lock-warning-face prepend)))
 
 ;; ;; tide
 ;; (use-package tide
@@ -360,8 +359,8 @@
 ;;   :after (typescript-mode company flycheck)
 ;;   :hook ((typescript-mode . tide-setup)
 ;;          (typescript-mode . tide-hl-identifier-mode)
-;; 	 (js2-mode . tide-setup)
-;; 	 (rjsx-mode . tide-setup)
+;;     (js2-mode . tide-setup)
+;;     (rjsx-mode . tide-setup)
 ;;          (before-save . tide-format-before-save))
 ;;   )
 
@@ -441,27 +440,27 @@
 ;;; Magit
 (use-package magit
   :bind (
-	 ("C-x g" . magit-status)
-	 )
+          ("C-x g" . magit-status)
+          )
   :ensure t
   :config
-  ; Yubikey support
+                                        ; Yubikey support
   (setq magit-process-password-prompt-regexps
-      '("^\\(Enter \\)?[Pp]assphrase\\( for \\(RSA \\)?key '.*'\\)?: ?$"
-        ;; match-group 99 is used to identify a host
-        "^\\(Enter \\)?[Pp]assword\\( for '\\(?99:.*\\)'\\)?: ?$"
-        "^.*'s password: ?$"
-        "^Yubikey for .*: ?$"
-        "^Enter PIN for '.*': ?$"))
+    '("^\\(Enter \\)?[Pp]assphrase\\( for \\(RSA \\)?key '.*'\\)?: ?$"
+       ;; match-group 99 is used to identify a host
+       "^\\(Enter \\)?[Pp]assword\\( for '\\(?99:.*\\)'\\)?: ?$"
+       "^.*'s password: ?$"
+       "^Yubikey for .*: ?$"
+       "^Enter PIN for '.*': ?$"))
   )
 
 ;;; Magit Repositories
 (use-package magit-repos
   :config
   (setq magit-repository-directories '(
-				       ("~/dotfiles" . 0)
-				       ("~/dev/repos" . 1)
-				       ))
+                                        ("~/dotfiles" . 0)
+                                        ("~/dev/repos" . 1)
+                                        ))
   )
 
 ;;; Magit Forge (wait until more mature)
@@ -483,27 +482,27 @@
 (defun toggle-window-split ()
   (interactive)
   (if (= (count-windows) 2)
-      (let* ((this-win-buffer (window-buffer))
-	     (next-win-buffer (window-buffer (next-window)))
-	     (this-win-edges (window-edges (selected-window)))
-	     (next-win-edges (window-edges (next-window)))
-	     (this-win-2nd (not (and (<= (car this-win-edges)
-					 (car next-win-edges))
-				     (<= (cadr this-win-edges)
-					 (cadr next-win-edges)))))
-	     (splitter
-	      (if (= (car this-win-edges)
-		     (car (window-edges (next-window))))
-		  'split-window-horizontally
-		'split-window-vertically)))
-	(delete-other-windows)
-	(let ((first-win (selected-window)))
-	  (funcall splitter)
-	  (if this-win-2nd (other-window 1))
-	  (set-window-buffer (selected-window) this-win-buffer)
-	  (set-window-buffer (next-window) next-win-buffer)
-	  (select-window first-win)
-	  (if this-win-2nd (other-window 1))))))
+    (let* ((this-win-buffer (window-buffer))
+            (next-win-buffer (window-buffer (next-window)))
+            (this-win-edges (window-edges (selected-window)))
+            (next-win-edges (window-edges (next-window)))
+            (this-win-2nd (not (and (<= (car this-win-edges)
+                                      (car next-win-edges))
+                                 (<= (cadr this-win-edges)
+                                   (cadr next-win-edges)))))
+            (splitter
+              (if (= (car this-win-edges)
+                    (car (window-edges (next-window))))
+                'split-window-horizontally
+                'split-window-vertically)))
+      (delete-other-windows)
+      (let ((first-win (selected-window)))
+        (funcall splitter)
+        (if this-win-2nd (other-window 1))
+        (set-window-buffer (selected-window) this-win-buffer)
+        (set-window-buffer (next-window) next-win-buffer)
+        (select-window first-win)
+        (if this-win-2nd (other-window 1))))))
 
 (global-set-key (kbd "C-x |") 'toggle-window-split)
 
