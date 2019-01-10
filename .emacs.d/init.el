@@ -266,6 +266,8 @@
 
 (use-package company
   :ensure t
+  :bind (:map company-mode-map
+              ("<C-tab>" . company-complete))
   :hook (prog-mode . company-mode)
   :config
   (add-to-list 'company-backends 'company-ansible)
@@ -282,9 +284,10 @@
 (use-package company-ansible
   :ensure t)
 
+;; rust: rustup add component rls rustfmt rust-src
+;; c/c++: ccls
 (use-package eglot
   :ensure t
-  :bind ("C-c C-f" . eglot-format)
   :hook ((rust-mode . eglot-ensure)
          (c-mode . eglot-ensure)
          (c++-mode . eglot-ensure)))
@@ -303,6 +306,15 @@
   :defer t
   :ensure t
   :hook (rust-mode . cargo-minor-mode))
+
+(use-package clang-format
+  :defer t
+  :ensure t
+  :config
+  (setq clang-format-style-option "file")
+  (use-package cc-mode
+    :bind (:map c++-mode-map
+                ("C-c C-f" . clang-format-region))))
 
 (use-package js
   :config
