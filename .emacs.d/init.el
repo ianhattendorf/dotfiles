@@ -30,6 +30,18 @@
 ;;; Fira Code ligatures (requires Fira Code Symbol font, see: https://github.com/tonsky/FiraCode/issues/211#issuecomment-239058632)
 (require 'setup-ligatures)
 
+(setq utf-translate-cjk-mode nil) ; disable CJK coding/encoding (Chinese/Japanese/Korean characters)
+(set-language-environment 'utf-8)
+(set-keyboard-coding-system 'utf-8-mac) ; For old Carbon emacs on OS X only
+(setq locale-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-selection-coding-system
+ (if (eq system-type 'windows-nt)
+     'utf-16-le  ;; https://rufflewind.com/2014-07-20/pasting-unicode-in-emacs-on-windows
+   'utf-8))
+(prefer-coding-system 'utf-8)
+
 ;; Avoid polluting init.el with customizations
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file :noerror)
@@ -207,7 +219,11 @@
          (prog-mode . flyspell-prog-mode))
   :init
   (setq flyspell-issue-welcome-flag nil)
-  (setq ispell-program-name "aspell")
+  (if (eq system-type 'windows-nt)
+      (progn (setq ispell-program-name "hunspell")
+             (setq ispell-really-hunspell t))
+    (setq ispell-program-name "aspell")
+    (setq ispell-really-aspell t))
   (defun flyspell-check-next-highlighted-word ()
     "Custom function to spell check next highlighted word"
     (interactive)
