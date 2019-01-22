@@ -68,11 +68,11 @@ function initOs {
 
       initAntigen ~/bin/antigen-2.2.3.zsh
 
-      # Start i3 on tty1, Sway on tty2
+      # Start Sway on tty1, i3 on tty2
       if [[ ! $DISPLAY && $XDG_VTNR -eq 1 ]]; then
-        exec startx
-      elif [[ ! $DISPLAY && $XDG_VTNR -eq 2 ]]; then
         exec sway
+      elif [[ ! $DISPLAY && $XDG_VTNR -eq 2 ]]; then
+        exec startx
       fi
       ;;
   esac
