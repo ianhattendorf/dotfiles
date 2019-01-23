@@ -2,3 +2,9 @@
 	email = ianh@axosoft.com
 	name = Ian Hattendorf
 	signingkey = 7CF87166E7ACE74A4636ADB36BD814063E969CD9
+[tag]
+	forceSignAnnotated = false
+[commit]
+	gpgSign = false
+[gpg]
+	program = gpg
