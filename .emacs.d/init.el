@@ -176,9 +176,18 @@
 
 (use-package smartparens
   :ensure t
+  :hook ((prog-mode text-mode) . smartparens-mode)
   :config
-  (use-package smartparens-config)
-  (smartparens-global-mode 1))
+  (sp-local-pair 'rust-mode "|" "|")
+  (dolist (start-pair '("{" "(" "["))
+    (sp-local-pair 'prog-mode start-pair nil :post-handlers '((my-create-newline-and-enter-sexp "RET"))))
+  (defun my-create-newline-and-enter-sexp (&rest _ignored)
+    "Open a new brace or bracket expression, with relevant newlines and indent."
+    (newline)
+    (indent-according-to-mode)
+    (forward-line -1)
+    (indent-according-to-mode))
+  (require 'smartparens-config))
 
 (use-package rainbow-delimiters
   :ensure t
