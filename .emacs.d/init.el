@@ -131,12 +131,27 @@
 
 (use-package projectile
   :ensure t
+  :bind (:map projectile-mode-map
+              ("s-p" . projectile-command-map)
+              ("C-c p" . projectile-command-map))
   :config
   (projectile-mode +1)
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  ;; Windows path
+  (when (eq system-type 'windows-nt)
+
+    ;; Make sure Unix tools are in front of `exec-path'
+    (let ((bash "C:\\Program Files\\Git\\usr\\bin\\bash.exe"))
+      (when (file-exists-p bash)
+        (push (file-name-directory bash) exec-path)))
+
+    ;; Update PATH from exec-path
+    (let ((path (mapcar 'file-truename
+                        (append exec-path
+                                (split-string (getenv "PATH") path-separator t)))))
+      (setenv "PATH" (mapconcat 'identity (delete-dups path) path-separator))))
   :custom
   (projectile-completion-system 'ivy)
+  (projectile-indexing-method 'alien)
   (projectile-enable-caching t))
 
 (use-package counsel-projectile
