@@ -20,7 +20,7 @@ set $menu rofi -show drun
 # Font
 font pango:Fira Mono, Font Awesome 12
 # Locker
-set $Locker swaylock -f && sleep 1
+set $Locker swaylock -s fill -i ~/Pictures/wallpaper.png --inside-color 00000033 --inside-ver-color 00000033 --ring-color ffffffff --ring-ver-color ffffffff --ring-wrong-color ffffffff --line-uses-inside --key-hl-color ebbe65ff --bs-hl-color ebbe65ff --separator-color 00000000 --text-ver-color ebbe65ff --indicator-thickness 4
 
 ### Output configuration
 #
@@ -227,7 +227,12 @@ mode "$mode_system" {
 
 bindsym $mod+Pause mode "$mode_system"
 
-exec --no-startup-id xautolock -time 10 -locker "$Locker" -notify 30 -notifier "notify-send -u critical -t 10000 -- 'LOCKING screen in 30 seconds'"
+exec swayidle \
+     timeout 270 'notify-send -u critical -t 10000 "Screen Lock" "LOCKING screen in 30 seconds"' \
+     timeout 300 "$Locker" \
+     timeout 330 'swaymsg "output * dpms off"' \
+     resume 'swaymsg "output * dpms on"' \
+     before-sleep "$Locker"
 
 # Pulse Audio controls
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% && pkill -RTMIN+10 i3blocks
