@@ -263,5 +263,6 @@ bar {
 exec /usr/libexec/lxqt-policykit-agent
 exec /usr/bin/gpg2 --batch --card-status 1>/dev/null # Will start gpg-agent
 exec /usr/bin/mako
+exec /usr/bin/udiskie
 
 include /etc/sway/config.d/*
