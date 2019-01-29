@@ -255,7 +255,8 @@ bar {
     separator_symbol "|"
 }
 
-exec gpg2 --batch --card-status # Will start gpg-agent
+exec /usr/libexec/lxqt-policykit-agent
+exec /usr/bin/gpg2 --batch --card-status 1>/dev/null # Will start gpg-agent
 exec /usr/bin/mako
 
 include /etc/sway/config.d/*

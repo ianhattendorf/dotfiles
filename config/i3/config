@@ -244,7 +244,7 @@ hide_edge_borders smart
 new_window pixel 3
 
 exec --no-startup-id seapplet
-exec --no-startup-id /usr/libexec/polkit-mate-authentication-agent-1
+exec --no-startup-id /usr/libexec/lxqt-policykit-agent
 exec --no-startup-id feh --bg-fill ~/Pictures/saitama-wallpaper.png
 exec --no-startup-id nm-applet
 exec --no-startup-id pasystray
@@ -253,4 +253,3 @@ exec --no-startup-id /usr/libexec/gsd-clipboard # gnome-screenshot requires this
 # Will start gpg-agent
 # Use instead of gpg-connect-agent to initialize smart card support
 exec --no-startup-id gpg2 --batch --card-status 1>/dev/null
-
