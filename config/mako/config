@@ -1,0 +1,8 @@
+font=DejaVu Sans Mono 11
+
+[hidden]
+format=(and %h more)
+
+[urgency=high]
+background-color=#ff0000
+border-color=#b80000

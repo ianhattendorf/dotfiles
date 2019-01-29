@@ -243,6 +243,9 @@ bindsym XF86AudioPrev exec playerctl previous
 # scrot
 bindsym Print exec swaygrab
 
+bindsym Ctrl+Space exec makoctl dismiss
+bindsym Ctrl+Shift+Space exec makoctl dismiss --all
+
 #
 # Status Bar:
 #
@@ -253,5 +256,6 @@ bar {
 }
 
 exec gpg2 --batch --card-status # Will start gpg-agent
+exec /usr/bin/mako
 
 include /etc/sway/config.d/*

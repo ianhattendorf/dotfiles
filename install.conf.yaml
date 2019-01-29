@@ -9,6 +9,7 @@
   - mkdir -p ~/.config/fish
   - mkdir -p ~/.config/i3/scripts
   - mkdir -p ~/.config/i3blocks/scripts
+  - mkdir -p ~/.config/mako
   - mkdir -p ~/.config/mpv/scripts
   - mkdir -p ~/.config/dunst
   - mkdir -p ~/.emacs.d/user-lisp
@@ -26,6 +27,7 @@
   - '~/.config/i3/scripts'
   - '~/.config/i3blocks'
   - '~/.config/i3blocks/scripts'
+  - '~/.config/mako'
   - '~/.config/mpv'
   - '~/.config/mpv/scripts'
   - '~/.config/dunst'
@@ -63,6 +65,7 @@
     ~/.config/i3/scripts/simba.sh: config/i3/scripts/simba.sh
     ~/.config/i3blocks/config: config/i3blocks/config
     ~/.config/i3blocks/scripts: config/i3blocks/scripts
+    ~/.config/mako/config: config/mako/config
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
     ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
     ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
