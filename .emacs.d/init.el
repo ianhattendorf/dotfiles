@@ -412,15 +412,70 @@
 ; Disabled (wait until more mature)
 (use-package forge
   :disabled
-  :ensure t
-  :config
-  (delete "~/.authinfo.gpg" auth-sources)
-  (add-to-list 'auth-sources "~/.authinfo.gpg"))
+  :ensure t)
+
+(use-package auth-source
+  :custom
+  (auth-sources '("~/.authinfo.gpg")))
 
 (use-package expand-region
   :ensure t
   :commands er/expand-region
   :bind ("C-=" . er/expand-region))
+
+(use-package alert
+  :ensure t
+  :custom
+  (alert-default-style (cond
+                        ((string-equal system-type "windows-nt") 'message)
+                        ((string-equal system-type "darwin") 'osx-notifier)
+                        ((string-equal system-type "gnu/linux") 'libnotify)))
+  :config
+  (alert "Some alert"))
+
+(use-package erc
+  :bind (:map erc-mode-map
+              ("C-c C-s" . erc-status-sidebar-toggle))
+  :preface
+  (defun my/erc-notify (nickname message)
+    "Displays a notification message for ERC."
+    (let* ((channel (buffer-name))
+           (nick (erc-hl-nicks-trim-irc-nick nickname))
+           (title (if (string-match-p (concat "^" nickname) channel)
+                      nick
+                    (concat nick " (" channel ")")))
+           (msg message))
+      (alert (concat nick ": " msg) :title title)))
+  :custom
+  (erc-autojoin-channels-alist '(("freenode.net" "#emacs")))
+  (erc-autojoin-timing 'ident)
+  (erc-fill-function 'erc-fill-static)
+  (erc-kill-buffer-on-part t)
+  (erc-kill-queries-on-quit t)
+  (erc-kill-server-buffer-on-quit t)
+  (erc-nick "ihattend")
+  (erc-prompt-for-nickserv-password nil)
+  (erc-prompt-for-password nil)
+  (erc-rename-buffers t)
+  (erc-server "chat.freenode.net")
+  (erc-track-exclude-types '("JOIN" "MODE" "NICK" "PART" "QUIT"
+                             "324" "329" "332" "333" "353" "477"))
+  :config
+  (add-to-list 'erc-modules 'spelling)
+  (erc-services-mode 1)
+  (erc-update-modules)
+  (use-package erc-hl-nicks
+    :ensure t)
+  (use-package erc-image
+    :ensure t
+    :config
+    (add-to-list 'erc-modules 'image)
+    (erc-update-modules))
+  (use-package erc-status-sidebar
+    :ensure t)
+  (use-package ercn
+    :ensure t
+    :hook (ercn-notify . my/erc-notify)))
 
 (defun toggle-window-split ()
   (interactive)
