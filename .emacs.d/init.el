@@ -429,9 +429,7 @@
   (alert-default-style (cond
                         ((string-equal system-type "windows-nt") 'message)
                         ((string-equal system-type "darwin") 'osx-notifier)
-                        ((string-equal system-type "gnu/linux") 'libnotify)))
-  :config
-  (alert "Some alert"))
+                        ((string-equal system-type "gnu/linux") 'libnotify))))
 
 (use-package erc
   :bind (:map erc-mode-map
@@ -449,6 +447,8 @@
   :custom
   (erc-autojoin-channels-alist '(("freenode.net" "#emacs")))
   (erc-autojoin-timing 'ident)
+  (erc-join-buffer 'bury)
+  (erc-hide-list '("JOIN" "PART" "QUIT"))
   (erc-fill-function 'erc-fill-static)
   (erc-kill-buffer-on-part t)
   (erc-kill-queries-on-quit t)
