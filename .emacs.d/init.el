@@ -96,13 +96,18 @@
 
 (package-initialize)
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(let ((package-list '(diminish use-package)))
+  (progn
+    (when (member nil (mapcar 'package-installed-p package-list))
+      ;; refresh only once iff we have one or more packages to install
+      (package-refresh-contents))
+    (dolist (package package-list)
+      (package-install package))))
 
 ;;; use-package
 (eval-when-compile
   (require 'use-package))
+(require 'diminish)
 (require 'bind-key)
 
 (load-theme 'leuven)
@@ -124,10 +129,14 @@
          ("<C-s-right>" . buf-move-right)))
 
 (use-package whitespace
+  :diminish
   :hook ((prog-mode text-mode) . whitespace-mode)
   :config
   (setq whitespace-line-column 120)
   (setq whitespace-style '(face tabs tab-mark empty trailing lines-tail)))
+
+(use-package autorevert
+  :diminish auto-revert-mode)
 
 (use-package projectile
   :ensure t
@@ -190,6 +199,7 @@
   (winum-mode))
 
 (use-package smartparens
+  :diminish
   :ensure t
   :hook ((prog-mode text-mode) . smartparens-mode)
   :config
@@ -209,8 +219,9 @@
   :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package counsel
-  :ensure t
   :after ivy
+  :diminish
+  :ensure t
   :config
   (counsel-mode 1)
   (if (executable-find "rg")
@@ -267,6 +278,7 @@
          ("M-p" . flymake-goto-prev-error)))
 
 (use-package yasnippet
+  :diminish yas-minor-mode
   :ensure t
   :config
   (yas-global-mode 1))
