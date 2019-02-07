@@ -218,6 +218,10 @@
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
 
+(use-package rg
+  :ensure t
+  :bind ("C-c R" . rg))
+
 (use-package counsel
   :after ivy
   :diminish
