@@ -82,6 +82,8 @@
 ;; Git symbolic link visit real file
 (setq vc-follow-symlinks t)
 
+(global-set-key (kbd "s-u") 'revert-buffer)
+
 ;;; Packages
 (require 'package)
 
