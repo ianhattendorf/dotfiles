@@ -233,11 +233,21 @@
     (warn "\nWARNING: Could not find ripgrep executable, defaulting to grep.")))
 
 (use-package ivy
-  :bind (("C-c C-r" . ivy-resume)
-         ("<f6>" . ivy-resume))
+  :diminish
+  :bind ("C-c C-r" . ivy-resume)
+  :custom
+  (ivy-use-virtual-buffers t)
+  (ivy-count-format "(%d/%d) ")
   :config
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-count-format "(%d/%d) "))
+  (ivy-mode 1))
+
+(use-package ivy-rich
+  :after ivy
+  :ensure t
+  :custom
+  (ivy-format-function 'ivy-format-function-line)
+  :config
+  (ivy-rich-mode 1))
 
 (use-package swiper
   :bind (("C-s" . swiper)
