@@ -277,5 +277,7 @@ exec /usr/bin/gpg2 --batch --card-status 1>/dev/null # Will start gpg-agent
 exec /usr/bin/mako
 exec /usr/bin/udiskie
 
+exec swaymsg 'workspace 1; exec firefox-wayland; workspace 3; exec emacs; workspace 2; exec konsole; exec konsole; workspace 1'
+
 include /etc/sway/config.d/*
 include ~/.config/sway/`hostname`
