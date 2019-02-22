@@ -1,0 +1,107 @@
+@define-color primary #f5cab8;
+@define-color secondary #2c2440;
+@define-color primary-alternate #2a5c45;
+@define-color secondary-alternate #90b1b1;
+@define-color secondary-spotify #66cc99;
+@define-color secondary-tray #2980b9;
+@define-color secondary-waybar rgb(100, 114, 125);
+@define-color secondary-waybar-50 rgba(100, 114, 125, 0.5);
+@define-color warning #f53c3c;
+@define-color good #26a65b;
+
+* {
+    border: none;
+    border-radius: 0;
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: @secondary;
+    border-bottom: 3px solid @secondary-waybar-50;
+    color: @primary;
+}
+
+#workspaces button {
+    background: transparent;
+    border-bottom: 3px solid transparent;
+    color: @primary;
+    padding: 0 5px;
+}
+
+#workspaces button.focused {
+    background: @secondary-waybar;
+    border-bottom: 3px solid @primary;
+}
+
+#mode {
+    background: @secondary-waybar;
+    border-bottom: 3px solid white;
+}
+
+#clock, #backlight, #battery, #cpu, #memory, #network, #pulseaudio, #custom-spotify, #tray, #mode {
+    color: @primary;
+    margin: 0 5px;
+    margin-bottom: 4px;
+    padding: 0 10px;
+}
+
+#clock {
+}
+
+#backlight {
+}
+
+#battery {
+}
+
+#battery.charging {
+    background-color: @good;
+}
+
+@keyframes blink {
+    to {
+        background-color: #ffffff;
+        color: black;
+    }
+}
+
+#battery.warning:not(.charging) {
+    background: @warning;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+#cpu {
+}
+
+#memory {
+}
+
+#network {
+}
+
+#network.disconnected {
+    background: @warning;
+}
+
+#pulseaudio {
+}
+
+#pulseaudio.muted {
+    background: @secondary-alternate;
+    color: @primary-alternate;
+}
+
+#custom-spotify {
+    background: @secondary-spotify;
+    color: @primary-alternate;
+}
+
+#tray {
+    background-color: @secondary-tray;
+}

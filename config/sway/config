@@ -210,6 +210,21 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
+
+set $bg-color            #2c2440
+set $inactive-bg-color   #2c2440
+set $text-color          #f5cab8
+set $inactive-text-color #f5cab8
+set $urgent-bg-color     #2980b9
+set $indicator-color     #2980b9
+
+# window colors
+#                       border              background         text                 indicator        child_border
+client.focused          $bg-color           $bg-color          $text-color          $indicator-color $bg-color
+client.unfocused        $inactive-bg-color  $inactive-bg-color $inactive-text-color $indicator-color $bg-color
+client.focused_inactive $inactive-bg-color  $inactive-bg-color $inactive-text-color $indicator-color $bg-color
+client.urgent $urgent-bg-color $urgent-bg-color $text-color $indicator-color $bg-color
+
 # Lock/Logout/Suspend/Hibernate/Reboot/Shutdown
 set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
 mode "$mode_system" {
@@ -256,8 +271,7 @@ bindsym Ctrl+Shift+Space exec makoctl dismiss --all
 #
 # Read `man 5 sway-bar` for more information about this section.
 bar {
-    status_command SCRIPT_DIR=~/.config/i3blocks/scripts i3blocks
-    separator_symbol "|"
+    swaybar_command waybar
 }
 
 exec /usr/libexec/lxqt-policykit-agent

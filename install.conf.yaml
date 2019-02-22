@@ -12,6 +12,7 @@
   - mkdir -p ~/.config/mako
   - mkdir -p ~/.config/mpv/scripts
   - mkdir -p ~/.config/dunst
+  - mkdir -p ~/.config/waybar
   - mkdir -p ~/.emacs.d/user-lisp
   - mkdir -p ~/.gnupg
   - sh mpv-hwdec.sh
@@ -31,6 +32,7 @@
   - '~/.config/mpv'
   - '~/.config/mpv/scripts'
   - '~/.config/dunst'
+  - '~/.config/waybar'
   - '~/.emacs.d'
   - '~/.emacs.d/user-lisp'
   - '~/.gnupg'
@@ -69,3 +71,5 @@
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
     ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
     ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
+    ~/.config/waybar/style.css: config/waybar/style.css
+    ~/.config/waybar/config: config/waybar/config
