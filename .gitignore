@@ -2,6 +2,10 @@
 !/.emacs.d/init.el
 !/.emacs.d/user-lisp/
 
+# C/C++
+/.ccls-cache/
+/compile_commands.json
+
 # Intellij
 .idea
 cmake-build-*/
