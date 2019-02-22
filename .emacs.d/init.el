@@ -83,6 +83,7 @@
 (setq vc-follow-symlinks t)
 
 (global-set-key (kbd "s-u") 'revert-buffer)
+(global-unset-key (kbd "C-z"))
 
 ;;; Packages
 (require 'package)
