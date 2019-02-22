@@ -13,6 +13,7 @@
   - mkdir -p ~/.config/mpv/scripts
   - mkdir -p ~/.config/dunst
   - mkdir -p ~/.config/waybar
+  - mkdir -p ~/.local/share/konsole
   - mkdir -p ~/.emacs.d/user-lisp
   - mkdir -p ~/.gnupg
   - sh mpv-hwdec.sh
@@ -33,6 +34,7 @@
   - '~/.config/mpv/scripts'
   - '~/.config/dunst'
   - '~/.config/waybar'
+  - '~/.local/share/konsole'
   - '~/.emacs.d'
   - '~/.emacs.d/user-lisp'
   - '~/.gnupg'
@@ -62,6 +64,8 @@
     ~/.config/fish/config.fish: config/fish/config.fish
     ~/.config/i3/config: config/i3/config
     ~/.config/sway/config: config/sway/config
+    ~/.config/sway/nala: config/sway/nala
+    ~/.config/sway/simba: config/sway/simba
     ~/.config/i3/scripts/nala.sh: config/i3/scripts/nala.sh
     ~/.config/i3/scripts/work-vm.sh: config/i3/scripts/work-vm.sh
     ~/.config/i3/scripts/simba.sh: config/i3/scripts/simba.sh
@@ -73,3 +77,5 @@
     ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
     ~/.config/waybar/style.css: config/waybar/style.css
     ~/.config/waybar/config: config/waybar/config
+    ~/.local/share/konsole/Personal.colorscheme: .local/share/konsole/Personal.colorscheme
+    ~/.local/share/konsole/Personal.profile: .local/share/konsole/Personal.profile

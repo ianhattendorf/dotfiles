@@ -71,7 +71,7 @@ function initOs {
       if [ ! $DISPLAY ]; then
         # Start Sway on tty1, i3 on tty2
         if [[ $XDG_VTNR -eq 1 ]]; then
-          exec sway
+          exec sway > ~/.sway.log 2> ~/.sway.error.log
         elif [[ $XDG_VTNR -eq 2 ]]; then
           exec startx
         fi

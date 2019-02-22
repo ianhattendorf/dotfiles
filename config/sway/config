@@ -14,18 +14,25 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term gnome-terminal
+set $term env QT_QPA_PLATFORM=wayland QT_WAYLAND_DISABLE_WINDOWDECORATION=1 konsole
 # Your preferred application launcher
 set $menu rofi -show drun
 # Font
 font pango:Fira Mono, Font Awesome 12
+
+# Gaps
+gaps inner 10
+gaps outer 0
+
+# Hide title bar
+default_border pixel 2
+
 # Locker
 set $Locker swaylock -s fill -i ~/Pictures/wallpaper.png --inside-color 00000033 --inside-ver-color 00000033 --ring-color ffffffff --ring-ver-color ffffffff --ring-wrong-color ffffffff --line-uses-inside --key-hl-color ebbe65ff --bs-hl-color ebbe65ff --separator-color 00000000 --text-ver-color ebbe65ff --indicator-thickness 4
 
 ### Output configuration
-#
-# Default wallpaper (more resolutions are available in __DATADIR__/backgrounds/sway/)
 output * bg ~/Pictures/wallpaper.png fill
+
 #
 # Example configuration:
 #
@@ -61,15 +68,6 @@ output * bg ~/Pictures/wallpaper.png fill
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
 #
-input "2:14:ETPS/2_Elantech_Touchpad" {
-    tap enabled
-    natural_scroll disabled
-}
-
-input "1:1:AT_Translated_Set_2_keyboard" {
-    xkb_layout us,br
-    xkb_options grp:win_space_toggle
-}
 
 ### Key bindings
 #
@@ -280,3 +278,4 @@ exec /usr/bin/mako
 exec /usr/bin/udiskie
 
 include /etc/sway/config.d/*
+include ~/.config/sway/`hostname`
