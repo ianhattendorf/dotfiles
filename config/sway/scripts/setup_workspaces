@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -eu
+
+if [ $# -ne 1 ]; then
+  >&2 echo "usage: $0 <term>"
+  exit 1
+fi
+terminal=$1
+sleep_for=2
+
+swaymsg 'splith; workspace 1; exec firefox-wayland'
+sleep $sleep_for
+swaymsg "workspace 2; exec $terminal; exec $terminal; workspace 3; exec emacs; workspace 2"
+sleep $sleep_for
+swaymsg 'splitv'
+sleep $sleep_for
+swaymsg "exec $terminal"

@@ -6,6 +6,9 @@ HOSTNAME=`hostname --short`
 # Also set gpu-context
 if [ "$HOSTNAME" = 'nala' ]; then
   echo 'hwdec=vaapi-copy
+gpu-context=wayland'
+elif [ "$HOSTNAME" = 'simba' ]; then
+  echo 'hwdec=auto
 gpu-context=wayland
 '
 else
