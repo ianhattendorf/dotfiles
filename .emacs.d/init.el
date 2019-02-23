@@ -422,10 +422,34 @@
   :ensure t
   :init (global-diff-hl-mode t))
 
+;; (use-package ediff
+;;   :preface
+;;   (defun ediff-copy-both-to-C ()
+;;     (interactive)
+;;     (ediff-copy-diff ediff-current-difference nil 'C nil
+;;                      (concat
+;;                       (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+;;                       (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+;;   :bind (:map ediff-mode-map
+;;               ("d" . ediff-copy-both-to-C)))
+;; ;; (defun add-B-to-ediff-mode-map () (define-key ediff-mode-map "B" 'ediff-copy-both-to-C))
+;; ;; (add-hook 'ediff-keymap-setup-hook 'add-B-to-ediff-mode-map)
+
+(defun ediff-copy-both-to-C ()
+  (interactive)
+  (ediff-copy-diff ediff-current-difference nil 'C nil
+                   (concat
+                    (ediff-get-region-contents ediff-current-difference 'A ediff-control-buffer)
+                    (ediff-get-region-contents ediff-current-difference 'B ediff-control-buffer))))
+(defun add-d-to-ediff-mode-map () (define-key ediff-mode-map "d" 'ediff-copy-both-to-C))
+(add-hook 'ediff-keymap-setup-hook 'add-d-to-ediff-mode-map)
+
 (use-package magit
   :bind (("C-x g" . magit-status))
   :ensure t
   :config
+  (add-to-list 'magit-log-arguments "--show-signature")
+  (setq magit-revision-headers-format (concat magit-revision-headers-format "%GG"))
   (setq magit-process-password-prompt-regexps ; Yubikey support
         '("^\\(Enter \\)?[Pp]assphrase\\( for \\(RSA \\)?key '.*'\\)?: ?$"
           ;; match-group 99 is used to identify a host
@@ -437,6 +461,15 @@
 (use-package magit-repos
   :config
   (setq magit-repository-directories '(("~/dotfiles" . 0) ("~/dev/repos" . 1))))
+
+(use-package git-commit
+  :ensure nil
+  :preface
+  (defun my/git-commit-set-fill-column ()
+    (setq-local comment-auto-fill-only-comments nil)
+    (setq-local fill-column 72))
+  :config
+  (advice-add 'git-commit-turn-on-auto-fill :before #'my/git-commit-set-fill-column))
 
 ; Disabled (wait until more mature)
 (use-package forge
