@@ -65,13 +65,18 @@ function initOs {
       ;;
     Linux)
       export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
+      export HOSTNAME_SHORT=$(hostname --short)
 
       initAntigen ~/bin/antigen-2.2.3.zsh
 
       if [ ! $DISPLAY ]; then
         # Start Sway on tty1, i3 on tty2
         if [[ $XDG_VTNR -eq 1 ]]; then
-          exec sway > ~/.sway.log 2> ~/.sway.error.log
+          export XDG_SESSION_TYPE=wayland
+          export QT_QPA_PLATFORM=wayland
+          export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+
+          exec dbus-launch --sh-syntax --exit-with-session sway > ~/.sway.log 2> ~/.sway.error.log
         elif [[ $XDG_VTNR -eq 2 ]]; then
           exec startx
         fi

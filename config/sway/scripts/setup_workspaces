@@ -7,12 +7,15 @@ if [ $# -ne 1 ]; then
   exit 1
 fi
 terminal=$1
-sleep_for=2
+sleep_long=2
+sleep_short=1
 
 swaymsg 'splith; workspace 1; exec firefox-wayland'
-sleep $sleep_for
+sleep $sleep_long
 swaymsg "workspace 2; exec $terminal; exec $terminal; workspace 3; exec emacs; workspace 2"
-sleep $sleep_for
+sleep $sleep_long
 swaymsg 'splitv'
-sleep $sleep_for
+sleep $sleep_short
 swaymsg "exec $terminal"
+sleep $sleep_short
+swaymsg 'workspace 1'

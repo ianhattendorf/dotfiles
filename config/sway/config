@@ -280,4 +280,4 @@ exec /usr/bin/udiskie
 exec ~/.config/sway/scripts/setup_workspaces $term
 
 include /etc/sway/config.d/*
-include ~/.config/sway/`hostname`
+include ~/.config/sway/$HOSTNAME_SHORT
