@@ -59,6 +59,8 @@ function initOs {
       macOsPathSetup
 
       export SSH_AUTH_SOCK=$HOME/.gnupg/S.gpg-agent.ssh
+      export WEECHAT_HOME=$HOME/.config/weechat
+
       gpg-connect-agent updatestartuptty /bye > /dev/null
 
       initAntigen /usr/local/share/antigen/antigen.zsh
@@ -66,6 +68,7 @@ function initOs {
     Linux)
       export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
       export HOSTNAME_SHORT=$(hostname --short)
+      export WEECHAT_HOME="$XDG_CONFIG_HOME/weechat"
 
       initAntigen ~/bin/antigen-2.2.3.zsh
 
@@ -86,6 +89,8 @@ function initOs {
 }
 
 function initPath {
+  export PATH=~/.local/bin:$PATH
+
   if [ -f ~/.cargo/env ]; then
     . ~/.cargo/env
   fi

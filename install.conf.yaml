@@ -14,6 +14,8 @@
   - mkdir -p ~/.config/sway/scripts
   - mkdir -p ~/.config/dunst
   - mkdir -p ~/.config/waybar
+  - mkdir -p ~/.config/weechat
+  - mkdir -p ~/.local/bin
   - mkdir -p ~/.local/share/konsole
   - mkdir -p ~/.emacs.d/user-lisp
   - mkdir -p ~/.gnupg
@@ -37,6 +39,8 @@
   - '~/.config/sway/scripts'
   - '~/.config/dunst'
   - '~/.config/waybar'
+  - '~/.config/weechat'
+  - '~/.local/bin'
   - '~/.local/share/konsole'
   - '~/.emacs.d'
   - '~/.emacs.d/user-lisp'
@@ -79,7 +83,19 @@
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
     ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
     ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
+    ~/.config/weechat/.weechat-pass.gpg: config/weechat/.weechat-pass.gpg
     ~/.config/waybar/style.css: config/waybar/style.css
     ~/.config/waybar/config: config/waybar/config
+    ~/.config/weechat/alias.conf: config/weechat/alias.conf
+    ~/.config/weechat/aspell.conf: config/weechat/aspell.conf
+    ~/.config/weechat/autosort.conf: config/weechat/autosort.conf
+    ~/.config/weechat/buflist.conf: config/weechat/buflist.conf
+    ~/.config/weechat/charset.conf: config/weechat/charset.conf
+    ~/.config/weechat/irc.conf: config/weechat/irc.conf
+    ~/.config/weechat/plugins.conf: config/weechat/plugins.conf
+    ~/.config/weechat/script.conf: config/weechat/script.conf
+    ~/.config/weechat/sec.conf: config/weechat/sec.conf
+    ~/.config/weechat/weechat.conf: config/weechat/weechat.conf
+    ~/.local/bin/weechat.sh: .local/bin/weechat.sh
     ~/.local/share/konsole/Personal.colorscheme: .local/share/konsole/Personal.colorscheme
     ~/.local/share/konsole/Personal.profile: .local/share/konsole/Personal.profile
