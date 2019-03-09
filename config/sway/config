@@ -28,7 +28,7 @@ gaps outer 0
 default_border pixel 2
 
 # Locker
-set $Locker swaylock -s fill -i ~/Pictures/wallpaper.png --inside-color 00000033 --inside-ver-color 00000033 --ring-color ffffffff --ring-ver-color ffffffff --ring-wrong-color ffffffff --line-uses-inside --key-hl-color ebbe65ff --bs-hl-color ebbe65ff --separator-color 00000000 --text-ver-color ebbe65ff --indicator-thickness 4
+set $Locker swaylock -f -s fill -i ~/Pictures/wallpaper.png --inside-color 00000033 --inside-ver-color 00000033 --ring-color ffffffff --ring-ver-color ffffffff --ring-wrong-color ffffffff --line-uses-inside --key-hl-color ebbe65ff --bs-hl-color ebbe65ff --separator-color 00000000 --text-ver-color ebbe65ff --indicator-thickness 4
 
 ### Output configuration
 output * bg ~/Pictures/wallpaper.png fill
