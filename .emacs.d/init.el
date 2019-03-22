@@ -115,6 +115,9 @@
 
 (load-theme 'leuven)
 
+(use-package hideshow
+  :hook (prog-mode . hs-minor-mode))
+
 (use-package hl-todo
   :ensure t
   :hook (prog-mode . hl-todo-mode)
