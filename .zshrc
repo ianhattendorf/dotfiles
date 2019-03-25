@@ -66,9 +66,11 @@ function initOs {
       initAntigen /usr/local/share/antigen/antigen.zsh
       ;;
     Linux)
+      export GPG_TTY=$(tty)
       export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
       export HOSTNAME_SHORT=$(hostname --short)
       export WEECHAT_HOME="$XDG_CONFIG_HOME/weechat"
+      gpg-connect-agent updatestartuptty /bye
 
       initAntigen ~/bin/antigen-2.2.3.zsh
 
