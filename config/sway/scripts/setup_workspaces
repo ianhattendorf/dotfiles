@@ -10,7 +10,7 @@ terminal=$1
 sleep_long=2
 sleep_short=1
 
-swaymsg 'splith; workspace 1; exec firefox-wayland'
+swaymsg 'splith; workspace 1; exec firefox'
 sleep $sleep_long
 swaymsg "workspace 2; exec $terminal; exec $terminal; workspace 3; exec emacs; workspace 2"
 sleep $sleep_long
