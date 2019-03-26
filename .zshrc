@@ -71,11 +71,11 @@ function initOs {
       export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh"
       export HOSTNAME_SHORT=$(hostname --short)
       export WEECHAT_HOME="$XDG_CONFIG_HOME/weechat"
+      gpg-connect-agent updatestartuptty /bye
 
       initAntigen ~/bin/antigen-2.2.3.zsh
 
       if [ ! $DISPLAY ]; then
-        gpg-connect-agent updatestartuptty /bye
         # Start Sway on tty1, i3 on tty2
         if [[ $XDG_VTNR -eq 1 ]]; then
           export XDG_SESSION_TYPE=wayland
