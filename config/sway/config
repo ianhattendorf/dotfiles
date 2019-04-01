@@ -18,7 +18,7 @@ set $term konsole
 # Your preferred application launcher
 set $menu rofi -show drun
 # Font
-font pango:Fira Mono, Font Awesome 12
+font pango:sans-serif, Font Awesome 12
 
 # Gaps
 gaps inner 10
