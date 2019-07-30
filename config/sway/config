@@ -21,8 +21,20 @@ set $menu rofi -show drun
 font pango:sans-serif, Font Awesome 12
 
 # Gaps
-gaps inner 10
-gaps outer 0
+set $gaps_inner 10
+set $gaps_outer 0
+
+gaps inner $gaps_inner
+gaps outer $gaps_outer
+
+set $mode_gaps Toggle gaps: (1) on (2) off
+bindsym $mod+g mode "$mode_gaps"
+mode "$mode_gaps" {
+    bindsym 1 mode "default", gaps inner all set $gaps_inner, gaps outer all set $gaps_outer
+    bindsym 2 mode "default", gaps inner all set 0, gaps outer all set 0
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
 
 # Hide title bar
 default_border pixel 2
@@ -272,7 +284,7 @@ bar {
     swaybar_command waybar
 }
 
-exec /usr/libexec/lxqt-policykit-agent
+exec /usr/bin/lxqt-policykit-agent
 exec /usr/bin/gpg2 --batch --card-status 1>/dev/null # Will start gpg-agent
 exec /usr/bin/mako
 exec /usr/bin/udiskie
