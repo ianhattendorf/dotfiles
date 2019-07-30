@@ -11,6 +11,7 @@
   - mkdir -p ~/.config/i3blocks/scripts
   - mkdir -p ~/.config/mako
   - mkdir -p ~/.config/mpv/scripts
+  - mkdir -p ~/.config/redshift
   - mkdir -p ~/.config/sway/scripts
   - mkdir -p ~/.config/dunst
   - mkdir -p ~/.config/waybar
@@ -35,6 +36,7 @@
   - '~/.config/mako'
   - '~/.config/mpv'
   - '~/.config/mpv/scripts'
+  - '~/.config/redshift'
   - '~/.config/sway'
   - '~/.config/sway/scripts'
   - '~/.config/dunst'
@@ -83,6 +85,7 @@
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
     ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
     ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
+    ~/.config/redshift/redshift.conf: config/redshift/redshift.conf
     ~/.config/weechat/.weechat-pass.gpg: config/weechat/.weechat-pass.gpg
     ~/.config/waybar/style.css: config/waybar/style.css
     ~/.config/waybar/config: config/waybar/config
