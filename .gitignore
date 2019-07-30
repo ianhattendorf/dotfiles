@@ -1,6 +1,7 @@
 /.emacs.d/
 !/.emacs.d/init.el
 !/.emacs.d/user-lisp/
+/.vscode/
 
 # C/C++
 /.ccls-cache/
