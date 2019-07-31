@@ -63,6 +63,7 @@
     ~/.nethackrc: .nethackrc
     ~/.profile: .profile
     ~/.rpmmacros: .rpmmacros
+    ~/.tmux.conf: .tmux.conf
     ~/.vim/colors/seoul256.vim: .vim/colors/seoul256.vim
     ~/.vimrc: .vimrc
     ~/.Xclients: .Xclients
