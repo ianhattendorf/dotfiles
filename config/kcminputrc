@@ -1,0 +1,5 @@
+[Libinput][2][14][ETPS/2 Elantech Touchpad]
+TapToClick=true
+
+[Mouse]
+cursorTheme=breeze_cursors

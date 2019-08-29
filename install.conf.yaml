@@ -5,48 +5,48 @@
       force: true
 
 - shell:
-  - mkdir -p ~/.config/Code/User
-  - mkdir -p ~/.config/fish
-  - mkdir -p ~/.config/i3/scripts
-  - mkdir -p ~/.config/i3blocks/scripts
-  - mkdir -p ~/.config/mako
-  - mkdir -p ~/.config/mpv/scripts
-  - mkdir -p ~/.config/redshift
-  - mkdir -p ~/.config/sway/scripts
-  - mkdir -p ~/.config/dunst
-  - mkdir -p ~/.config/waybar
-  - mkdir -p ~/.config/weechat
-  - mkdir -p ~/.local/bin
-  - mkdir -p ~/.local/share/konsole
-  - mkdir -p ~/.emacs.d/user-lisp
-  - mkdir -p ~/.gnupg
-  - sh mpv-hwdec.sh
-  - sh antigen-install.sh 2.2.3
-  - sh betterlockscreen-install.sh update-cache
-  - sh gitconfig-local.sh
+    - mkdir -p ~/.config/Code/User
+    - mkdir -p ~/.config/fish
+    - mkdir -p ~/.config/i3/scripts
+    - mkdir -p ~/.config/i3blocks/scripts
+    - mkdir -p ~/.config/mako
+    - mkdir -p ~/.config/mpv/scripts
+    - mkdir -p ~/.config/redshift
+    - mkdir -p ~/.config/sway/scripts
+    - mkdir -p ~/.config/dunst
+    - mkdir -p ~/.config/waybar
+    - mkdir -p ~/.config/weechat
+    - mkdir -p ~/.local/bin
+    - mkdir -p ~/.local/share/konsole
+    - mkdir -p ~/.emacs.d/user-lisp
+    - mkdir -p ~/.gnupg
+    - sh mpv-hwdec.sh
+    - sh antigen-install.sh 2.2.3
+    - sh betterlockscreen-install.sh update-cache
+    - sh gitconfig-local.sh
 
 - clean:
-  - '~'
-  - '~/.config/Code/User'
-  - '~/.config/fish'
-  - '~/.config/i3'
-  - '~/.config/i3/scripts'
-  - '~/.config/i3blocks'
-  - '~/.config/i3blocks/scripts'
-  - '~/.config/mako'
-  - '~/.config/mpv'
-  - '~/.config/mpv/scripts'
-  - '~/.config/redshift'
-  - '~/.config/sway'
-  - '~/.config/sway/scripts'
-  - '~/.config/dunst'
-  - '~/.config/waybar'
-  - '~/.config/weechat'
-  - '~/.local/bin'
-  - '~/.local/share/konsole'
-  - '~/.emacs.d'
-  - '~/.emacs.d/user-lisp'
-  - '~/.gnupg'
+    - "~"
+    - "~/.config/Code/User"
+    - "~/.config/fish"
+    - "~/.config/i3"
+    - "~/.config/i3/scripts"
+    - "~/.config/i3blocks"
+    - "~/.config/i3blocks/scripts"
+    - "~/.config/mako"
+    - "~/.config/mpv"
+    - "~/.config/mpv/scripts"
+    - "~/.config/redshift"
+    - "~/.config/sway"
+    - "~/.config/sway/scripts"
+    - "~/.config/dunst"
+    - "~/.config/waybar"
+    - "~/.config/weechat"
+    - "~/.local/bin"
+    - "~/.local/share/konsole"
+    - "~/.emacs.d"
+    - "~/.emacs.d/user-lisp"
+    - "~/.gnupg"
 
 - link:
     ~/.bash_profile: .bash_profile
@@ -69,6 +69,9 @@
     ~/.Xclients: .Xclients
     ~/.zshrc: .zshrc
     ~/.zshenv: .zshenv
+    ~/.config/kcminputrc: config/kcminputrc
+    ~/.config/kglobalshortcutsrc: config/kglobalshortcutsrc
+    ~/.config/touchpadxlibinputrc: config/touchpadxlibinputrc
     ~/.config/Code/User/settings.json: config/Code/User/settings.json
     ~/.config/dunst/dunstrc: config/dunst/dunstrc
     ~/.config/fish/config.fish: config/fish/config.fish
