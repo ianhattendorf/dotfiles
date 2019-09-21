@@ -1,10 +1,11 @@
 [ActivityManager]
 _k_friendly_name=Activity Manager
+switch-to-activity-7f23804c-0925-4d73-a0d3-c992ddb1f623=none,none,Switch to activity "Default"
 switch-to-activity-d5fcdafe-ca28-499b-a336-f8c43e6cc6dc=none,none,Switch to activity "Default"
 
 [KDE Keyboard Layout Switcher]
 Switch to Next Keyboard Layout=Ctrl+Alt+K,Ctrl+Alt+K,Switch to Next Keyboard Layout
-_k_friendly_name=KWin
+_k_friendly_name=KDE Daemon
 
 [kaccess]
 Toggle Screen Reader On and Off=Meta+Alt+S,Meta+Alt+S,Toggle Screen Reader On and Off
@@ -22,8 +23,8 @@ _k_friendly_name=KDE Daemon
 display=Display\tMeta+P,Display\tMeta+P,Switch Display
 
 [khotkeys]
-_k_friendly_name=System Settings Module
-{559f5d21-286e-48dd-8c11-ce5069234765}=Meta+Return,none,Launch Konsole
+_k_friendly_name=KDE Daemon
+{8835eb6e-3f6e-408c-9888-09182ebf1d0a}=Ctrl+Alt+T\tMeta+Return,none,Launch Konsole
 {d03619b6-9b3c-48cc-9d9c-a2aadb485550}=,none,Search
 
 [kmix]
@@ -219,6 +220,8 @@ activate task manager entry 6=Meta+6,Meta+6,Activate Task Manager Entry 6
 activate task manager entry 7=Meta+7,Meta+7,Activate Task Manager Entry 7
 activate task manager entry 8=Meta+8,Meta+8,Activate Task Manager Entry 8
 activate task manager entry 9=Meta+9,Meta+9,Activate Task Manager Entry 9
+activate widget 22=none,none,Activate Task Manager Widget
+activate widget 3=,none,Activate Application Launcher Widget
 activate widget 57=Alt+F1,none,Activate Application Launcher Widget
 clear-history=none,none,Clear Clipboard History
 clipboard_action=Ctrl+Alt+X,Ctrl+Alt+X,Enable Clipboard Actions
