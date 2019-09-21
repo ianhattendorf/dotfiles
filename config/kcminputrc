@@ -1,5 +1,8 @@
 [Libinput][2][14][ETPS/2 Elantech Touchpad]
 TapToClick=true
 
+[Libinput][2][7][SynPS/2 Synaptics TouchPad]
+PointerAcceleration=0.400
+
 [Mouse]
 cursorTheme=breeze_cursors
