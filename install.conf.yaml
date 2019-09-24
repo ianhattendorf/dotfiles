@@ -91,6 +91,8 @@
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
     ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
     ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
+    ~/.config/plasma-locale-settings.sh: config/plasma-locale-settings.sh
+    ~/.config/plasma-localerc: config/plasma-localerc
     ~/.config/plasma-workspace/env/env.sh: config/plasma-workspace/env/env.sh
     ~/.config/redshift/redshift.conf: config/redshift/redshift.conf
     ~/.config/weechat/.weechat-pass.gpg: config/weechat/.weechat-pass.gpg
@@ -106,6 +108,7 @@
     ~/.config/weechat/script.conf: config/weechat/script.conf
     ~/.config/weechat/sec.conf: config/weechat/sec.conf
     ~/.config/weechat/weechat.conf: config/weechat/weechat.conf
+    ~/.config/kxkbrc: config/kxkbrc
     ~/.local/bin/weechat.sh: .local/bin/weechat.sh
     ~/.local/share/konsole/Personal.colorscheme: .local/share/konsole/Personal.colorscheme
     ~/.local/share/konsole/Personal.profile: .local/share/konsole/Personal.profile
