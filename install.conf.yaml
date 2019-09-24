@@ -11,6 +11,7 @@
     - mkdir -p ~/.config/i3blocks/scripts
     - mkdir -p ~/.config/mako
     - mkdir -p ~/.config/mpv/scripts
+    - mkdir -p ~/.config/plasma-workspace/env
     - mkdir -p ~/.config/redshift
     - mkdir -p ~/.config/sway/scripts
     - mkdir -p ~/.config/dunst
@@ -36,6 +37,7 @@
     - "~/.config/mako"
     - "~/.config/mpv"
     - "~/.config/mpv/scripts"
+    - "~/.config/plasma-workspace/env"
     - "~/.config/redshift"
     - "~/.config/sway"
     - "~/.config/sway/scripts"
@@ -89,6 +91,7 @@
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
     ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
     ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
+    ~/.config/plasma-workspace/env/env.sh: config/plasma-workspace/env/env.sh
     ~/.config/redshift/redshift.conf: config/redshift/redshift.conf
     ~/.config/weechat/.weechat-pass.gpg: config/weechat/.weechat-pass.gpg
     ~/.config/waybar/style.css: config/waybar/style.css
