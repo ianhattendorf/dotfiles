@@ -73,6 +73,7 @@
     ~/.zshenv: .zshenv
     ~/.config/kcminputrc: config/kcminputrc
     ~/.config/kglobalshortcutsrc: config/kglobalshortcutsrc
+    ~/.config/khotkeysrc: config/khotkeysrc
     ~/.config/touchpadxlibinputrc: config/touchpadxlibinputrc
     ~/.config/Code/User/settings.json: config/Code/User/settings.json
     ~/.config/dunst/dunstrc: config/dunst/dunstrc
