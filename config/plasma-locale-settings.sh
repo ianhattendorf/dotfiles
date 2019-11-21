@@ -3,4 +3,4 @@
 # This script has been generated from kcmshell5 formats.
 # It will automatically be overwritten from there.
 export LANG=en_US.UTF-8
-export LANGUAGE=en_US:pt_BR
+export LANGUAGE=en_US
