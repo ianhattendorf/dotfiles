@@ -90,6 +90,7 @@ Color=255,255,255
 
 [General]
 Blur=true
+ColorRandomization=false
 Description=Personal
-Opacity=0.85
+Opacity=0.97
 Wallpaper=
