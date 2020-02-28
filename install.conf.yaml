@@ -6,6 +6,7 @@
 
 - shell:
     - mkdir -p ~/.config/Code/User
+    - mkdir -p ~/.config/environment.d
     - mkdir -p ~/.config/fish
     - mkdir -p ~/.config/i3/scripts
     - mkdir -p ~/.config/i3blocks/scripts
@@ -29,6 +30,7 @@
 - clean:
     - "~"
     - "~/.config/Code/User"
+    - "~/.config/environment.d"
     - "~/.config/fish"
     - "~/.config/i3"
     - "~/.config/i3/scripts"
@@ -76,6 +78,7 @@
     ~/.config/khotkeysrc: config/khotkeysrc
     ~/.config/touchpadxlibinputrc: config/touchpadxlibinputrc
     ~/.config/Code/User/settings.json: config/Code/User/settings.json
+    ~/.config/environment.d/90-ssh-sock.conf: config/environment.d/90-ssh-sock.conf
     ~/.config/dunst/dunstrc: config/dunst/dunstrc
     ~/.config/fish/config.fish: config/fish/config.fish
     ~/.config/i3/config: config/i3/config
