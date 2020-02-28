@@ -5,7 +5,7 @@
     "diffEditor.ignoreTrimWhitespace": true,
     "diffEditor.renderSideBySide": false,
     "workbench.iconTheme": "vscode-icons",
-    "window.zoomLevel": -1,
+    "window.zoomLevel": 0,
     "mesonbuild.configureOnOpen": true,
     "[cpp]": {
         "editor.defaultFormatter": "ms-vscode.cpptools"
