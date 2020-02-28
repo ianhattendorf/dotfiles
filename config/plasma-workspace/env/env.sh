@@ -10,6 +10,4 @@ gpg-connect-agent updatestartuptty /bye
 HOSTNAME=`hostname --short`
 
 if [ "$HOSTNAME" = 'nala' ]; then
-  export GDK_DPI_SCALE=1.25
-  export GDK_SCALE=1.25
 fi
