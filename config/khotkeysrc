@@ -885,6 +885,15 @@ TriggersCount=1
 GesturePointData=0,0.0625,-0.5,0.5,1,0.0625,0.0625,-0.5,0.5,0.875,0.125,0.0625,-0.5,0.5,0.75,0.1875,0.0625,-0.5,0.5,0.625,0.25,0.0625,-0.5,0.5,0.5,0.3125,0.0625,-0.5,0.5,0.375,0.375,0.0625,-0.5,0.5,0.25,0.4375,0.0625,-0.5,0.5,0.125,0.5,0.0625,0.5,0.5,0,0.5625,0.0625,0.5,0.5,0.125,0.625,0.0625,0.5,0.5,0.25,0.6875,0.0625,0.5,0.5,0.375,0.75,0.0625,0.5,0.5,0.5,0.8125,0.0625,0.5,0.5,0.625,0.875,0.0625,0.5,0.5,0.75,0.9375,0.0625,0.5,0.5,0.875,1,0,0,0.5,1
 Type=GESTURE
 
+[General]
+ColorScheme[$d]
+fixed[$d]
+font[$d]
+menuFont[$d]
+smallestReadableFont[$d]
+toolBarFont[$d]
+widgetStyle[$d]
+
 [Gestures]
 Disabled=true
 MouseButton=2
@@ -893,6 +902,13 @@ Timeout=300
 [GesturesExclude]
 Comment=
 WindowsCount=0
+
+[Icons]
+Theme[$d]
+
+[KDE]
+ColorScheme[$d]
+widgetStyle[$d]
 
 [Main]
 AlreadyImported=defaults,kde32b1,konsole,konqueror_gestures_kde321
