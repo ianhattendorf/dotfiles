@@ -66,8 +66,8 @@ function initOs {
       initAntigen /usr/local/share/antigen/antigen.zsh
       ;;
     Linux)
-      source $HOME/.config/plasma-workspace/env/env.sh
       initAntigen ~/bin/antigen-2.2.3.zsh
+      gpg-connect-agent updatestartuptty /bye
 
       if [ ! $DISPLAY ]; then
         # Start Sway on tty4, i3 on tty5
@@ -85,28 +85,8 @@ function initOs {
   esac
 }
 
-function initPath {
-  export PATH=~/.local/bin:$PATH
-
-  if [ -f ~/.cargo/env ]; then
-    . ~/.cargo/env
-  fi
-}
-
-function initMisc {
-  if [ -d $HOME/.nvm ]; then
-    export NVM_DIR="$HOME/.nvm"
-  fi
-
-  if [ -f /usr/local/opt/nvm/nvm.sh ]; then
-    . /usr/local/opt/nvm/nvm.sh
-  fi
-}
-
 function init {
   initOs
-  initPath
-  initMisc
 }
 
 init

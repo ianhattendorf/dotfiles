@@ -71,6 +71,7 @@
     ~/.vim/colors/seoul256.vim: .vim/colors/seoul256.vim
     ~/.vimrc: .vimrc
     ~/.Xclients: .Xclients
+    ~/.zprofile: .zprofile
     ~/.zshrc: .zshrc
     ~/.zshenv: .zshenv
     ~/.config/kcminputrc: config/kcminputrc
