@@ -115,5 +115,5 @@
     ~/.config/weechat/weechat.conf: config/weechat/weechat.conf
     ~/.config/kxkbrc: config/kxkbrc
     ~/.local/bin/weechat.sh: .local/bin/weechat.sh
-    ~/.local/share/konsole/Personal.colorscheme: .local/share/konsole/Personal.colorscheme
+    ~/.local/share/konsole/Moe.colorscheme: .local/share/konsole/Moe.colorscheme
     ~/.local/share/konsole/Personal.profile: .local/share/konsole/Personal.profile
