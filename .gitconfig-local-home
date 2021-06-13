@@ -7,4 +7,4 @@
 [commit]
 	gpgSign = true
 [gpg]
-	program = gpg2
+	program = gpg
