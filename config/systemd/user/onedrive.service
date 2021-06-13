@@ -1,0 +1,22 @@
+[Unit]
+Description=OneDrive (rclone)
+AssertPathIsDirectory=%h/mnt/OneDrive
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=rclone mount OneDrive: %h/mnt/OneDrive \
+  --log-level INFO \
+  --dir-perms 0755 \
+  --file-perms 0644 \
+  --vfs-cache-mode full \
+  --vfs-cache-max-size 5G \
+  --vfs-cache-max-age 120h \
+  --cache-dir %h/.local/share/rclone/vfs/OneDrive
+ExecStop=/bin/fusermount -u %h/mnt/OneDrive
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
