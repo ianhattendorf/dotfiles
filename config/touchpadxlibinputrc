@@ -1,2 +1,5 @@
 [ETPS/2 Elantech Touchpad]
 tapToClick=true
+
+[SynPS/2 Synaptics TouchPad]
+pointerAcceleration=0.4
