@@ -1,3 +1,6 @@
+[$Version]
+update_info=delete_cursor_old_default_size.upd:DeleteCursorOldDefaultSize
+
 [Keyboard]
 KeyboardRepeating=0
 NumLock=2
@@ -11,4 +14,6 @@ TapToClick=true
 PointerAcceleration=0.400
 
 [Mouse]
+XLbInptAccelProfileFlat=true
+XLbInptPointerAcceleration=0
 cursorTheme=breeze_cursors
