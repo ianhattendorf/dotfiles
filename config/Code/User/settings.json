@@ -14,5 +14,6 @@
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
     "mesonbuild.buildFolder": "build-vscode",
-    "workbench.colorTheme": "Quiet Light"
+    "workbench.colorTheme": "Quiet Light",
+    "editor.tabSize": 2
 }
