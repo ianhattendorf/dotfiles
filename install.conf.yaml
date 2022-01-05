@@ -120,6 +120,9 @@
     ~/.local/bin/weechat.sh: .local/bin/weechat.sh
     ~/.local/share/konsole/Moe.colorscheme: .local/share/konsole/Moe.colorscheme
     ~/.local/share/konsole/Personal.profile: .local/share/konsole/Personal.profile
+    ~/.siril/scripts/OSC_Preprocessing_With_BGR.ssf: .siril/scripts/OSC_Preprocessing_With_BGR.ssf
+    ~/.siril/scripts/OSC_Preprocessing_With_BGR_With_Masters.ssf: .siril/scripts/OSC_Preprocessing_With_BGR_With_Masters.ssf
+    ~/.siril/scripts/OSC_Preprocessing_With_BGR_With_Bias_Master.ssf: .siril/scripts/OSC_Preprocessing_With_BGR_With_Bias_Master.ssf
 
 - shell:
     - systemctl --user daemon-reload
