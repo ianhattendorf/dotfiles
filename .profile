@@ -21,4 +21,5 @@ if [ -f /usr/local/opt/nvm/nvm.sh ]; then
   . /usr/local/opt/nvm/nvm.sh
 fi
 
+export EDITOR=vim
 export PATH
