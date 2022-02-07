@@ -1,7 +1,7 @@
 [user]
 	email = ianh@axosoft.com
 	name = Ian Hattendorf
-	signingkey = 7CF87166E7ACE74A4636ADB36BD814063E969CD9
+	signingkey = D748D2094AD4D42F6E5C693F25B7FAE2B2F84C88
 [tag]
 	forceSignAnnotated = false
 [commit]
