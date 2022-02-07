@@ -69,7 +69,6 @@
     ~/.nethackrc: .nethackrc
     ~/.profile: .profile
     ~/.rpmmacros: .rpmmacros
-    ~/.tmux.conf: .tmux.conf
     ~/.vim/colors/seoul256.vim: .vim/colors/seoul256.vim
     ~/.vimrc: .vimrc
     ~/.Xclients: .Xclients
@@ -103,6 +102,7 @@
     ~/.config/plasma-workspace/env/env.sh: config/plasma-workspace/env/env.sh
     ~/.config/redshift/redshift.conf: config/redshift/redshift.conf
     ~/.config/systemd/user/onedrive.service: config/systemd/user/onedrive.service
+    ~/.config/tmux/tmux.conf: config/tmux/tmux.conf
     ~/.config/weechat/.weechat-pass.gpg: config/weechat/.weechat-pass.gpg
     ~/.config/waybar/style.css: config/waybar/style.css
     ~/.config/waybar/config: config/waybar/config
