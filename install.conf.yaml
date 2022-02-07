@@ -79,7 +79,7 @@
     ~/.gitignore: .gitignore
     ~/.gnupg/gpg.conf: .gnupg/gpg.conf
     ~/.gnupg/dirmngr.conf: .gnupg/dirmngr.conf
-    ~/.gnupg/gpg-agent.conf: .gnupg/gpg-agent.conf
+#    ~/.gnupg/gpg-agent.conf: .gnupg/gpg-agent.conf
     ~/.irbrc: .irbrc
     ~/.nethackrc: .nethackrc
     ~/.profile: .profile
@@ -97,7 +97,7 @@
     ~/.config/khotkeysrc: config/khotkeysrc
     ~/.config/touchpadxlibinputrc: config/touchpadxlibinputrc
     ~/.config/Code/User/settings.json: config/Code/User/settings.json
-    ~/.config/environment.d/90-ssh-sock.conf: config/environment.d/90-ssh-sock.conf
+#    ~/.config/environment.d/90-ssh-sock.conf: config/environment.d/90-ssh-sock.conf
     ~/.config/dunst/dunstrc: config/dunst/dunstrc
     ~/.config/fish/config.fish: config/fish/config.fish
     ~/.config/foot/foot.ini: config/foot/foot.ini

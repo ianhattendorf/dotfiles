@@ -4,6 +4,7 @@
     "diffEditor.ignoreTrimWhitespace": true,
     "diffEditor.renderSideBySide": false,
     "editor.formatOnSave": true,
+    "C_Cpp.clang_format_path": "/usr/bin/clang-format",
     "editor.formatOnType": true,
     "workbench.colorTheme": "Quiet Light",
     "editor.tabSize": 2,
