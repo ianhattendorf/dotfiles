@@ -1,9 +1,7 @@
-# [include]
-# 	path = .gitconfig-local
 [user]
+	email = ianh@axosoft.com
 	name = Ian Hattendorf
-	email = ian@ianhattendorf.com
-	signingKey = 97923DF85C294A7AE4058B253A7EA46F568616DC
+	signingKey = D748D2094AD4D42F6E5C693F25B7FAE2B2F84C88
 [tag]
 	forceSignAnnotated = true
 [commit]
