@@ -1,0 +1,25 @@
+############################################
+#
+# Script for Siril 1.0
+# Jan 2022
+# (C) Ian Hattendorf
+# Masters v1.0
+#
+########### BIAS MASTER SCRIPT ###########
+#
+# Script for color camera master creation
+#
+# Needs 1 set of RAW/FITS biases in the working
+# directory
+#
+############################################
+
+requires 0.99.4
+
+# Convert Bias Frames to .fit files
+convert bias -out=./process
+cd ./process
+
+# Stack Bias Frames to bias_stacked.fit
+stack bias rej 3 3 -nonorm
+cd ..

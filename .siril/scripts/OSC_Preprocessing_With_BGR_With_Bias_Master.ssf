@@ -1,20 +1,23 @@
 ############################################
 #
 # Script for Siril 1.0
-# July 2020
+# Jan 2022
 # (C) Cyril Richard
+# (C) Ian Hattendorf
 # Preprocessing v1.0
 #
 ########### PREPROCESSING SCRIPT ###########
 #
 # Script for color camera preprocessing
 #
-# Needs 4 sets of RAW images in the working
-# directory, within 4 directories:
-#   Bias/
-#   Flat/
+# Needs 3 set of RAW/FITS lights in the working
+# directory, within directory:
 #   Dark/
+#   Flat/
 #   Light/
+#
+# and 1 master in the working directory:
+#   bias_stacked.fit
 #
 ############################################
 
@@ -26,7 +29,7 @@ convert flat -out=../process
 cd ../process
 
 # Pre-process Flat Frames
-preprocess flat -bias=bias_stacked
+preprocess flat -bias=../bias_stacked
 
 # Stack Flat Frames to pp_flat_stacked.fit
 stack pp_flat rej 3 3 -norm=mul

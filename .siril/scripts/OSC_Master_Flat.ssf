@@ -1,0 +1,28 @@
+############################################
+#
+# Script for Siril 1.0
+# Jan 2022
+# (C) Ian Hattendorf
+# Masters v1.0
+#
+########### FLAT MASTER SCRIPT ###########
+#
+# Script for color camera master creation
+#
+# Needs 1 set of RAW/FITS flats in the working
+# directory, along with a bias_stacked.fit file
+#
+############################################
+
+requires 0.99.4
+
+# Convert Flat Frames to .fit files
+convert flat -out=./process
+cd ./process
+
+# Pre-process Flat Frames
+preprocess flat -bias=bias_stacked
+
+# Stack Flat Frames to pp_flat_stacked.fit
+stack pp_flat rej 3 3 -norm=mul
+cd ..

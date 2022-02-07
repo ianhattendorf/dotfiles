@@ -123,6 +123,9 @@
     ~/.siril/scripts/OSC_Preprocessing_With_BGR.ssf: .siril/scripts/OSC_Preprocessing_With_BGR.ssf
     ~/.siril/scripts/OSC_Preprocessing_With_BGR_With_Masters.ssf: .siril/scripts/OSC_Preprocessing_With_BGR_With_Masters.ssf
     ~/.siril/scripts/OSC_Preprocessing_With_BGR_With_Bias_Master.ssf: .siril/scripts/OSC_Preprocessing_With_BGR_With_Bias_Master.ssf
+    ~/.siril/scripts/OSC_Master_Bias.ssf: .siril/scripts/OSC_Master_Bias.ssf
+    ~/.siril/scripts/OSC_Master_Dark.ssf: .siril/scripts/OSC_Master_Dark.ssf
+    ~/.siril/scripts/OSC_Master_Flat.ssf: .siril/scripts/OSC_Master_Flat.ssf
 
 - shell:
     - systemctl --user daemon-reload

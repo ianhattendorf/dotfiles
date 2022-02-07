@@ -1,32 +1,34 @@
 ############################################
 #
 # Script for Siril 1.0
-# July 2020
+# Jan 2022
 # (C) Cyril Richard
+# (C) Ian Hattendorf
 # Preprocessing v1.0
 #
 ########### PREPROCESSING SCRIPT ###########
 #
 # Script for color camera preprocessing
 #
-# Needs 4 sets of RAW images in the working
-# directory, within 4 directories:
-#   Bias/
-#   Flat/
-#   Dark/
+# Needs 1 set of RAW/FITS lights in the working
+# directory, within directory:
 #   Light/
+#
+# and 2 masters in the working directory:
+#   dark_stacked.fit
+#   pp_flat_stacked.fit
 #
 ############################################
 
 requires 0.99.4
 
 # Convert Light Frames to .fit files
-cd lights
+cd Light
 convert light -out=../process
 cd ../process
 
 # Pre-process Light Frames
-preprocess light -dark=dark_stacked -flat=pp_flat_stacked -cfa -equalize_cfa -debayer
+preprocess light -dark=../dark_stacked -flat=../pp_flat_stacked -cfa -equalize_cfa -debayer
 
 # Align lights
 register pp_light
