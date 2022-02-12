@@ -908,7 +908,12 @@ Theme[$d]
 
 [KDE]
 ColorScheme[$d]
+SingleClick[$d]
 widgetStyle[$d]
+
+[KDE Action Restrictions]
+action/start_new_session[$d]
+action/switch_user[$d]
 
 [Main]
 AlreadyImported=defaults,kde32b1,konsole,konqueror_gestures_kde321

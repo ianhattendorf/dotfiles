@@ -7,6 +7,9 @@ NumLock=2
 RepeatDelay=600
 RepeatRate=25
 
+[Libinput][1133][49298][Logitech G203 LIGHTSYNC Gaming Mouse]
+PointerAccelerationProfile=1
+
 [Libinput][2][14][ETPS/2 Elantech Touchpad]
 TapToClick=true
 
@@ -16,7 +19,6 @@ PointerAcceleration=0.400
 [Mouse]
 XLbInptAccelProfileFlat=true
 XLbInptPointerAcceleration=0
-cursorTheme=breeze_cursors
 
 [Tmp]
 update_info=delete_cursor_old_default_size.upd:DeleteCursorOldDefaultSize
