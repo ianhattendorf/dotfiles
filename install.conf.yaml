@@ -75,6 +75,8 @@
     ~/.zprofile: .zprofile
     ~/.zshrc: .zshrc
     ~/.zshenv: .zshenv
+    ~/.config/alacritty/alacritty.yml: config/alacritty/alacritty.yml
+    ~/.config/alacritty/tempus_dawn.yml: config/alacritty/tempus_dawn.yml
     ~/.config/kcminputrc: config/kcminputrc
     ~/.config/kglobalshortcutsrc: config/kglobalshortcutsrc
     ~/.config/khotkeysrc: config/khotkeysrc
@@ -119,6 +121,7 @@
     ~/.config/weechat/weechat.conf: config/weechat/weechat.conf
     ~/.config/kxkbrc: config/kxkbrc
     ~/.local/bin/weechat.sh: .local/bin/weechat.sh
+    ~/.local/share/applications/Alacritty.desktop: .local/share/applications/Alacritty.desktop
     ~/.local/share/applications/foot.desktop: .local/share/applications/foot.desktop
     ~/.local/share/konsole/Moe.colorscheme: .local/share/konsole/Moe.colorscheme
     ~/.local/share/konsole/Personal.profile: .local/share/konsole/Personal.profile
