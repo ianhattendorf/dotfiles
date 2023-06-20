@@ -1,17 +1,10 @@
 {
     "editor.fontLigatures": true,
     "editor.fontFamily": "'Fira Code', 'Fira Mono', 'Droid Sans Mono', 'Courier New', monospace, 'Droid Sans Fallback'",
-    "vsicons.dontShowNewVersionMessage": true,
     "diffEditor.ignoreTrimWhitespace": true,
     "diffEditor.renderSideBySide": false,
-    "workbench.iconTheme": "vscode-icons",
-    "mesonbuild.configureOnOpen": true,
-    "[cpp]": {
-        "editor.defaultFormatter": "ms-vscode.cpptools"
-    },
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
-    "mesonbuild.buildFolder": "build-vscode",
     "workbench.colorTheme": "Quiet Light",
     "editor.tabSize": 2,
     "redhat.telemetry.enabled": true,
@@ -19,13 +12,10 @@
     "todo-tree.tree.buttons.groupBySubTag": true,
     "todo-tree.highlights.defaultHighlight": {
         "type": "tag-and-subTag"
-    }
+    },
     "nrf-connect.topdir": "${nrf-connect.sdk:2.3.0-rc1}",
     "nrf-connect.toolchain.path": "PATH",
     "nrf-connect.enableTelemetry": true,
     "nrf-connect.welcome.showOnStartup": false,
-    "devicetree.defaultBoard": "nrf5340dk_nrf5340",
-    "[python]": {
-        "editor.formatOnType": true
-    }
+    "devicetree.defaultBoard": "nrf5340dk_nrf5340"
 }
