@@ -7,6 +7,8 @@ Wants=network-online.target
 [Service]
 Type=simple
 ExecStart=rclone mount OneDrive: %h/mnt/OneDrive \
+  --rc \
+  --rc-web-gui \
   --log-level INFO \
   --dir-perms 0755 \
   --file-perms 0644 \
