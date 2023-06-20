@@ -42,3 +42,5 @@
 	required = true
 [gc]
 	autoDetach = false
+[init]
+	defaultBranch = main
