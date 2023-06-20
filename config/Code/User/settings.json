@@ -15,6 +15,11 @@
     "workbench.colorTheme": "Quiet Light",
     "editor.tabSize": 2,
     "redhat.telemetry.enabled": true,
+    "todo-tree.regex.subTagRegex": "^\\((.*)\\)",
+    "todo-tree.tree.buttons.groupBySubTag": true,
+    "todo-tree.highlights.defaultHighlight": {
+        "type": "tag-and-subTag"
+    }
     "nrf-connect.topdir": "${nrf-connect.sdk:2.3.0-rc1}",
     "nrf-connect.toolchain.path": "PATH",
     "nrf-connect.enableTelemetry": true,
