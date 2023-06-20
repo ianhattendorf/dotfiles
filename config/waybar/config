@@ -21,7 +21,7 @@
   ],
   "sway/workspaces": {
     "disable-scroll": true,
-    "all-outputs": true,
+    "all-outputs": false,
     "format": "{name}: {icon}",
     "format-icons": {
       "1": "",
@@ -56,7 +56,7 @@
     "states": {
       "good": 95,
       "warning": 30,
-      "critical": 15
+      "critical": 10
     },
     "format": "{capacity}% {icon}",
     // "format-good": "", // An empty format will hide the module
