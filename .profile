@@ -1,7 +1,7 @@
 # .profile
 
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$HOME/.config}"
-export SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh
+# export SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/gnupg/S.gpg-agent.ssh
 export HOSTNAME_SHORT=$(hostname --short)
 export WEECHAT_HOME="$XDG_CONFIG_HOME/weechat"
 
