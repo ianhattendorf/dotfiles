@@ -25,17 +25,10 @@ function initOs {
   case `uname` in
     Linux)
       initAntigen ~/bin/antigen-2.2.3.zsh
-      # TODO is this still necessary? maybe only with sway?
-      # gpg-connect-agent updatestartuptty /bye
-
       if [ ! $DISPLAY ]; then
-        # Start Sway on tty4, i3 on tty5
-        if [[ $XDG_VTNR -eq 4 ]]; then
-          export XDG_SESSION_TYPE=wayland
-          export QT_QPA_PLATFORM=wayland
-          export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-
-          exec dbus-launch --sh-syntax --exit-with-session sway > ~/.sway.log 2> ~/.sway.error.log
+        # Start Sway on tty1 or tty4, i3 on tty5
+        if [ $XDG_VTNR -eq 1 ] || [ $XDG_VTNR -eq 4 ]; then
+          exec start-sway
         elif [[ $XDG_VTNR -eq 5 ]]; then
           exec startx
         fi

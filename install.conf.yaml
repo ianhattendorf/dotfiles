@@ -14,6 +14,7 @@
     - mkdir -p ~/.config/mpv/scripts
     - mkdir -p ~/.config/plasma-workspace/env
     - mkdir -p ~/.config/redshift
+    - mkdir -p ~/.config/sway/config.d
     - mkdir -p ~/.config/sway/scripts
     - mkdir -p ~/.config/dunst
     - mkdir -p ~/.config/systemd/user
@@ -44,6 +45,7 @@
     - "~/.config/redshift"
     - "~/.config/systemd/user"
     - "~/.config/sway"
+    - "~/.config/sway/config.d"
     - "~/.config/sway/scripts"
     - "~/.config/dunst"
     - "~/.config/waybar"
@@ -88,8 +90,13 @@
     ~/.config/foot/foot.ini: config/foot/foot.ini
     ~/.config/i3/config: config/i3/config
     ~/.config/sway/config: config/sway/config
-    ~/.config/sway/nala: config/sway/nala
-    ~/.config/sway/simba: config/sway/simba
+    ~/.config/sway/environment: config/sway/environment
+    ~/.config/sway/ianh-dell.conf: config/sway/ianh-dell.conf
+    ~/.config/sway/nala.conf: config/sway/nala.conf
+    ~/.config/sway/simba.conf: config/sway/simba.conf
+    ~/.config/sway/config.d/50-rules-shell.conf: config/sway/config.d/50-rules-shell.conf
+    ~/.config/sway/config.d/50-rules-zoom.conf: config/sway/config.d/50-rules-zoom.conf
+    ~/.config/sway/config.d/90-swayidle.conf: config/sway/config.d/90-swayidle.conf
     ~/.config/sway/scripts/setup_workspaces: config/sway/scripts/setup_workspaces
     ~/.config/i3/scripts/nala.sh: config/i3/scripts/nala.sh
     ~/.config/i3/scripts/work-vm.sh: config/i3/scripts/work-vm.sh

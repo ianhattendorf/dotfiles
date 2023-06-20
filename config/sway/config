@@ -14,18 +14,22 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term konsole
+# Recommends: foot
+set $term foot tmux
 # Your preferred application launcher
-set $menu rofi -show drun
+# Note: pass the final command to swaymsg so that the resulting window can be opened
+# on the original workspace that the command was run on.
+set $menu fuzzel
+
 # Font
-font pango:sans-serif, Font Awesome 12
+font pango:sans-serif, Font Awesome 10
 
 # Gaps
-set $gaps_inner 10
+set $gaps_inner 5
 set $gaps_outer 0
 
-gaps inner $gaps_inner
-gaps outer $gaps_outer
+gaps inner 0
+gaps outer 0
 
 set $mode_gaps Toggle gaps: (1) on (2) off
 bindsym $mod+g mode "$mode_gaps"
@@ -39,12 +43,11 @@ mode "$mode_gaps" {
 # Hide title bar
 default_border pixel 2
 
-# Locker
-set $Locker swaylock -f -s fill -i ~/Pictures/wallpaper.png --inside-color 00000033 --inside-ver-color 00000033 --ring-color ffffffff --ring-ver-color ffffffff --ring-wrong-color ffffffff --line-uses-inside --key-hl-color ebbe65ff --bs-hl-color ebbe65ff --separator-color 00000000 --text-ver-color ebbe65ff --indicator-thickness 4
-
 ### Output configuration
-output * bg ~/Pictures/wallpaper.png fill
-
+#
+# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
+# Requires: desktop-backgrounds-compat, swaybg
+output * bg ~/Pictures/wallpaper.png fill #000000
 #
 # Example configuration:
 #
@@ -56,14 +59,13 @@ output * bg ~/Pictures/wallpaper.png fill
 #
 # Example configuration:
 #
-#exec swayidle \
-#    timeout 300 'swaylock -c 000000' \
-#    timeout 600 'swaymsg "output * dpms off"' \
-#       resume 'swaymsg "output * dpms on"' \
-#    before-sleep 'swaylock -c 000000'
+# exec swayidle -w \
+#          timeout 300 'swaylock -f -c 000000' \
+#          timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+#          before-sleep 'swaylock -f -c 000000'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
-# your displays after another 600 seconds, and turn your screens back on when
+# your displays after another 300 seconds, and turn your screens back on when
 # resumed. It will also lock your screen before your computer goes to sleep.
 
 ### Input configuration
@@ -79,19 +81,33 @@ output * bg ~/Pictures/wallpaper.png fill
 #
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
-#
+
+input type:mouse {
+    accel_profile flat
+    pointer_accel 0
+}
+
+input type:keyboard {
+    xkb_layout us,br
+    xkb_options grp:win_space_toggle
+}
+
+input type:touchpad {
+    click_method clickfinger
+    dwt enabled
+}
 
 ### Key bindings
 #
 # Basics:
 #
-    # start a terminal
+    # Start a terminal
     bindsym $mod+Return exec $term
 
-    # kill focused window
+    # Kill focused window
     bindsym $mod+Shift+q kill
 
-    # start your launcher
+    # Start your launcher
     bindsym $mod+d exec $menu
 
     # Drag floating windows by holding down $mod and left mouse button.
@@ -99,14 +115,13 @@ output * bg ~/Pictures/wallpaper.png fill
     # Despite the name, also works for non-floating windows.
     # Change normal to inverse to use left mouse button for resizing and right
     # mouse button for dragging.
-    # TODO floating_modifier not currently supported by Sway 1.0-alpha
-    #floating_modifier $mod normal
+    floating_modifier $mod normal
 
-    # reload the configuration file
+    # Reload the configuration file
     bindsym $mod+Shift+c reload
 
-    # exit sway (logs you out of your wayland session)
-    bindsym $mod+Shift+e exit
+    # Exit sway (logs you out of your Wayland session)
+    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 #
 # Moving around:
 #
@@ -115,49 +130,58 @@ output * bg ~/Pictures/wallpaper.png fill
     bindsym $mod+$down focus down
     bindsym $mod+$up focus up
     bindsym $mod+$right focus right
-    # or use $mod+[up|down|left|right]
+    # Or use $mod+[up|down|left|right]
     bindsym $mod+Left focus left
     bindsym $mod+Down focus down
     bindsym $mod+Up focus up
     bindsym $mod+Right focus right
 
-    # _move_ the focused window with the same, but add Shift
+    # Move the focused window with the same, but add Shift
     bindsym $mod+Shift+$left move left
     bindsym $mod+Shift+$down move down
     bindsym $mod+Shift+$up move up
     bindsym $mod+Shift+$right move right
-    # ditto, with arrow keys
+    # Ditto, with arrow keys
     bindsym $mod+Shift+Left move left
     bindsym $mod+Shift+Down move down
     bindsym $mod+Shift+Up move up
     bindsym $mod+Shift+Right move right
+
+    # Alt + Tab toggle workspace
+    bindsym Mod1+tab workspace back_and_forth
 #
 # Workspaces:
 #
-    # switch to workspace
-    bindsym $mod+1 workspace 1
-    bindsym $mod+2 workspace 2
-    bindsym $mod+3 workspace 3
-    bindsym $mod+4 workspace 4
-    bindsym $mod+5 workspace 5
-    bindsym $mod+6 workspace 6
-    bindsym $mod+7 workspace 7
-    bindsym $mod+8 workspace 8
-    bindsym $mod+9 workspace 9
-    bindsym $mod+0 workspace 10
-    # move focused container to workspace
-    bindsym $mod+Shift+1 move container to workspace 1
-    bindsym $mod+Shift+2 move container to workspace 2
-    bindsym $mod+Shift+3 move container to workspace 3
-    bindsym $mod+Shift+4 move container to workspace 4
-    bindsym $mod+Shift+5 move container to workspace 5
-    bindsym $mod+Shift+6 move container to workspace 6
-    bindsym $mod+Shift+7 move container to workspace 7
-    bindsym $mod+Shift+8 move container to workspace 8
-    bindsym $mod+Shift+9 move container to workspace 9
-    bindsym $mod+Shift+0 move container to workspace 10
+    # Switch to workspace
+    bindsym $mod+1 workspace number 1
+    bindsym $mod+2 workspace number 2
+    bindsym $mod+3 workspace number 3
+    bindsym $mod+4 workspace number 4
+    bindsym $mod+5 workspace number 5
+    bindsym $mod+6 workspace number 6
+    bindsym $mod+7 workspace number 7
+    bindsym $mod+8 workspace number 8
+    bindsym $mod+9 workspace number 9
+    bindsym $mod+0 workspace number 10
+    # Move focused container to workspace
+    bindsym $mod+Shift+1 move container to workspace number 1
+    bindsym $mod+Shift+2 move container to workspace number 2
+    bindsym $mod+Shift+3 move container to workspace number 3
+    bindsym $mod+Shift+4 move container to workspace number 4
+    bindsym $mod+Shift+5 move container to workspace number 5
+    bindsym $mod+Shift+6 move container to workspace number 6
+    bindsym $mod+Shift+7 move container to workspace number 7
+    bindsym $mod+Shift+8 move container to workspace number 8
+    bindsym $mod+Shift+9 move container to workspace number 9
+    bindsym $mod+Shift+0 move container to workspace number 10
     # Note: workspaces can have any name you want, not just numbers.
     # We just use 1-10 as the default.
+
+    # Move workspace to different output
+    bindsym $mod+Control+Shift+Right move workspace to output right
+    bindsym $mod+Control+Shift+Left move workspace to output left
+    bindsym $mod+Control+Shift+Down move workspace to output down
+    bindsym $mod+Control+Shift+Up move workspace to output up
 #
 # Layout stuff:
 #
@@ -181,7 +205,7 @@ output * bg ~/Pictures/wallpaper.png fill
     # Swap focus between the tiling area and the floating area
     bindsym $mod+space focus mode_toggle
 
-    # move focus to the parent container
+    # Move focus to the parent container
     bindsym $mod+a focus parent
 #
 # Scratchpad:
@@ -208,19 +232,27 @@ mode "resize" {
     bindsym $up resize shrink height 10px
     bindsym $right resize grow width 10px
 
-    # ditto, with arrow keys
+    # Ditto, with arrow keys
     bindsym Left resize shrink width 10px
     bindsym Down resize grow height 10px
     bindsym Up resize shrink height 10px
     bindsym Right resize grow width 10px
 
-    # return to default mode
+    # Return to default mode
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
 bindsym $mod+r mode "resize"
 
+# Media player controls
+# bindsym XF86AudioPlay exec playerctl play
+# bindsym XF86AudioPause exec playerctl pause
+# bindsym XF86AudioNext exec playerctl next
+# bindsym XF86AudioPrev exec playerctl previou
 
+#
+# Theming:
+#
 set $bg-color            #2c2440
 set $inactive-bg-color   #2c2440
 set $text-color          #f5cab8
@@ -233,63 +265,46 @@ set $indicator-color     #2980b9
 client.focused          $bg-color           $bg-color          $text-color          $indicator-color $bg-color
 client.unfocused        $inactive-bg-color  $inactive-bg-color $inactive-text-color $indicator-color $bg-color
 client.focused_inactive $inactive-bg-color  $inactive-bg-color $inactive-text-color $indicator-color $bg-color
-client.urgent $urgent-bg-color $urgent-bg-color $text-color $indicator-color $bg-color
-
-# Lock/Logout/Suspend/Hibernate/Reboot/Shutdown
-set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
-mode "$mode_system" {
-    bindsym l exec $Locker, mode "default"
-    bindsym e exec swaymsg exit, mode "default"
-    bindsym s exec $Locker && systemctl suspend, mode "default"
-    bindsym h exec $Locker && systemctl hibernate, mode "default"
-    bindsym r exec systemctl reboot, mode "default"
-    bindsym Shift+s exec systemctl poweroff -i, mode "default"
-
-    # back to normal: Enter or Escape
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
-}
-
-bindsym $mod+Pause mode "$mode_system"
-
-exec swayidle \
-     timeout 270 'notify-send -u critical -t 10000 "Screen Lock" "LOCKING screen in 30 seconds"' \
-     timeout 300 "$Locker" \
-     timeout 330 'swaymsg "output * dpms off"' \
-     resume 'swaymsg "output * dpms on"' \
-     before-sleep "$Locker"
-
-# Pulse Audio controls
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% && pkill -RTMIN+10 i3blocks
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% && pkill -RTMIN+10 i3blocks
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle && pkill -RTMIN+10 i3blocks
-
-# Media player controls
-bindsym XF86AudioPlay exec playerctl play
-bindsym XF86AudioPause exec playerctl pause
-bindsym XF86AudioNext exec playerctl next
-bindsym XF86AudioPrev exec playerctl previous
-
-# scrot
-bindsym Print exec swaygrab
-
-bindsym Ctrl+Space exec makoctl dismiss
-bindsym Ctrl+Shift+Space exec makoctl dismiss --all
+client.urgent           $urgent-bg-color    $urgent-bg-color   $text-color          $indicator-color $bg-color
 
 #
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
-bar {
-    swaybar_command waybar
-}
+# bar {
+#     swaybar_command waybar
+# }
 
-exec /usr/bin/lxqt-policykit-agent
-exec /usr/bin/gpg2 --batch --card-status 1>/dev/null # Will start gpg-agent
-exec /usr/bin/mako
-exec /usr/bin/udiskie
+# Include configs from 3 locations:
+#  - /usr/share/sway/config.d
+#  - /etc/sway/config.d
+#  - $XDG_CONFIG_HOME/sway/config.d ($HOME/.config/sway/config.d)
+#
+# If multiple directories contain the files with the same name, the later
+# directory takes precedence; `$XDG_CONFIG_HOME/sway/config.d/20-swayidle.conf`
+# will always be loaded instead of `/usr/share/sway/config.d/20-swayidle.conf`
+# or `/etc/sway/config.d/20-swayidle.conf`
+#
+# This mechanism permits overriding our default configuration per-system
+# (/etc) or per-user ($XDG_CONFIG_HOME) basis. Just create the file you
+# want to modify/override in the higher-level directory.
+#
+# For example, to disable the default bar from Fedora configs, you'll need to
+#     $ echo -n > "$HOME/.config/sway/config.d/90-bar.conf"
+#
+# Note the quoting, the $() and the arguments quoting. All the parts are equally
+# important to make the magic work. And if you want to learn the secret behind
+# the trick, it's all in the `wordexp(3)`.
+#
 
-exec ~/.config/sway/scripts/setup_workspaces $term
+exec systemctl --user import-environment
 
-include /etc/sway/config.d/*
-include ~/.config/sway/$HOSTNAME_SHORT
+include '$(/usr/libexec/sway/layered-include "/usr/share/sway/config.d/*.conf" "/etc/sway/config.d/*.conf" "${XDG_CONFIG_HOME:-$HOME/.config}/sway/config.d/*.conf")'
+
+include "${XDG_CONFIG_HOME:-$HOME/.config}/sway/$(hostname -s).conf"
+
+# Update systemd environment
+# https://github.com/emersion/xdg-desktop-portal-wlr/wiki/systemd-user-services,-pam,-and-environment-variables#tldr
+exec systemctl --user import-environment XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE DISPLAY WAYLAND_DISPLAY SWAYSOCK SSH_AUTH_SOCK
+exec hash dbus-update-activation-environment 2>/dev/null && \
+  dbus-update-activation-environment --systemd XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE DISPLAY WAYLAND_DISPLAY SWAYSOCK SSH_AUTH_SOCK
