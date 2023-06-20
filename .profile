@@ -23,3 +23,4 @@ fi
 
 export EDITOR=vim
 export PATH
+. "$HOME/.cargo/env"
