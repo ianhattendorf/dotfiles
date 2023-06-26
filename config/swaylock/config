@@ -1,0 +1,15 @@
+scaling=fill
+image=~/Pictures/wallpaper.png
+# TODO script with: swaymsg -t get_outputs | jq -r '.[] | select(.transform != "normal") | .name'
+image=DP-5:~/Pictures/wallpaper-portrait.png
+inside-color=00000033
+inside-ver-color=00000033
+ring-color=ffffffff
+ring-ver-color=ffffffff
+ring-wrong-color=ffffffff
+line-uses-inside
+key-hl-color=ebbe65ff
+bs-hl-color=ebbe65ff
+separator-color=00000000
+text-ver-color=ebbe65ff
+indicator-thickness=4

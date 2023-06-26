@@ -47,6 +47,7 @@
     - "~/.config/sway"
     - "~/.config/sway/config.d"
     - "~/.config/sway/scripts"
+    - "~/.config/swaylock"
     - "~/.config/dunst"
     - "~/.config/waybar"
     - "~/.config/weechat"
@@ -98,6 +99,7 @@
     ~/.config/sway/config.d/50-rules-zoom.conf: config/sway/config.d/50-rules-zoom.conf
     ~/.config/sway/config.d/90-swayidle.conf: config/sway/config.d/90-swayidle.conf
     ~/.config/sway/scripts/setup_workspaces: config/sway/scripts/setup_workspaces
+    ~/.config/swaylock/config: config/swaylock/config
     ~/.config/i3/scripts/nala.sh: config/i3/scripts/nala.sh
     ~/.config/i3/scripts/work-vm.sh: config/i3/scripts/work-vm.sh
     ~/.config/i3/scripts/simba.sh: config/i3/scripts/simba.sh
