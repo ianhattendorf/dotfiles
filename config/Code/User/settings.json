@@ -18,5 +18,6 @@
     "nrf-connect.enableTelemetry": true,
     "nrf-connect.welcome.showOnStartup": false,
     "devicetree.defaultBoard": "nrf5340dk_nrf5340",
-    "mesonbuild.configureOnOpen": true
+    "mesonbuild.configureOnOpen": true,
+    "window.zoomLevel": -1
 }
