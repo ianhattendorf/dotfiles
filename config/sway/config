@@ -89,6 +89,7 @@ input type:mouse {
 
 input type:keyboard {
     xkb_layout us,br
+    xkb_numlock enabled
     xkb_options grp:win_space_toggle
 }
 

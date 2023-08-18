@@ -131,7 +131,9 @@
     ~/.config/kxkbrc: config/kxkbrc
     ~/.local/bin/weechat.sh: .local/bin/weechat.sh
     ~/.local/share/applications/Alacritty.desktop: .local/share/applications/Alacritty.desktop
+    ~/.local/share/applications/code.desktop: .local/share/applications/code.desktop
     ~/.local/share/applications/foot.desktop: .local/share/applications/foot.desktop
+    ~/.local/share/applications/gitkraken.desktop: .local/share/applications/gitkraken.desktop
     ~/.local/share/konsole/Moe.colorscheme: .local/share/konsole/Moe.colorscheme
     ~/.local/share/konsole/Personal.profile: .local/share/konsole/Personal.profile
     ~/.siril/scripts/OSC_Preprocessing_With_BGR.ssf: .siril/scripts/OSC_Preprocessing_With_BGR.ssf
@@ -143,3 +145,4 @@
 
 - shell:
     - systemctl --user daemon-reload
+    - update-desktop-database ~/.locale/share/applications
