@@ -148,4 +148,4 @@
 
 - shell:
     - systemctl --user daemon-reload
-    - update-desktop-database ~/.locale/share/applications
+    - update-desktop-database ~/.local/share/applications
