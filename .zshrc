@@ -33,11 +33,11 @@ function initOs {
     Linux)
       initAntigen ~/bin/antigen-2.2.3.zsh
       initAutocomplete
-      if [ ! $DISPLAY ]; then
+      if [ ! "$DISPLAY" ]; then
         # Start Sway on tty1 or tty4, i3 on tty5
-        if [ $XDG_VTNR -eq 1 ] || [ $XDG_VTNR -eq 4 ]; then
+        if [ "$XDG_VTNR" -eq 1 ] || [ "$XDG_VTNR" -eq 4 ]; then
           exec start-sway
-        elif [[ $XDG_VTNR -eq 5 ]]; then
+        elif [ "$XDG_VTNR" -eq 5 ]; then
           exec startx
         fi
       fi
