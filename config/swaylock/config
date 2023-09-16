@@ -1,7 +1,9 @@
 scaling=fill
-image=~/Pictures/wallpaper.png
 # TODO script with: swaymsg -t get_outputs | jq -r '.[] | select(.transform != "normal") | .name'
-image=DP-5:~/Pictures/wallpaper-portrait.png
+image=~/Pictures/wallpaper.png
+image=DP-1:~/Pictures/wallpaper-1
+image=DP-2:~/Pictures/wallpaper-1
+image=DP-3:~/Pictures/wallpaper-2
 inside-color=00000033
 inside-ver-color=00000033
 ring-color=ffffffff
