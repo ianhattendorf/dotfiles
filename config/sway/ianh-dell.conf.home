@@ -1,0 +1,42 @@
+set $output_center DP-2
+set $output_left eDP-1
+set $output_right DP-3
+
+output $output_left {
+    bg '~/Pictures/wallpaper-1' fill #000000
+    position 0,1030
+    resolution 1920x1200@60Hz
+    subpixel rgb
+}
+
+output $output_center {
+    bg '~/Pictures/wallpaper-2' fill #000000
+    # cat /sys/class/drm/card1-DP-3/edid | edid-decode --xmodeline | grep 'DTD 1:
+    # 2160p@60Hz
+#    modeline 533.250 3840 3888 3920 4000 2160 2214 2219 2222 +HSync -VSync
+    position 1920,0
+    resolution 3840x2160@60Hz
+    adaptive_sync off
+    render_bit_depth 10
+    scale 1.5
+    subpixel rgb
+}
+
+output $output_right {
+    bg '~/Pictures/wallpaper-portrait' fill #000000
+    position 4480,0
+    resolution 3840x2160@60Hz
+    adaptive_sync off
+    render_bit_depth 10
+    scale 1.5
+    subpixel rgb
+}
+
+workspace 1 output $output_center
+workspace 2 output $output_right
+workspace 3 output $output_center
+workspace 4 output $output_left
+workspace 5 output $output_center
+workspace 6 output $output_center
+
+exec swaymsg focus output $output_center
