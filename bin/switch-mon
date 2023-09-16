@@ -2,6 +2,8 @@
 
 set -eu
 
+monitor_choice="${1:-all}"
+
 vcp_input='0x60'
 
 input_hdmi_1='0x05'
@@ -9,7 +11,7 @@ input_hdmi_2='0x06'
 input_dp_c='0x07'
 input_dp_1='0x08'
 
-display_1='7'
+display_1='6'
 display_1_input_us="$input_dp_1"
 display_1_input_them="$input_dp_c"
 
@@ -20,5 +22,9 @@ display_2_input_them="$input_dp_c"
 display_1_input="$display_1_input_them"
 display_2_input="$display_2_input_them"
 
-ddcutil --bus "$display_1" setvcp "$vcp_input" "$display_1_input" || true
-ddcutil --bus "$display_2" setvcp "$vcp_input" "$display_2_input" || true
+if [ "$monitor_choice" = "1" ] || [ "$monitor_choice" = "all" ]; then
+  ddcutil --bus "$display_1" setvcp "$vcp_input" "$display_1_input" || true
+fi
+if [ "$monitor_choice" = "2" ] || [ "$monitor_choice" = "all" ]; then
+  ddcutil --bus "$display_2" setvcp "$vcp_input" "$display_2_input" || true
+fi
