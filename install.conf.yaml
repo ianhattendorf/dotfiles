@@ -22,6 +22,7 @@
     - mkdir -p ~/.config/weechat
     - mkdir -p ~/.local/bin
     - mkdir -p ~/.local/share/konsole
+    - mkdir -p ~/.emacs.d/straight/versions
     - mkdir -p ~/.emacs.d/user-lisp
     - mkdir -p ~/.gnupg
     - mkdir -p ~/bin
@@ -55,6 +56,8 @@
     - "~/.local/bin"
     - "~/.local/share/konsole"
     - "~/.emacs.d"
+    - "~/.emacs.d/straight"
+    - "~/.emacs.d/straight/versions"
     - "~/.emacs.d/user-lisp"
     - "~/.gnupg"
     - "~/bin"
@@ -63,6 +66,7 @@
     ~/.bash_profile: .bash_profile
     ~/.bashrc: .bashrc
     ~/.emacs.d/init.el: .emacs.d/init.el
+    ~/.emacs.d/straight/versions/default.el: .emacs.d/straight/versions/default.el
     ~/.emacs.d/user-lisp/setup-ligatures.el: .emacs.d/user-lisp/setup-ligatures.el
     ~/.gemrc: .gemrc
     ~/.gitconfig: .gitconfig
