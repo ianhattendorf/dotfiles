@@ -15,3 +15,5 @@ fi
 
 # User specific aliases and functions
 . "$HOME/.cargo/env"
+
+complete -C /usr/bin/terraform terraform
