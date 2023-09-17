@@ -45,6 +45,26 @@
 (global-set-key (kbd "s-u") 'revert-buffer)
 (global-unset-key (kbd "C-z"))
 
+;;; Tree-sitter
+; Requires branch, not sha
+;(setq treesit-language-source-alist
+;      '((bash "https://github.com/tree-sitter/tree-sitter-bash" "c0f5797a728fc4ebd78a8b0e436b1494a8ab5f51") ; 0.20.0
+;        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "f1e5a09b8d02f8209a68249c93f0ad647b228e6e") ; 0.20.1
+;        (json "https://github.com/tree-sitter/tree-sitter-json" "ca3f8919800e3c1ad4508de3bfd7b0b860ce434f") ; master-20230710
+;        (markdown "https://github.com/MDeiml/tree-sitter-markdown" "aaf76797aa8ecd9a5e78e0ec3681941de6c945ee") ; 0.1.6
+;        (toml "https://github.com/tree-sitter/tree-sitter-toml" "342d9be207c2dba869b9967124c679b5e6fd0ebe") ; master-20220421
+;        (rust "https://github.com/tree-sitter/tree-sitter-rust" "2697585ee0a6a07a9c762d8855022f974c831a89") ; 0.20.4
+;        (yaml "https://github.com/ikatyang/tree-sitter-yaml" "0e36bed171768908f331ff7dff9d956bae016efb"))) ; master-20210510
+
+(setq treesit-language-source-alist
+      '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+        (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
+        (json "https://github.com/tree-sitter/tree-sitter-json")
+        (markdown "https://github.com/MDeiml/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src")
+        (rust "https://github.com/tree-sitter/tree-sitter-rust")
+        (toml "https://github.com/tree-sitter/tree-sitter-toml")
+        (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
 ;;; Packages
 ; dnf install emacs-json-mode emacs-magit emacs-yaml-mode
 (add-to-list 'load-path "/usr/share/emacs/site-lisp/")
@@ -102,6 +122,13 @@
   :defer t
   :mode (".yml" ".yaml"))
 
+(use-package rust-mode
+  :straight t
+  :defer t
+  :config
+  (setq rust-format-on-save t)
+  :mode (".rs"))
+
 (use-package eglot
   :defer t
   :config
@@ -110,8 +137,15 @@
   ; doesn't appear to work (see commented out attempt below) so we prevent Eglot from taking over all modes.
   ; https://github.com/joaotavora/eglot/issues/268#issuecomment-544890756
   (setq eglot-stay-out-of '(flymake))
-  :hook ((eglot-managed-mode . (lambda () (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)))
-         (js-mode . eglot-ensure)))
+;  :hook ((eglot-managed-mode . (lambda () (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)))
+  :hook ((js-mode . eglot-ensure)
+         (rust-mode . eglot-ensure))
+  :config
+  (add-to-list 'eglot-server-programs
+               `(rust-mode . ("rust-analyzer" :initializationOptions
+                              ( :procMacro (:enable t)
+                                :cargo ( :buildScripts (:enable t)
+                                         :features "all"))))))
 
 ;(use-package flymake-eslint
 ;  :straight t
