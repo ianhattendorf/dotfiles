@@ -153,10 +153,12 @@
   ; Unfortunately, https://github.com/orzechowskid/flymake-eslint/issues/23#issuecomment-1675481378
   ; doesn't appear to work (see commented out attempt below) so we prevent Eglot from taking over all modes.
   ; https://github.com/joaotavora/eglot/issues/268#issuecomment-544890756
-  (setq eglot-stay-out-of '(flymake))
-;  :hook ((eglot-managed-mode . (lambda () (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)))
-  :hook ((js-mode . eglot-ensure)
-         (rust-mode . eglot-ensure))
+  ; Doesn't appear to be playing well with other modes, gate behind env var for now
+  (when (string= (getenv "ESLINT") "1")
+    (setq eglot-stay-out-of '(flymake))
+    (add-hook 'eglot--managed-mode-hook (lambda () (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t))))
+  :hook ((js-ts-mode . eglot-ensure)
+         (rust-ts-mode . eglot-ensure))
   :config
   (add-to-list 'eglot-server-programs
                `(rust-mode . ("rust-analyzer" :initializationOptions
