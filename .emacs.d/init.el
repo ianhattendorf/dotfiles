@@ -44,6 +44,13 @@
 (line-number-mode 1)
 (column-number-mode 1)
 
+;; Native compilation
+(setq native-comp-async-report-warnings-errors 'silent)
+(setq native-compile-prune-cache t)
+
+;; Backups/autosave
+(setq make-backup-files nil)
+
 ;; Git symbolic link visit real file
 (setq vc-follow-symlinks t)
 
