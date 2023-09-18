@@ -64,6 +64,7 @@
 ;        (rust "https://github.com/tree-sitter/tree-sitter-rust" "2697585ee0a6a07a9c762d8855022f974c831a89") ; 0.20.4
 ;        (yaml "https://github.com/ikatyang/tree-sitter-yaml" "0e36bed171768908f331ff7dff9d956bae016efb"))) ; master-20210510
 
+; M-: (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
 (setq treesit-language-source-alist
       '((bash "https://github.com/tree-sitter/tree-sitter-bash")
         (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
@@ -121,14 +122,15 @@
   :bind (("M-n" . flymake-goto-next-error)
          ("M-p" . flymake-goto-prev-error)))
 
-(use-package json-mode
+(use-package json-ts-mode
   :defer t
   :mode (".json"))
 
-(use-package js
+(use-package js-ts-mode
   :defer t
   :config
-  (setq js-indent-level 2))
+  (setq js-indent-level 2)
+  :mode (".js" ".jsx"))
 
 (use-package flow-minor-mode
   :defer t
@@ -136,13 +138,13 @@
               :type git
               :host github
               :repo "an-sh/flow-minor-mode")
-  :hook (js-mode . flow-minor-enable-automatically))
+  :hook (js-ts-mode . flow-minor-enable-automatically))
 
-(use-package yaml-mode
+(use-package yaml-ts-mode
   :defer t
   :mode (".yml" ".yaml"))
 
-(use-package rust-mode
+(use-package rust-ts-mode
   :straight t
   :defer t
   :config
@@ -164,7 +166,7 @@
          (rust-ts-mode . eglot-ensure))
   :config
   (add-to-list 'eglot-server-programs
-               `(rust-mode . ("rust-analyzer" :initializationOptions
+               `(rust-ts-mode . ("rust-analyzer" :initializationOptions
                               ( :procMacro (:enable t)
                                 :cargo ( :buildScripts (:enable t)
                                          :features "all"))))))
@@ -173,12 +175,12 @@
 ;  :straight t
 ;  :hook
 ;  (eglot-managed-mode . (lambda ()
-;                          (when (derived-mode-p 'js-mode)
+;                          (when (derived-mode-p 'js-ts-mode)
 ;                            (flymake-eslint-enable)))))
 
 (use-package flymake-eslint
   :straight t
-  :hook (js-mode . flymake-eslint-enable))
+  :hook (js-ts-mode . flymake-eslint-enable))
  
 (use-package magit
   :defer t
