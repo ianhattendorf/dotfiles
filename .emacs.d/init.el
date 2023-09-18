@@ -252,13 +252,13 @@
   :init
   (marginalia-mode))
 
-(use-package orderless
-  :defer t
-  :straight t
-  :init
-  (setq completion-styles '(substring orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles basic partial-completion)))))
+;(use-package orderless
+;  :defer t
+;  :straight t
+;  :init
+;  (setq completion-styles '(substring orderless basic)
+;        completion-category-defaults nil
+;        completion-category-overrides '((file (styles basic partial-completion)))))
 
 (use-package vertico
   :defer t
