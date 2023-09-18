@@ -10,6 +10,9 @@ RepeatRate=25
 [Libinput][1133][49298][Logitech G203 LIGHTSYNC Gaming Mouse]
 PointerAccelerationProfile=1
 
+[Libinput][1452][833][Apple Internal Keyboard / Trackpad]
+NaturalScroll=false
+
 [Libinput][2][14][ETPS/2 Elantech Touchpad]
 TapToClick=true
 
