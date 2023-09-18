@@ -50,6 +50,9 @@
 (global-set-key (kbd "s-u") 'revert-buffer)
 (global-unset-key (kbd "C-z"))
 
+;; Auto revert buffer if unchanged and file on disk changes
+(global-auto-revert-mode)
+
 ;;; Tree-sitter
 ; Requires branch, not sha
 ;(setq treesit-language-source-alist
