@@ -34,6 +34,11 @@
 ;; Disable bell
 (setq ring-bell-function #'ignore)
 
+;; Smooth scrolling
+(setq pixel-scroll-precision-large-scroll-height 40.0)
+(setq pixel-scroll-precision-interpolate-page t)
+(pixel-scroll-precision-mode)
+
 ;; Display line infomation
 (global-display-line-numbers-mode 1)
 (line-number-mode 1)
