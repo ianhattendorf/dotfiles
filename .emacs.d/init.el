@@ -96,6 +96,18 @@
 (eval-when-compile
   (require 'use-package))
 
+(use-package avy
+  :defer t
+  :straight t
+  :bind (("C-:" . avy-goto-char)
+         ("C-'" . avy-goto-char-2)
+         ("M-g f" . avy-goto-line)
+         ("M-g w" . avy-goto-word-1)
+         ("M-g e" . avy-goto-word-0)
+         ("C-c C-j" . avy-resume))
+  :config
+  (avy-setup-default))
+
 (use-package flymake
   :defer t
   :bind (("M-n" . flymake-goto-next-error)
