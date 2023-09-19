@@ -2,6 +2,7 @@
  ("compat" . "d1e893b02301a7321ca9879bc9a4da50e2fdf09f")
  ("consult" . "4b8f8a55e875f705925b954822127bfbc7045c82")
  ("corfu" . "cc244c54b392ce4d27ed166730efde4f4d01a07f")
+ ("ef-themes" . "ac439fff75ce1768a6b9f2750a9929e890b7aa61")
  ("el-get" . "05bb836e3dfac8ffe4b8a10ec332aa2f661523ce")
  ("emacsmirror-mirror" . "920fc68859c72ee52e1b802fb099bed0f9c31287")
  ("eslint-disable-rule" . "54771405e09e2cf5cb8f47aab2818e77d3046f53")
