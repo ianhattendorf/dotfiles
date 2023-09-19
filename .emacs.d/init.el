@@ -346,6 +346,9 @@
 (use-package flymake-eslint
   :straight t
   :hook (js-ts-mode . flymake-eslint-enable))
+
+(use-package eslint-disable-rule
+  :straight t)
  
 (use-package magit
   :bind (("C-x g" . magit-status)))

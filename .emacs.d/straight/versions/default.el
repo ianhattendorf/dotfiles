@@ -4,6 +4,7 @@
  ("corfu" . "cc244c54b392ce4d27ed166730efde4f4d01a07f")
  ("el-get" . "05bb836e3dfac8ffe4b8a10ec332aa2f661523ce")
  ("emacsmirror-mirror" . "920fc68859c72ee52e1b802fb099bed0f9c31287")
+ ("eslint-disable-rule" . "54771405e09e2cf5cb8f47aab2818e77d3046f53")
  ("flow-minor-mode" . "804217a15a28f6918fba93c91d495ed7d50b0495")
  ("flymake-eslint" . "82b1345c699172b6092e13be2c4cc10551d88b90")
  ("gnu-elpa-mirror" . "e814620b181b7f1b14da51d4ee022b766067d114")
