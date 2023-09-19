@@ -113,7 +113,6 @@
   (require 'use-package))
 
 (use-package avy
-  :defer t
   :straight t
   :bind (("C-:" . avy-goto-char)
          ("C-'" . avy-goto-char-2)
@@ -125,7 +124,6 @@
   (avy-setup-default))
 
 (use-package consult
-  :defer t
   :straight t
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings in `mode-specific-map'
@@ -245,7 +243,6 @@
   )
 
 (use-package marginalia
-  :defer t
   :straight t
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
@@ -253,7 +250,6 @@
   (marginalia-mode))
 
 ;(use-package orderless
-;  :defer t
 ;  :straight t
 ;  :init
 ;  (setq completion-styles '(substring orderless basic)
@@ -261,28 +257,23 @@
 ;        completion-category-overrides '((file (styles basic partial-completion)))))
 
 (use-package vertico
-  :defer t
   :straight t
   :init
   (vertico-mode))
 
 (use-package flymake
-  :defer t
   :bind (("M-n" . flymake-goto-next-error)
          ("M-p" . flymake-goto-prev-error)))
 
 (use-package json-ts-mode
-  :defer t
   :mode (".json"))
 
 (use-package js-ts-mode
-  :defer t
   :config
   (setq js-indent-level 2)
   :mode (".js" ".jsx"))
 
 (use-package flow-minor-mode
-  :defer t
   :straight '(flow-minor-mode
               :type git
               :host github
@@ -290,18 +281,15 @@
   :hook (js-ts-mode . flow-minor-enable-automatically))
 
 (use-package yaml-ts-mode
-  :defer t
   :mode (".yml" ".yaml"))
 
 (use-package rust-ts-mode
   :straight t
-  :defer t
   :config
   (setq rust-format-on-save t)
   :mode (".rs"))
 
 (use-package eglot
-  :defer t
   :config
   ; Seems to be the only way to prevent flymake-eslint from being overriden
   ; Unfortunately, https://github.com/orzechowskid/flymake-eslint/issues/23#issuecomment-1675481378
@@ -332,7 +320,6 @@
   :hook (js-ts-mode . flymake-eslint-enable))
  
 (use-package magit
-  :defer t
   :bind (("C-x g" . magit-status)))
 
 (load-theme 'leuven)
