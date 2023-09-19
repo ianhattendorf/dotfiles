@@ -294,12 +294,12 @@
          ("M-p" . flymake-goto-prev-error)))
 
 (use-package json-ts-mode
-  :mode (".json"))
+  :mode ("\\.json\\'"))
 
 (use-package js-ts-mode
   :custom
   (js-indent-level 2)
-  :mode (".js" ".jsx"))
+  :mode ("\\.jsx?\\'"))
 
 (use-package flow-minor-mode
   :straight '(flow-minor-mode
@@ -309,13 +309,13 @@
   :hook (js-ts-mode . flow-minor-enable-automatically))
 
 (use-package yaml-ts-mode
-  :mode (".yml" ".yaml"))
+  :mode ("\\.ya?ml\\'"))
 
 (use-package rust-ts-mode
   :straight t
   :config
   (setq rust-format-on-save t)
-  :mode (".rs"))
+  :mode ("\\.rs\\'"))
 
 (use-package eglot
   :config
