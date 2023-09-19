@@ -269,8 +269,8 @@
   :mode (".json"))
 
 (use-package js-ts-mode
-  :config
-  (setq js-indent-level 2)
+  :custom
+  (js-indent-level 2)
   :mode (".js" ".jsx"))
 
 (use-package flow-minor-mode
