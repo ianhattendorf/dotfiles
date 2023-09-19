@@ -11,6 +11,7 @@
  ("marginalia" . "f1734375a5d8fa18e9cecb47ae4b5ae86c72399f")
  ("melpa" . "e363be39a815cf63de3ecdeb58bbdd808df248d3")
  ("nongnu-elpa" . "7be7879e3ea01401ff51a515da882e79148392ea")
+ ("orderless" . "6936fe46ef07df168a423f04efeda130b4e69753")
  ("straight.el" . "9b11112b2e7aedd994feb2d8f95bd66dbc5749a5")
  ("vertico" . "81bec39151f0a2fc6cad541f2290b4ab6282e6e2"))
 :gamma

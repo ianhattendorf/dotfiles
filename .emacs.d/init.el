@@ -251,7 +251,7 @@
   :custom
   ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
-  ;; (corfu-separator ?\s)          ;; Orderless field separator
+  (corfu-separator ?\s)          ;; Orderless field separator
   ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
   ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
   ;; (corfu-preview-current nil)    ;; Disable current candidate preview
@@ -277,12 +277,12 @@
   :init
   (marginalia-mode))
 
-;(use-package orderless
-;  :straight t
-;  :init
-;  (setq completion-styles '(substring orderless basic)
-;        completion-category-defaults nil
-;        completion-category-overrides '((file (styles basic partial-completion)))))
+(use-package orderless
+  :straight t
+  :init
+  (setq completion-styles '(substring orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles basic partial-completion)))))
 
 (use-package vertico
   :straight t
