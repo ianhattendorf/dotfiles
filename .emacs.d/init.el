@@ -61,8 +61,8 @@
   ;; Disable GUI elements
   ;; Leave menu enabled
   (when (fboundp 'menu-bar-mode) (menu-bar-mode t))
-                                        ;(when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-                                        ;(when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
+  (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+  ;; (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
 
   ;; Disable splash screen
   (setq inhibit-startup-screen t)
