@@ -19,7 +19,7 @@ set $term foot tmux
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
-set $menu fuzzel
+set $menu fuzzel --launch-prefix="swaymsg exec --"
 
 # Font
 font pango:sans-serif, Font Awesome 10
