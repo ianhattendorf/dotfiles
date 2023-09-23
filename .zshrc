@@ -28,11 +28,26 @@ function initAutocomplete {
   fi
 }
 
+function initTheme {
+  if hash darkman 2>/dev/null; then
+    if [ $(darkman get) = "dark" ]; then
+      if [ -f ~/.local/share/dark-mode.d/dark.sh ]; then
+        ~/.local/share/dark-mode.d/dark.sh
+      fi
+    else
+      if [ -f ~/.local/share/light-mode.d/light.sh ]; then
+        ~/.local/share/light-mode.d/light.sh
+      fi
+    fi
+  fi
+}
+
 function initOs {
   case `uname` in
     Linux)
       initAntigen ~/bin/antigen-2.2.3.zsh
       initAutocomplete
+      initTheme
       if [ ! "$DISPLAY" ] && [ "$(uname -m)" != "aarch64" ]; then
         # Start Sway on tty1 or tty4, i3 on tty5
         if [ "$XDG_VTNR" -eq 1 ] || [ "$XDG_VTNR" -eq 4 ]; then

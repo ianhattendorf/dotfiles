@@ -22,6 +22,8 @@
     - mkdir -p ~/.config/weechat
     - mkdir -p ~/.local/bin
     - mkdir -p ~/.local/share/konsole
+    - mkdir -p ~/.local/share/dark-mode.d
+    - mkdir -p ~/.local/share/light-mode.d
     - mkdir -p ~/.emacs.d/straight/versions
     - mkdir -p ~/.emacs.d/user-lisp
     - mkdir -p ~/.gnupg
@@ -56,6 +58,8 @@
     - "~/.config/weechat"
     - "~/.local/bin"
     - "~/.local/share/konsole"
+    - "~/.local/share/dark-mode.d"
+    - "~/.local/share/light-mode.d"
     - "~/.emacs.d"
     - "~/.emacs.d/straight"
     - "~/.emacs.d/straight/versions"
@@ -144,6 +148,8 @@
     ~/.local/share/applications/gitkraken.desktop: .local/share/applications/gitkraken.desktop
     ~/.local/share/konsole/Moe.colorscheme: .local/share/konsole/Moe.colorscheme
     ~/.local/share/konsole/Personal.profile: .local/share/konsole/Personal.profile
+    ~/.local/share/dark-mode.d/dark.sh: .local/share/dark-mode.d/dark.sh
+    ~/.local/share/light-mode.d/light.sh: .local/share/light-mode.d/light.sh
     ~/.siril/scripts/OSC_Preprocessing_With_BGR.ssf: .siril/scripts/OSC_Preprocessing_With_BGR.ssf
     ~/.siril/scripts/OSC_Preprocessing_With_BGR_With_Masters.ssf: .siril/scripts/OSC_Preprocessing_With_BGR_With_Masters.ssf
     ~/.siril/scripts/OSC_Preprocessing_With_BGR_With_Bias_Master.ssf: .siril/scripts/OSC_Preprocessing_With_BGR_With_Bias_Master.ssf
