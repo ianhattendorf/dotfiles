@@ -25,6 +25,7 @@
     - mkdir -p ~/.emacs.d/straight/versions
     - mkdir -p ~/.emacs.d/user-lisp
     - mkdir -p ~/.gnupg
+    - mkdir -p ~/.ssh
     - mkdir -p ~/bin
     - sh mpv-hwdec.sh
     - sh antigen-install.sh 2.2.3
@@ -60,6 +61,7 @@
     - "~/.emacs.d/straight/versions"
     - "~/.emacs.d/user-lisp"
     - "~/.gnupg"
+    - "~/.ssh"
     - "~/bin"
 
 - link:
@@ -148,6 +150,7 @@
     ~/.siril/scripts/OSC_Master_Bias.ssf: .siril/scripts/OSC_Master_Bias.ssf
     ~/.siril/scripts/OSC_Master_Dark.ssf: .siril/scripts/OSC_Master_Dark.ssf
     ~/.siril/scripts/OSC_Master_Flat.ssf: .siril/scripts/OSC_Master_Flat.ssf
+    ~/.ssh/known_hosts2: .ssh/known_hosts2
     ~/bin/switch-mon: bin/switch-mon
 
 - shell:
