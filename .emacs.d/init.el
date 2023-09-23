@@ -382,14 +382,7 @@
   ;; (load-theme 'ef-cyprus :no-confirm)
 
   ;; OR use this to load the theme which also calls `ef-themes-post-load-hook':
-  (ef-themes-select 'ef-cyprus)
-
-  ;; If you like two specific themes and want to switch between them, you
-  ;; can specify them in `ef-themes-to-toggle' and then invoke the command
-  ;; `ef-themes-toggle'.  All the themes are included in the variable
-  ;; `ef-themes-collection'.
-  (setq ef-themes-to-toggle '(ef-cyprus ef-elea-dark))
-
+  ;; (ef-themes-select 'ef-cyprus)
 
   ;; The themes we provide are recorded in the `ef-themes-dark-themes',
   ;; `ef-themes-light-themes'.
@@ -404,6 +397,15 @@
   ;; - `ef-themes-preview-colors'
   ;; - `ef-themes-preview-colors-current'
   )
+
+(use-package auto-dark
+  :straight t
+  :after ef-themes
+  :config
+  (setq auto-dark-light-theme 'ef-cyprus)
+  (setq auto-dark-dark-theme 'ef-elea-dark)
+  (setq ef-themes-to-toggle '(ef-cyprus ef-elea-dark))
+  (auto-dark-mode t))
 
 (provide 'init)
 ;;; init.el ends here
