@@ -27,16 +27,6 @@
           (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
   ;; Packages
-  ; dnf install emacs-json-mode emacs-magit emacs-yaml-mode
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/")
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/yaml-mode/")
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/json-mode/")
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/json-snatcher/")
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/magit/")
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/async/")
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/dash/")
-  (add-to-list 'load-path "/usr/share/emacs/site-lisp/with-editor/")
-
   (setq package-enable-at-startup nil)
 
   ;; straight.el
@@ -365,6 +355,7 @@
   :straight t)
  
 (use-package magit
+  :straight t
   :bind (("C-x g" . magit-status)))
 
 (use-package ef-themes
