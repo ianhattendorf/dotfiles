@@ -103,6 +103,7 @@
     ~/.config/sway/config: config/sway/config
     ~/.config/sway/environment: config/sway/environment
     ~/.config/sway/ianh-dell.conf: config/sway/ianh-dell.conf
+    ~/.config/sway/mba2020.conf: config/sway/mba2020.conf
     ~/.config/sway/nala.conf: config/sway/nala.conf
     ~/.config/sway/simba.conf: config/sway/simba.conf
     ~/.config/sway/config.d/50-rules-shell.conf: config/sway/config.d/50-rules-shell.conf
