@@ -13,13 +13,15 @@
 (use-package emacs
   :init
   ;; Tree-sitter
-   (setq treesit-language-source-alist
+  ;; Update all: M-: -> (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
+  (setq treesit-language-source-alist
         '((bash "https://github.com/tree-sitter/tree-sitter-bash")
           (c "https://github.com/tree-sitter/tree-sitter-c")
           (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
           (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
           (json "https://github.com/tree-sitter/tree-sitter-json")
           (markdown "https://github.com/MDeiml/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src")
+          (python "https://github.com/tree-sitter/tree-sitter-python")
           (rust "https://github.com/tree-sitter/tree-sitter-rust")
           (toml "https://github.com/tree-sitter/tree-sitter-toml")
           (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
@@ -128,6 +130,9 @@
   :config
   (avy-setup-default))
 
+(use-package company
+  :straight t)
+
 (use-package consult
   :straight t
   ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -153,7 +158,7 @@
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g f" . consult-flycheck)               ;; Alternative: consult-flycheck
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
@@ -247,31 +252,6 @@
   ;; (setq consult-project-function nil)
   )
 
-(use-package corfu
-  :straight t
-  ;; Optional customizations
-  :custom
-  ;; (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
-  (corfu-separator ?\s)          ;; Orderless field separator
-  ;; (corfu-quit-at-boundary nil)   ;; Never quit at completion boundary
-  ;; (corfu-quit-no-match nil)      ;; Never quit, even if there is no match
-  ;; (corfu-preview-current nil)    ;; Disable current candidate preview
-  ;; (corfu-preselect 'prompt)      ;; Preselect the prompt
-  ;; (corfu-on-exact-match nil)     ;; Configure handling of exact matches
-  ;; (corfu-scroll-margin 5)        ;; Use scroll margin
-
-  ;; Enable Corfu only for certain modes.
-  ;; :hook ((prog-mode . corfu-mode)
-  ;;        (shell-mode . corfu-mode)
-  ;;        (eshell-mode . corfu-mode))
-
-  ;; Recommended: Enable Corfu globally.
-  ;; This is recommended since Dabbrev can be used globally (M-/).
-  ;; See also `global-corfu-modes'.
-  :init
-  (global-corfu-mode))
-
 (use-package marginalia
   :straight t
   :bind (:map minibuffer-local-map
@@ -291,9 +271,11 @@
   :init
   (vertico-mode))
 
-(use-package flymake
-  :bind (("M-n" . flymake-goto-next-error)
-         ("M-p" . flymake-goto-prev-error)))
+(use-package flycheck
+  :straight t
+  :init (global-flycheck-mode)
+  :bind (("M-n" . flycheck-next-error)
+         ("M-p" . flycheck-previous-error)))
 
 (use-package clang-format
   :bind (("C-c u" . clang-format-buffer)
@@ -320,45 +302,59 @@
 (use-package yaml-ts-mode
   :mode ("\\.ya?ml\\'"))
 
+(use-package python-ts-mode
+  :config
+  :mode ("\\.py\\'"))
+
 (use-package rust-ts-mode
   :straight t
   :config
   (setq rust-format-on-save t)
   :mode ("\\.rs\\'"))
 
-(use-package eglot
-  :config
-  ; Seems to be the only way to prevent flymake-eslint from being overriden
-  ; Unfortunately, https://github.com/orzechowskid/flymake-eslint/issues/23#issuecomment-1675481378
-  ; doesn't appear to work (see commented out attempt below) so we prevent Eglot from taking over all modes.
-  ; https://github.com/joaotavora/eglot/issues/268#issuecomment-544890756
-  ; Doesn't appear to be playing well with other modes, gate behind env var for now
-  (when (string= (getenv "ESLINT") "1")
-    (setq eglot-stay-out-of '(flymake))
-    (add-hook 'eglot--managed-mode-hook (lambda () (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t))))
-  :hook ((js-ts-mode . eglot-ensure)
-         (rust-ts-mode . eglot-ensure))
-  :config
-  (add-to-list 'eglot-server-programs
-               `(rust-ts-mode . ("rust-analyzer" :initializationOptions
-                              ( :procMacro (:enable t)
-                                :cargo ( :buildScripts (:enable t)
-                                         :features "all"))))))
-
 (use-package dts-mode
   :straight t
   :mode ("\\.overlay\\'" "\\.dts\\'" "\\.dtsi\\'"))
 
-;(use-package flymake-eslint
-;  :straight t
-;  :hook
-;  (eglot-managed-mode . (lambda ()
-;                          (when (derived-mode-p 'js-ts-mode)
-;                            (flymake-eslint-enable)))))
-
-(use-package flymake-eslint
+(use-package lsp-mode
   :straight t
-  :hook (js-ts-mode . flymake-eslint-enable))
+  :init
+  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
+  (setq lsp-keymap-prefix "C-c l")
+  :hook ((c-ts-mode. lsp)
+         (c++-ts-mode. lsp)
+         (js-ts-mode. lsp)
+         (typescript-ts-mode. lsp)
+         (python-ts-mode . lsp)
+         (rust-ts-mode. lsp)
+         ;; if you want which-key integration
+         (lsp-mode . lsp-enable-which-key-integration))
+  :commands lsp)
+
+;; optionally
+(use-package lsp-ui
+  :straight t
+  :commands lsp-ui-mode)
+
+;; ;; optionally if you want to use debugger
+;; (use-package dap-mode)
+;; ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+
+;; ;; optional if you want which-key integration
+(use-package which-key
+  :straight t
+  :config
+  (which-key-mode))
+
+(use-package lsp-pyright
+  :straight t
+  :hook (python-mode . (lambda ()
+                         (require 'lsp-pyright)
+                         (lsp))))
+
+;; (use-package flymake-eslint
+;;   :straight t
+;;   :hook (js-ts-mode . flymake-eslint-enable))
 
 (use-package eslint-disable-rule
   :straight t)
