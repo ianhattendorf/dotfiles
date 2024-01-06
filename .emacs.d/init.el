@@ -15,6 +15,8 @@
   ;; Tree-sitter
    (setq treesit-language-source-alist
         '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+          (c "https://github.com/tree-sitter/tree-sitter-c")
+          (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
           (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
           (json "https://github.com/tree-sitter/tree-sitter-json")
           (markdown "https://github.com/MDeiml/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src")
@@ -293,6 +295,13 @@
   :bind (("M-n" . flymake-goto-next-error)
          ("M-p" . flymake-goto-prev-error)))
 
+(use-package clang-format
+  :bind (("C-c u" . clang-format-buffer)
+         ("C-M-<tab>" . clang-format-region)))
+
+(use-package c-ts-mode
+  :mode ("\\.c\\'" "\\.h\\'"))
+
 (use-package json-ts-mode
   :mode ("\\.json\\'"))
 
@@ -335,6 +344,10 @@
                               ( :procMacro (:enable t)
                                 :cargo ( :buildScripts (:enable t)
                                          :features "all"))))))
+
+(use-package dts-mode
+  :straight t
+  :mode ("\\.overlay\\'" "\\.dts\\'" "\\.dtsi\\'"))
 
 ;(use-package flymake-eslint
 ;  :straight t
