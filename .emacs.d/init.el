@@ -312,6 +312,10 @@
   (setq rust-format-on-save t)
   :mode ("\\.rs\\'"))
 
+(use-package terraform-mode
+  :straight t
+  :mode ("\\.tf\\'"))
+
 (use-package dts-mode
   :straight t
   :mode ("\\.overlay\\'" "\\.dts\\'" "\\.dtsi\\'"))
@@ -323,6 +327,7 @@
   (setq lsp-keymap-prefix "C-c l")
   :hook ((c-ts-mode. lsp)
          (c++-ts-mode. lsp)
+         (terraform-mode. lsp)
          (js-ts-mode. lsp)
          (typescript-ts-mode. lsp)
          (python-ts-mode . lsp)
