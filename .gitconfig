@@ -1,13 +1,14 @@
 [user]
 	email = ian.hattendorf@gitkraken.com
 	name = Ian Hattendorf
-	signingKey = D748D2094AD4D42F6E5C693F25B7FAE2B2F84C88
+	signingKey = /home/ian/.ssh/id_ed25519
 [tag]
 	forceSignAnnotated = true
 [commit]
 	gpgSign = true
 [gpg]
 	program = gpg
+	format = ssh
 [core]
 	whitespace = trailing-space
 	autocrlf = input
@@ -42,6 +43,9 @@
 	autoDetach = false
 [init]
 	defaultBranch = main
+[gpg "ssh"]
+	allowedSignersFile = /home/ian/.ssh/allowed_signers.valid
+	program = ssh-keygen
 [diff]
 	tool = meld
 [difftool "meld"]
