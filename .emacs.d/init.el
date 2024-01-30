@@ -26,6 +26,32 @@
           (toml "https://github.com/tree-sitter/tree-sitter-toml")
           (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
+  ;; Garbage collect when idle
+  (defmacro k-time (&rest body)
+    "Measure and return the time it takes evaluating BODY."
+    `(let ((time (current-time)))
+       ,@body
+       (float-time (time-since time))))
+
+  ;; Set garbage collection threshold to 1GB.
+  (setq gc-cons-threshold #x40000000)
+
+  ;; When idle for 15sec run the GC no matter what.
+  (defvar k-gc-timer
+    (run-with-idle-timer 15 t
+                         (lambda ()
+                           (message "Garbage Collector has run for %.06fsec"
+                                    (k-time (garbage-collect))))))
+
+  ;; Garbage collect on blur
+  (add-function :after
+                after-focus-change-function
+                (lambda () (unless (frame-focus-state) (message "Garbage Collector has run for %.06fsec"
+                                                                (k-time (garbage-collect))))))
+
+  ;; Increase process read buffer
+  (setq read-process-output-max (* 1024 1024))
+
   ;; Packages
   ; dnf install emacs-json-mode emacs-magit emacs-yaml-mode
   (add-to-list 'load-path "/usr/share/emacs/site-lisp/")
