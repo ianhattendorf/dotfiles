@@ -11,13 +11,13 @@ input_hdmi_2='0x06'
 input_dp_c='0x07'
 input_dp_1='0x08'
 
-display_1='6'
-display_1_input_us="$input_dp_1"
-display_1_input_them="$input_dp_c"
+display_1='8'
+display_1_input_us="$input_dp_c"
+display_1_input_them="$input_dp_1"
 
-display_2='8'
-display_2_input_us="$input_dp_1"
-display_2_input_them="$input_dp_c"
+display_2='9'
+display_2_input_us="$input_dp_c"
+display_2_input_them="$input_dp_1"
 
 display_1_input="$display_1_input_them"
 display_2_input="$display_2_input_them"
