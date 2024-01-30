@@ -17,7 +17,8 @@ output $output_center {
     position 1920,0
     resolution 3840x2160@60Hz
     adaptive_sync off
-    render_bit_depth 10
+    # render_bit_depth 10
+    render_bit_depth 8
     scale 1.5
     subpixel rgb
 }
@@ -27,7 +28,8 @@ output $output_right {
     position 4480,0
     resolution 3840x2160@60Hz
     adaptive_sync off
-    render_bit_depth 10
+    # render_bit_depth 10
+    render_bit_depth 8
     scale 1.5
     subpixel rgb
 }
