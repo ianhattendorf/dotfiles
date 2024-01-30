@@ -4,6 +4,7 @@ switch-to-activity-56562e96-6237-4454-8379-ee4ba910004f=none,none,Switch to acti
 switch-to-activity-661bfb16-b2e1-4a64-b265-0aaa84578adb=none,none,Switch to activity "Default"
 switch-to-activity-7f23804c-0925-4d73-a0d3-c992ddb1f623=none,none,Switch to activity "Default"
 switch-to-activity-be836f88-d062-4d7d-b384-10a5e7db9eaf=none,none,Switch to activity "Default"
+switch-to-activity-d0ac70eb-0f16-42b4-bdfc-735acf619df4=none,none,Switch to activity "Default"
 switch-to-activity-d5fcdafe-ca28-499b-a336-f8c43e6cc6dc=none,none,Switch to activity "Default"
 switch-to-activity-f2fcf489-1d50-47d2-88ad-d0fd155bab32=none,none,Switch to activity "Default"
 
@@ -30,7 +31,6 @@ display=Display\tMeta+P,Display\tMeta+P,Switch Display
 
 [khotkeys]
 _k_friendly_name=Custom Shortcuts Service
-{92da302e-a6a7-41bc-9375-737badaa2cb5}=Meta+Return,none,Launch Konsole
 {d03619b6-9b3c-48cc-9d9c-a2aadb485550}=none,none,Search
 
 [kmix]
@@ -41,11 +41,6 @@ increase_microphone_volume=Microphone Volume Up,Microphone Volume Up,Increase Mi
 increase_volume=Volume Up,Volume Up,Increase Volume
 mic_mute=Microphone Mute,Microphone Mute\tMeta+Volume Mute,Mute Microphone
 mute=Volume Mute,Volume Mute,Mute
-
-[krunner]
-_k_friendly_name=Run Command
-run command=Alt+F2,Alt+Space,Run Command
-run command on clipboard contents=none,Alt+Shift+F2,Run Command on clipboard contents
 
 [ksmserver]
 Halt Without Confirmation=Ctrl+Alt+Shift+PgDown,,Halt Without Confirmation
@@ -119,10 +114,10 @@ Switch to Screen 4=none,,Switch to Screen 4
 Switch to Screen 5=none,,Switch to Screen 5
 Switch to Screen 6=none,,Switch to Screen 6
 Switch to Screen 7=none,,Switch to Screen 7
-Switch to Screen Above=,,Switch to Screen Above
-Switch to Screen Below=,,Switch to Screen Below
-Switch to Screen to the Left=,,Switch to Screen to the Left
-Switch to Screen to the Right=,,Switch to Screen to the Right
+Switch to Screen Above=none,,Switch to Screen Above
+Switch to Screen Below=none,,Switch to Screen Below
+Switch to Screen to the Left=none,,Switch to Screen to the Left
+Switch to Screen to the Right=none,,Switch to Screen to the Right
 Toggle Night Color=none,none,Toggle Night Color
 Toggle Window Raise/Lower=none,,Toggle Window Raise/Lower
 Walk Through Desktop List=none,,Walk Through Desktop List
@@ -158,10 +153,10 @@ Window One Desktop Down=none,Meta+Ctrl+Shift+Down,Window One Desktop Down
 Window One Desktop Up=none,Meta+Ctrl+Shift+Up,Window One Desktop Up
 Window One Desktop to the Left=none,Meta+Ctrl+Shift+Left,Window One Desktop to the Left
 Window One Desktop to the Right=none,Meta+Ctrl+Shift+Right,Window One Desktop to the Right
-Window One Screen Down=,,Window One Screen Down
-Window One Screen Up=,,Window One Screen Up
-Window One Screen to the Left=,,Window One Screen to the Left
-Window One Screen to the Right=,,Window One Screen to the Right
+Window One Screen Down=none,,Window One Screen Down
+Window One Screen Up=none,,Window One Screen Up
+Window One Screen to the Left=none,,Window One Screen to the Left
+Window One Screen to the Right=none,,Window One Screen to the Right
 Window Operations Menu=Alt+F3,Alt+F3,Window Operations Menu
 Window Pack Down=none,,Move Window Down
 Window Pack Left=none,,Move Window Left
@@ -240,12 +235,12 @@ _launch=Launch (1),Launch (1),KCalc
 NewTab=none,none,Open a New Tab
 NewWindow=none,none,Open a New Window
 _k_friendly_name=Konsole
-_launch=Ctrl+Alt+T,Ctrl+Alt+T,Konsole
+_launch=Meta+Return,Ctrl+Alt+T,Konsole
 
 [org.kde.krunner.desktop]
 RunClipboard=none,Alt+Shift+F2,Run command on clipboard contents
 _k_friendly_name=KRunner
-_launch=Alt+Space\tMeta+D\tSearch,Alt+Space\tAlt+F2\tSearch,KRunner
+_launch=Alt+F2,Alt+Space\tAlt+F2\tSearch,KRunner
 
 [org.kde.plasma.emojier.desktop]
 _k_friendly_name=Emoji Selector
@@ -288,7 +283,8 @@ activate task manager entry 8=Meta+8,Meta+8,Activate Task Manager Entry 8
 activate task manager entry 9=Meta+9,Meta+9,Activate Task Manager Entry 9
 activate widget 22=none,none,Activate Task Manager Widget
 activate widget 25=none,none,Activate Application Launcher Widget
-activate widget 3=,none,Activate Application Launcher Widget
+activate widget 3=none,none,Activate Application Launcher Widget
+activate widget 5=,none,Activate Application Launcher Widget
 activate widget 57=Alt+F1,none,Activate Application Launcher Widget
 clear-history=none,,Clear Clipboard History
 clipboard_action=Ctrl+Alt+X,Meta+Ctrl+X,Automatic Action Popup Menu
