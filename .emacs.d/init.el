@@ -26,6 +26,22 @@
           (toml "https://github.com/tree-sitter/tree-sitter-toml")
           (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
+  (setq major-mode-remap-alist
+        '(;;(bash-mode . bash-ts-mode)
+          (c-mode . c-ts-mode)
+          (c++-mode . c++-ts-mode)
+          ;; NOTE: If using flow, ensure `flow` binary is on path
+          (js-mode . js-ts-mode)
+          (js2-mode . js-ts-mode)
+          ;; (json-mode . json-ts-mode)
+          ;; TODO (markdown . markdown-ts-mode)
+          (python-mode . python-ts-mode)
+          ;; (rust-mode . rust-ts-mode)
+          ;; (toml-mode . toml-ts-mode)
+          ;; TODO (typescript-mode . typescript-ts-mode)
+          ;; (yaml-mode . yaml-ts-mode)))
+          ))
+
   ;; Garbage collect when idle
   (defmacro k-time (&rest body)
     "Measure and return the time it takes evaluating BODY."
@@ -122,6 +138,9 @@
 
   ;; Disable bell
   (setq ring-bell-function #'ignore)
+
+  ;; Allow remembering risky local variables
+  (advice-add 'risky-local-variable-p :override #'ignore)
 
   ;; Smooth scrolling
   (setq pixel-scroll-precision-large-scroll-height 40.0)
@@ -313,18 +332,6 @@
 (use-package json-ts-mode
   :mode ("\\.json\\'"))
 
-(use-package js-ts-mode
-  :custom
-  (js-indent-level 2)
-  :mode ("\\.jsx?\\'"))
-
-(use-package flow-minor-mode
-  :straight '(flow-minor-mode
-              :type git
-              :host github
-              :repo "an-sh/flow-minor-mode")
-  :hook (js-ts-mode . flow-minor-enable-automatically))
-
 (use-package yaml-ts-mode
   :mode ("\\.ya?ml\\'"))
 
@@ -351,12 +358,14 @@
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
-  :hook ((c-ts-mode. lsp)
-         (c++-ts-mode. lsp)
+  :hook ((c-mode. lsp)
+         (c++-mode. lsp)
          (terraform-mode. lsp)
-         (js-ts-mode. lsp)
+         (js-mode . lsp)
+         (js2-mode . lsp)
+         (web-mode. lsp)
          (typescript-ts-mode. lsp)
-         (python-ts-mode . lsp)
+         (python-mode . lsp)
          (rust-ts-mode. lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
@@ -382,10 +391,6 @@
   :hook (python-mode . (lambda ()
                          (require 'lsp-pyright)
                          (lsp))))
-
-;; (use-package flymake-eslint
-;;   :straight t
-;;   :hook (js-ts-mode . flymake-eslint-enable))
 
 (use-package eslint-disable-rule
   :straight t)
