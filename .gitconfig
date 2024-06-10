@@ -58,3 +58,5 @@
 	prompt = false
 [mergetool "meld"]
 	cmd = meld \"$LOCAL\" \"$MERGED\" \"$REMOTE\" --output \"$MERGED\"
+[fetch]
+	parallel = 0
