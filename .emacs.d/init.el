@@ -31,8 +31,8 @@
           (c-mode . c-ts-mode)
           (c++-mode . c++-ts-mode)
           ;; NOTE: If using flow, ensure `flow` binary is on path
-          (js-mode . js-ts-mode)
-          (js2-mode . js-ts-mode)
+          ;; (js-mode . js-ts-mode)
+          ;; (js2-mode . js-ts-mode)
           ;; (json-mode . json-ts-mode)
           ;; TODO (markdown . markdown-ts-mode)
           (python-mode . python-ts-mode)
@@ -318,6 +318,11 @@
 
 (use-package c-ts-mode
   :mode ("\\.c\\'" "\\.h\\'"))
+
+(use-package js-mode
+  :custom
+  (js-indent-level 2)
+  :mode ("\\.jsx?\\'"))
 
 (use-package json-ts-mode
   :mode ("\\.json\\'"))
