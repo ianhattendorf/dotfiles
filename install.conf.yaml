@@ -12,6 +12,7 @@
     - mkdir -p ~/.config/i3blocks/scripts
     - mkdir -p ~/.config/mako
     - mkdir -p ~/.config/mpv/scripts
+    - mkdir -p ~/.config/mpv/shaders
     - mkdir -p ~/.config/plasma-workspace/env
     - mkdir -p ~/.config/redshift
     - mkdir -p ~/.config/sway/config.d
@@ -46,6 +47,7 @@
     - "~/.config/mako"
     - "~/.config/mpv"
     - "~/.config/mpv/scripts"
+    - "~/.config/mpv/shaders"
     - "~/.config/plasma-workspace/env"
     - "~/.config/redshift"
     - "~/.config/systemd/user"
@@ -118,9 +120,16 @@
     ~/.config/i3blocks/config: config/i3blocks/config
     ~/.config/i3blocks/scripts: config/i3blocks/scripts
     ~/.config/mako/config: config/mako/config
+    ~/.config/mpv/input.conf: config/mpv/input.conf
     ~/.config/mpv/mpv.conf: config/mpv/mpv.conf
-    ~/.config/mpv/scripts/auto-profiles.lua: config/mpv/scripts/auto-profiles.lua
-    ~/.config/mpv/scripts/auto-profiles-functions.lua: config/mpv/scripts/auto-profiles-functions.lua
+    ~/.config/mpv/shaders/KrigBilateral.glsl: config/mpv/shaders/KrigBilateral.glsl
+    ~/.config/mpv/shaders/SSimDownscaler.glsl: config/mpv/shaders/SSimDownscaler.glsl
+    ~/.config/mpv/shaders/SSimSuperRes.glsl: config/mpv/shaders/SSimSuperRes.glsl
+    ~/.config/mpv/shaders/CfL_Prediction.glsl: config/mpv/shaders/CfL_Prediction.glsl
+    ~/.config/mpv/shaders/ravu-lite-ar-r4.hook: config/mpv/shaders/ravu-lite-ar-r4.hook
+    ~/.config/mpv/shaders/ravu-lite-ar-r4-gather.hook: config/mpv/shaders/ravu-lite-ar-r4-gather.hook
+    ~/.config/mpv/shaders/ravu-zoom-ar-r3.hook: config/mpv/shaders/ravu-zoom-ar-r3.hook
+    ~/.config/mpv/shaders/ravu-zoom-ar-r3-gather.hook: config/mpv/shaders/ravu-zoom-ar-r3-gather.hook
     ~/.config/plasma-locale-settings.sh: config/plasma-locale-settings.sh
     ~/.config/plasma-localerc: config/plasma-localerc
     ~/.config/plasma-workspace/env/env.sh: config/plasma-workspace/env/env.sh
