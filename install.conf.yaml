@@ -130,6 +130,9 @@
     ~/.config/mpv/shaders/ravu-lite-ar-r4-gather.hook: config/mpv/shaders/ravu-lite-ar-r4-gather.hook
     ~/.config/mpv/shaders/ravu-zoom-ar-r3.hook: config/mpv/shaders/ravu-zoom-ar-r3.hook
     ~/.config/mpv/shaders/ravu-zoom-ar-r3-gather.hook: config/mpv/shaders/ravu-zoom-ar-r3-gather.hook
+    ~/.config/mpv/shaders/FSRCNNX_x2_8-0-4-1.glsl: config/mpv/shaders/FSRCNNX_x2_8-0-4-1.glsl
+    ~/.config/mpv/shaders/FSRCNNX_x2_16-0-4-1.glsl: config/mpv/shaders/FSRCNNX_x2_16-0-4-1.glsl
+    ~/.config/mpv/shaders/FSRCNNX_x2_16-0-4-1_enhance.glsl: config/mpv/shaders/FSRCNNX_x2_16-0-4-1_enhance.glsl
     ~/.config/plasma-locale-settings.sh: config/plasma-locale-settings.sh
     ~/.config/plasma-localerc: config/plasma-localerc
     ~/.config/plasma-workspace/env/env.sh: config/plasma-workspace/env/env.sh
