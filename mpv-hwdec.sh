@@ -10,7 +10,7 @@ gpu-context=wayland'
 elif [ "$HOSTNAME" = 'simba' ]; then
   echo 'hwdec=auto
 gpu-context=wayland
-'
+dither-depth=10'
 else
   echo 'hwdec=auto'
 fi > ~/.config/mpv/hwdec.conf
