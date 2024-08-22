@@ -133,6 +133,9 @@
     ~/.config/mpv/shaders/FSRCNNX_x2_8-0-4-1.glsl: config/mpv/shaders/FSRCNNX_x2_8-0-4-1.glsl
     ~/.config/mpv/shaders/FSRCNNX_x2_16-0-4-1.glsl: config/mpv/shaders/FSRCNNX_x2_16-0-4-1.glsl
     ~/.config/mpv/shaders/FSRCNNX_x2_16-0-4-1_enhance.glsl: config/mpv/shaders/FSRCNNX_x2_16-0-4-1_enhance.glsl
+    ~/.config/mpv/shaders/ArtCNN_C4F8_DS_CMP.glsl: config/mpv/shaders/ArtCNN_C4F8_DS_CMP.glsl
+    ~/.config/mpv/shaders/ArtCNN_C4F16_DS_CMP.glsl: config/mpv/shaders/ArtCNN_C4F16_DS_CMP.glsl
+    ~/.config/mpv/shaders/ArtCNN_C4F32_DS_CMP.glsl: config/mpv/shaders/ArtCNN_C4F32_DS_CMP.glsl
     ~/.config/plasma-locale-settings.sh: config/plasma-locale-settings.sh
     ~/.config/plasma-localerc: config/plasma-localerc
     ~/.config/plasma-workspace/env/env.sh: config/plasma-workspace/env/env.sh
