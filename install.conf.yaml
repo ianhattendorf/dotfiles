@@ -136,6 +136,8 @@
     ~/.config/mpv/shaders/ArtCNN_C4F8_DS_CMP.glsl: config/mpv/shaders/ArtCNN_C4F8_DS_CMP.glsl
     ~/.config/mpv/shaders/ArtCNN_C4F16_DS_CMP.glsl: config/mpv/shaders/ArtCNN_C4F16_DS_CMP.glsl
     ~/.config/mpv/shaders/ArtCNN_C4F32_DS_CMP.glsl: config/mpv/shaders/ArtCNN_C4F32_DS_CMP.glsl
+    ~/.config/mpv/shaders/nnedi3-nns128-win8x4.hook: config/mpv/shaders/nnedi3-nns128-win8x4.hook
+    ~/.config/mpv/shaders/nnedi3-nns256-win8x4.hook: config/mpv/shaders/nnedi3-nns256-win8x4.hook
     ~/.config/plasma-locale-settings.sh: config/plasma-locale-settings.sh
     ~/.config/plasma-localerc: config/plasma-localerc
     ~/.config/plasma-workspace/env/env.sh: config/plasma-workspace/env/env.sh
