@@ -54,16 +54,12 @@
 
   ;; When idle for 15sec run the GC no matter what.
   (defvar k-gc-timer
-    (run-with-idle-timer 15 t
-                         (lambda ()
-                           (message "Garbage Collector has run for %.06fsec"
-                                    (k-time (garbage-collect))))))
+    (run-with-idle-timer 15 t 'garbage-collect))
 
   ;; Garbage collect on blur
   (add-function :after
                 after-focus-change-function
-                (lambda () (unless (frame-focus-state) (message "Garbage Collector has run for %.06fsec"
-                                                                (k-time (garbage-collect))))))
+                (lambda () (unless (frame-focus-state) 'garbage-collect)))
 
   ;; Increase process read buffer
   (setq read-process-output-max (* 1024 1024))
