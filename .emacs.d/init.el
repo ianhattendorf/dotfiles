@@ -23,6 +23,8 @@
           (markdown "https://github.com/MDeiml/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src")
           (python "https://github.com/tree-sitter/tree-sitter-python")
           (rust "https://github.com/tree-sitter/tree-sitter-rust")
+          (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+          (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
           (toml "https://github.com/tree-sitter/tree-sitter-toml")
           (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
@@ -319,6 +321,12 @@
   :custom
   (js-indent-level 2)
   :mode ("\\.jsx?\\'"))
+
+(use-package typescript-ts-mode
+  :mode ("\\.ts\\'"))
+
+(use-package tsx-ts-mode
+  :mode ("\\.tsx\\'"))
 
 (use-package flow-minor-mode
   :straight '(flow-minor-mode
