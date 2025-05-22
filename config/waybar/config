@@ -46,7 +46,11 @@
     "format": "{usage}% "
   },
   "memory": {
-    "format": "{}% "
+    "format": "{}% ",
+    "states": {
+      "warning": 92,
+      "critical": 95
+    },
   },
   "backlight": {
     "format": "{percent}% {icon}",
