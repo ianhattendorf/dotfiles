@@ -1,10 +1,9 @@
 ############################################
 #
-# Script for Siril 1.0
-# Jan 2022
+# Script for Siril 1.2
+# February 2023
 # (C) Cyril Richard
-# (C) Ian Hattendorf
-# Preprocessing v1.0
+# Preprocessing v1.3
 #
 ########### PREPROCESSING SCRIPT ###########
 #
@@ -12,63 +11,87 @@
 #
 # Needs 4 sets of RAW images in the working
 # directory, within 4 directories:
-#   Bias/
-#   Flat/
-#   Dark/
-#   Light/
+#   biases/
+#   flats/
+#   darks/
+#   lights/
+# Saves masters to ./masters/
 #
 ############################################
 
-requires 0.99.4
+requires 1.2.0
 
 # Convert Bias Frames to .fit files
-cd Bias
+cd biases
 convert bias -out=../process
 cd ../process
 
+# FX -> DX crop
+# (6048-3936)/2=1056
+# (4024-2624)/2=700
+seqcrop bias 1056 700 3936 2624
+
 # Stack Bias Frames to bias_stacked.fit
-stack bias rej 3 3 -nonorm
+stack cropped_bias rej 3 3 -nonorm -out=../masters/bias_stacked
 cd ..
 
 # Convert Flat Frames to .fit files
-cd Flat
+cd flats
 convert flat -out=../process
 cd ../process
 
-# Pre-process Flat Frames
-preprocess flat -bias=bias_stacked
+# FX -> DX crop
+# (6048-3936)/2=1056
+# (4024-2624)/2=700
+seqcrop flat 1056 700 3936 2624
+
+# Calibrate Flat Frames
+calibrate cropped_flat -bias=../masters/bias_stacked
 
 # Stack Flat Frames to pp_flat_stacked.fit
-stack pp_flat rej 3 3 -norm=mul
+stack pp_cropped_flat rej 3 3 -norm=mul -out=../masters/pp_flat_stacked
 cd ..
 
 # Convert Dark Frames to .fit files
-cd Dark
+cd darks
 convert dark -out=../process
 cd ../process
 
+# FX -> DX crop
+# (6048-3936)/2=1056
+# (4024-2624)/2=700
+seqcrop dark 1056 700 3936 2624
+
 # Stack Dark Frames to dark_stacked.fit
-stack dark rej 3 3 -nonorm
+stack cropped_dark rej 3 3 -nonorm -out=../masters/dark_stacked
 cd ..
 
 # Convert Light Frames to .fit files
-cd Light
+cd lights
 convert light -out=../process
 cd ../process
 
-# Pre-process Light Frames
-preprocess light -dark=dark_stacked -flat=pp_flat_stacked -cfa -equalize_cfa -debayer
-# Pre-process Light Frames without dark master (use bias instead)
-#preprocess light -dark=bias_stacked -flat=pp_flat_stacked -cfa -equalize_cfa -debayer
+# FX -> DX crop
+# (6048-3936)/2=1056
+# (4024-2624)/2=700
+seqcrop light 1056 700 3936 2624
 
-# Align lights
-register pp_light
+# Calibrate Light Frames
+calibrate cropped_light -dark=../masters/dark_stacked -flat=../masters/pp_flat_stacked -cc=dark -cfa -equalize_cfa -debayer
 
 # Per-sub gradient removal
-seqsubsky r_pp_light 1
+seqsubsky pp_cropped_light 1
+
+# Align lights
+register bkg_pp_cropped_light
 
 # Stack calibrated lights to result.fit
-stack bkg_r_pp_light rej linear 5 5 -norm=addscale -output_norm -out=../result
+stack r_bkg_pp_cropped_light rej 3 3 -norm=addscale -output_norm -rgb_equal -out=result
+
+# flip if required
+load result
+mirrorx -bottomup
+save ../result_$LIVETIME:%d$s
 
 cd ..
 close
