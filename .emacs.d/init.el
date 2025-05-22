@@ -302,6 +302,10 @@
   (setq rust-format-on-save t)
   :mode ("\\.rs\\'"))
 
+(use-package slint-mode
+  :straight t
+  :mode ("\\.slint\\'"))
+
 (use-package terraform-mode
   :straight t
   :mode ("\\.tf\\'"))
@@ -315,11 +319,11 @@
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
-  :hook ((c-ts-mode. lsp)
-         (c++-ts-mode. lsp)
-         (terraform-mode. lsp)
-         (js-ts-mode. lsp)
-         (typescript-ts-mode. lsp)
+  :hook ((c-ts-mode . lsp)
+         (c++-ts-mode . lsp)
+         (terraform-mode . lsp)
+         (js-ts-mode . lsp)
+         (typescript-ts-mode . lsp)
          (python-ts-mode . lsp)
          (rust-ts-mode. lsp)
          ;; if you want which-key integration
@@ -414,3 +418,4 @@
 
 (provide 'init)
 ;;; init.el ends here
+(put 'downcase-region 'disabled nil)
