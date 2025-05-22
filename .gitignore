@@ -11,6 +11,7 @@ cmake-build-*/
 ## generic files to ignore ##
 *~
 *.lock
+!Cargo.lock
 *.swp
 *.out
 
