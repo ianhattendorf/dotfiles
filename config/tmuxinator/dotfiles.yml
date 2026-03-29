@@ -1,0 +1,12 @@
+name: dotfiles
+root: ~/dotfiles
+
+windows:
+  - editor:
+      layout: main-vertical
+      panes:
+        - nvim .
+        - git status --short --branch
+  - shell:
+      panes:
+        - 

@@ -22,6 +22,12 @@ EOBUNDLES
 }
 
 function initAutocomplete {
+  fpath=(~/.local/share/zsh/site-functions $fpath)
+  autoload -U +X compinit && compinit
+  if [ -f ~/.local/share/zsh/site-functions/_tmuxinator ]; then
+    autoload -U +X _tmuxinator
+    compdef _tmuxinator tmuxinator
+  fi
   autoload -U +X bashcompinit && bashcompinit
   if [ -f /usr/bin/terraform ]; then
     complete -o nospace -C /usr/bin/terraform terraform

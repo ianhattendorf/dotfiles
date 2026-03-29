@@ -16,3 +16,13 @@ To update dotbot:
 $ cd dotfiles
 $ git submodule update --init --remote
 ```
+
+## Tmuxinator
+
+This repo now manages tmuxinator projects in `~/.config/tmuxinator`.
+
+`./install` will install tmuxinator with `gem install --user-install` if it is not already present, then you can start the included dotfiles workspace with:
+
+```sh
+$ tmuxinator start dotfiles
+```
