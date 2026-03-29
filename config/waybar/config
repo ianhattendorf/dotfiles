@@ -46,7 +46,7 @@
     "format": "{usage}% "
   },
   "memory": {
-    "format": "{}% ",
+    "format": "{avail:0.1f} + {swapAvail:0.1f} GB ",
     "states": {
       "warning": 92,
       "critical": 95
