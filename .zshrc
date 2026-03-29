@@ -38,15 +38,19 @@ function initAutocomplete {
 
 function initTheme {
   if hash darkman 2>/dev/null; then
-    if [ $(darkman get) = "dark" ]; then
-      if [ -f ~/.local/share/dark-mode.d/dark.sh ]; then
-        ~/.local/share/dark-mode.d/dark.sh
-      fi
-    else
-      if [ -f ~/.local/share/light-mode.d/light.sh ]; then
-        ~/.local/share/light-mode.d/light.sh
-      fi
-    fi
+    theme="$(darkman get 2>/dev/null || true)"
+    case "$theme" in
+      dark)
+        if [ -f ~/.local/share/dark-mode.d/dark.sh ]; then
+          ~/.local/share/dark-mode.d/dark.sh
+        fi
+        ;;
+      light)
+        if [ -f ~/.local/share/light-mode.d/light.sh ]; then
+          ~/.local/share/light-mode.d/light.sh
+        fi
+        ;;
+    esac
   fi
 }
 
