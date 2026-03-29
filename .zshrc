@@ -26,6 +26,8 @@ function initAutocomplete {
   if [ -f /usr/bin/terraform ]; then
     complete -o nospace -C /usr/bin/terraform terraform
   fi
+
+  eval "$(git wt --init zsh)"
 }
 
 function initTheme {
@@ -48,10 +50,10 @@ function initOs {
       initAntigen ~/bin/antigen-2.2.3.zsh
       initAutocomplete
       initTheme
-      if [ ! "$DISPLAY" ] && [ "$(uname -m)" != "aarch64" ]; then
+      if [ ! "$DISPLAY" ]; then
         # Start Sway on tty1 or tty4, i3 on tty5
         if [ "$XDG_VTNR" -eq 1 ] || [ "$XDG_VTNR" -eq 4 ]; then
-          exec start-sway
+          exec dbus-run-session start-sway
         elif [ "$XDG_VTNR" -eq 5 ]; then
           exec startx
         fi
