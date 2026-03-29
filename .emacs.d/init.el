@@ -12,20 +12,6 @@
 
 (use-package emacs
   :init
-  ;; Tree-sitter
-  ;; Update all: M-: -> (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist))
-  (setq treesit-language-source-alist
-        '((bash "https://github.com/tree-sitter/tree-sitter-bash")
-          (c "https://github.com/tree-sitter/tree-sitter-c")
-          (cpp "https://github.com/tree-sitter/tree-sitter-cpp")
-          (javascript "https://github.com/tree-sitter/tree-sitter-javascript")
-          (json "https://github.com/tree-sitter/tree-sitter-json")
-          (markdown "https://github.com/MDeiml/tree-sitter-markdown" "split_parser" "tree-sitter-markdown/src")
-          (python "https://github.com/tree-sitter/tree-sitter-python")
-          (rust "https://github.com/tree-sitter/tree-sitter-rust")
-          (toml "https://github.com/tree-sitter/tree-sitter-toml")
-          (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
-
   ;; Packages
   (setq package-enable-at-startup nil)
 
@@ -108,6 +94,14 @@
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete))
+
+(use-package treesit-auto
+  :straight t
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
 
 (use-package avy
   :straight t
@@ -271,16 +265,19 @@
   :bind (("C-c u" . clang-format-buffer)
          ("C-M-<tab>" . clang-format-region)))
 
-(use-package c-ts-mode
-  :mode ("\\.c\\'" "\\.h\\'"))
+(use-package c-mode
+  :mode ("\\.c\\'"))
 
-(use-package json-ts-mode
-  :mode ("\\.json\\'"))
+(use-package c++-mode
+  :mode ("\\.cpp\\'" "\\.cxx\\'" "\\.h\\'" "\\.hpp\\'" "\\.hxx\\'"))
 
-(use-package js-ts-mode
+;; (use-package json-ts-mode
+;;   :mode ("\\.json\\'"))
+
+(use-package js-mode
+  :defer t
   :custom
-  (js-indent-level 2)
-  :mode ("\\.jsx?\\'"))
+  (js-indent-level 2))
 
 (use-package flow-minor-mode
   :straight '(flow-minor-mode
@@ -289,19 +286,20 @@
               :repo "an-sh/flow-minor-mode")
   :hook (js-ts-mode . flow-minor-enable-automatically))
 
-(use-package yaml-ts-mode
-  :mode ("\\.ya?ml\\'"))
+;; (use-package yaml-ts-mode
+;;   :mode ("\\.ya?ml\\'"))
 
-(use-package python-ts-mode
-  :config
-  :mode ("\\.py\\'"))
+;; (use-package python-ts-mode
+;;   :config
+;;   :mode ("\\.py\\'"))
 
-(use-package rust-ts-mode
+(use-package rust-mode
   :straight t
   :config
   (setq rust-format-on-save t)
   :mode ("\\.rs\\'"))
 
+;; (setq warning-suppress-types '((lsp-mode)))
 (use-package slint-mode
   :straight t
   :mode ("\\.slint\\'"))
@@ -314,18 +312,81 @@
   :straight t
   :mode ("\\.overlay\\'" "\\.dts\\'" "\\.dtsi\\'"))
 
+(use-package markdown-mode
+  :straight t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown")
+  :bind (:map markdown-mode-map
+              ("C-c C-e" . markdown-do)))
+
+;; (use-package yasnippet
+;;   :straight t)
+
+;; (use-package yasnippet-snippets
+;;   :straight t)
+
+;; dnf install python3-{epc,orjson,sexpdata,six,setuptools,paramiko,rapidfuzz,watchdog,packaging
+;; (use-package lsp-bridge
+;;   :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
+;;                          :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+;;                          :build (:not compile))
+;;   :init
+;;   (global-lsp-bridge-mode))
+
 (use-package lsp-mode
   :straight t
   :init
   ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
   (setq lsp-keymap-prefix "C-c l")
-  :hook ((c-ts-mode . lsp)
+  :config
+  (defun lsp-booster--advice-json-parse (old-fn &rest args)
+    "Try to parse bytecode instead of json."
+    (or
+     (when (equal (following-char) ?#)
+       (let ((bytecode (read (current-buffer))))
+         (when (byte-code-function-p bytecode)
+           (funcall bytecode))))
+     (apply old-fn args)))
+  (advice-add (if (progn (require 'json)
+                         (fboundp 'json-parse-buffer))
+                  'json-parse-buffer
+                'json-read)
+              :around
+              #'lsp-booster--advice-json-parse)
+
+  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
+    "Prepend emacs-lsp-booster command to lsp CMD."
+    (let ((orig-result (funcall old-fn cmd test?)))
+      (if (and (not test?)                             ;; for check lsp-server-present?
+               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
+               lsp-use-plists
+               (not (functionp 'json-rpc-connection))  ;; native json-rpc
+               (executable-find "emacs-lsp-booster"))
+          (progn
+            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
+              (setcar orig-result command-from-exec-path))
+            (message "Using emacs-lsp-booster for %s!" orig-result)
+            (cons "emacs-lsp-booster" orig-result))
+        orig-result)))
+  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
+  :custom
+  (lsp-format-buffer-on-save t)
+  (lsp-format-buffer-on-save-list '(c++-ts-mode c++-mode c-ts-mode c-mode rust-ts-mode rust-mode))
+  :config
+  (require 'dap-cpptools)
+  :hook ((c-mode . lsp)
+         (c-ts-mode . lsp)
+         (c++-mode . lsp)
          (c++-ts-mode . lsp)
          (terraform-mode . lsp)
+         (js-mode . lsp)
          (js-ts-mode . lsp)
+         (typescript-mode . lsp)
          (typescript-ts-mode . lsp)
+         (python-mode . lsp)
          (python-ts-mode . lsp)
-         (rust-ts-mode. lsp)
+         (rust-mode . lsp)
+         (rust-ts-mode . lsp)
          ;; if you want which-key integration
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
@@ -335,9 +396,14 @@
   :straight t
   :commands lsp-ui-mode)
 
-;; ;; optionally if you want to use debugger
-;; (use-package dap-mode)
-;; ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
+;; (use-package dap-cpptools
+;;   :straight t)
+
+;; optionally if you want to use debugger
+(use-package dap-mode
+  :straight t
+  :custom
+  (dap-auto-configure-mode t))
 
 ;; ;; optional if you want which-key integration
 (use-package which-key

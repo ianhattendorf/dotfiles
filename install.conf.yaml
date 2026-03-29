@@ -74,6 +74,7 @@
     ~/.bash_profile: .bash_profile
     ~/.bashrc: .bashrc
     ~/.emacs.d/init.el: .emacs.d/init.el
+    ~/.emacs.d/early-init.el: .emacs.d/early-init.el
     ~/.emacs.d/straight/versions/default.el: .emacs.d/straight/versions/default.el
     ~/.emacs.d/user-lisp/setup-ligatures.el: .emacs.d/user-lisp/setup-ligatures.el
     ~/.gemrc: .gemrc
