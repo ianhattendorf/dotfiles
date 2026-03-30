@@ -1,4 +1,5 @@
 - link:
     ~/.gitconfig-local: profiles/work/home/.gitconfig-local
     ~/.zshenv: profiles/work/home/.zshenv
+    ~/.config/Code/User/settings.json: profiles/work/xdg_config/Code/User/settings.json
     ~/.config/sway/profile.conf: profiles/work/xdg_config/sway/profile.conf
