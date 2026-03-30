@@ -3,19 +3,20 @@
   "modules-left": [
     "sway/workspaces",
     "sway/mode",
-    "custom/spotify"
+    "sway/window"
   ],
   "modules-center": [
-    "sway/window"
   ],
   "modules-right": [
     "pulseaudio",
     "network",
     "cpu",
+    "custom/power_cpu",
     "memory",
+    "custom/gpu#0",
+    "custom/gpu#1",
     "backlight",
     "battery",
-    "battery#bat2",
     "clock",
     "tray"
   ],
@@ -58,7 +59,9 @@
       "warning": 30,
       "critical": 10
     },
-    "format": "{capacity}% {icon}",
+    "format-charging": "{capacity}% {time} {icon}",
+    "format-full": "{capacity}% {time} {icon}",
+    "format": "{capacity}% {icon} {time} ({power:4.1f} W)",
     // "format-good": "", // An empty format will hide the module
     // "format-full": "",
     "format-icons": ["", "", "", "", ""]
@@ -88,9 +91,19 @@
     },
     "on-click": "pavucontrol"
   },
-  "custom/spotify": {
-    "format": " {}",
+  "custom/power_cpu": {
     "max-length": 40,
-    "exec": "/etc/xdg/waybar/custom_modules/mediaplayer.py 2> /dev/null" // Script in resources folder
+    "exec": "/home/ian/dev/repos/waybar-modules/target/debug/waybar-modules cpu",
+    "return-type": "json"
+  },
+  "custom/gpu#0": {
+    "max-length": 40,
+    "exec": "/home/ian/dev/repos/waybar-modules/target/debug/waybar-modules gpu 0",
+    "return-type": "json"
+  },
+  "custom/gpu#1": {
+    "max-length": 40,
+    "exec": "/home/ian/dev/repos/waybar-modules/target/debug/waybar-modules gpu 1",
+    "return-type": "json"
   }
 }
