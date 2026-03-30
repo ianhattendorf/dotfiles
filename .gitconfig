@@ -1,13 +1,13 @@
 [user]
 	email = ian.hattendorf@gitkraken.com
 	name = Ian Hattendorf
+#	signingkey = 0x7056515F
 	signingKey = /home/ian/.ssh/id_ed25519
 [tag]
 	forceSignAnnotated = true
 [commit]
-	gpgSign = true
+	gpgsign = true
 [gpg]
-	program = gpg
 	format = ssh
 [core]
 	whitespace = trailing-space
@@ -44,7 +44,7 @@
 [init]
 	defaultBranch = main
 [gpg "ssh"]
-	allowedSignersFile = /home/ian/.ssh/allowed_signers.valid
+	allowedSignersFile = /home/ian/.ssh/allowed_signers
 	program = ssh-keygen
 [diff]
 	tool = meld
@@ -60,3 +60,8 @@
 	cmd = meld \"$LOCAL\" \"$MERGED\" \"$REMOTE\" --output \"$MERGED\"
 [fetch]
 	parallel = 0
+[safe]
+	directory = /git
+[wt]
+	basedir = ../{gitroot}.worktrees
+	copy = .claude/settings.local.json

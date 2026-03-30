@@ -1,8 +1,9 @@
-/.vscode/
+#/.vscode/
 
 # C/C++
 /.ccls-cache/
 /compile_commands.json
+/.claude/settings.local.json
 
 # Intellij
 .idea
