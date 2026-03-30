@@ -1,0 +1,61 @@
+[include]
+	path = ~/.gitconfig-local
+[user]
+	name = Ian Hattendorf
+	email = ian@ianhattendorf.com
+	signingKey = /home/ian/.ssh/id_ed25519
+[tag]
+	forceSignAnnotated = true
+[commit]
+	gpgSign = true
+[gpg]
+	program = gpg
+	format = ssh
+[core]
+	whitespace = trailing-space
+	autocrlf = input
+	excludesfile = ~/.gitignore
+
+[alias]
+	a = !git add . && git status
+	au = !git add -u . && git status
+	aa = !git add . && git add -u . && git status
+	cm = commit -m
+	l = log --graph --all --pretty=format:'%C(yellow)%h%C(cyan)%d%Creset %s %C(white)- %C(yellow)(%ar) %Creset<%an>%Creset'
+	ucm = reset --soft HEAD~1
+	ll = log --stat --abbrev-commit
+	lg = log --graph --pretty=format:'%C(red)%h%C(reset) - %s - %C(yellow)(%ar)%C(reset) <%an>'
+	lt = ls-tree -r --abbrev=6 --full-tree HEAD
+	d = diff --color-words
+	dh = diff --color-words head
+	# Show the diff between the latest commit and the current state
+	dlc = "!git diff-index --quiet HEAD -- || clear; git diff --patch-with-stat"
+	st = status -sb
+	incoming = "!git remote update -p; git log ..@{u}"
+	outgoing = log @{u}..
+
+[push]
+	default = simple
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[gc]
+	autoDetach = false
+[init]
+	defaultBranch = main
+[diff]
+    tool = meld
+[difftool]
+    prompt = false
+[difftool "meld"]
+    cmd = meld "$LOCAL" "$REMOTE"
+[merge]
+    tool = meld
+[mergetool "meld"]
+    # cmd = meld "$LOCAL" "$MERGED" "$REMOTE" --output "$MERGED"
+    cmd = meld "$LOCAL" "$BASE" "$REMOTE" --output "$MERGED"
+[wt]
+	basedir = ../{gitroot}.worktrees
+	copy = .claude/settings.local.json

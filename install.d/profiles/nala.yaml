@@ -1,0 +1,3 @@
+- link:
+    ~/.config/i3/profile.sh: profiles/nala/xdg_config/i3/profile.sh
+    ~/.config/mpv/hwdec.conf: profiles/nala/xdg_config/mpv/hwdec.conf

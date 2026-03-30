@@ -1,0 +1,6 @@
+- link:
+    ~/.config/weechat/.weechat-pass.gpg: stateful/xdg_config/weechat/.weechat-pass.gpg
+    ~/.gnupg/dirmngr.conf: stateful/gnupg/dirmngr.conf
+    ~/.gnupg/gpg-agent.conf: stateful/gnupg/gpg-agent.conf
+    ~/.gnupg/gpg.conf: stateful/gnupg/gpg.conf
+    ~/.ssh/known_hosts2: stateful/ssh/known_hosts2

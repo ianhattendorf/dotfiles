@@ -1,14 +1,64 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
-CONFIG="install.conf.yaml"
-DOTBOT_DIR="dotbot"
-
-DOTBOT_BIN="bin/dotbot"
 BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOTBOT_DIR="vendor/dotbot"
+DOTBOT_BIN="bin/dotbot"
+CONFIG_DIR="${BASEDIR}/install.d"
+
+profile="${DOTFILES_PROFILE:-}"
+
+case "${profile}" in
+  ""|base)
+    profile=""
+    ;;
+  home|work|simba|nala|mba2020|work-vm)
+    ;;
+  *)
+    printf 'Unknown DOTFILES_PROFILE: %s\n' "${profile}" >&2
+    exit 1
+    ;;
+esac
+
+config_paths=(
+  "${CONFIG_DIR}/base/00-defaults.yaml"
+  "${CONFIG_DIR}/base/10-clean.yaml"
+  "${CONFIG_DIR}/base/20-home.yaml"
+  "${CONFIG_DIR}/base/30-xdg-config.yaml"
+  "${CONFIG_DIR}/base/40-xdg-data.yaml"
+  "${CONFIG_DIR}/base/50-xdg-bin.yaml"
+  "${CONFIG_DIR}/base/60-stateful.yaml"
+  "${CONFIG_DIR}/base/70-bootstrap.yaml"
+  "${CONFIG_DIR}/base/80-post-install.yaml"
+)
+
+if [[ -n "${profile}" ]]; then
+  config_paths+=("${CONFIG_DIR}/profiles/${profile}.yaml")
+fi
+
+dry_run=0
+for arg in "$@"; do
+  if [[ "${arg}" == "--dry-run" ]]; then
+    dry_run=1
+    break
+  fi
+done
+
+tmp_config="$(mktemp)"
+cleanup() {
+  rm -f "${tmp_config}"
+}
+trap cleanup EXIT
+
+for config_path in "${config_paths[@]}"; do
+  cat "${config_path}" >> "${tmp_config}"
+  printf '\n' >> "${tmp_config}"
+done
 
 cd "${BASEDIR}"
 git submodule update --init --recursive "${DOTBOT_DIR}"
 
-"${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" -d "${BASEDIR}" -c "${CONFIG}" "${@}"
+DOTFILES_PROFILE="${profile}" \
+DOTFILES_DRY_RUN="${dry_run}" \
+"${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" -d "${BASEDIR}" -c "${tmp_config}" "$@"

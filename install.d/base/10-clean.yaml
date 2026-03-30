@@ -1,0 +1,9 @@
+- clean:
+    - "~"
+    - "~/.config"
+    - "~/.config/Code/User"
+    - "~/.config/weechat"
+    - "~/.local/bin"
+    - "~/.local/share"
+    - "~/.gnupg"
+    - "~/.ssh"

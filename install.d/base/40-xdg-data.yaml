@@ -1,0 +1,10 @@
+- link:
+    ~/.local/share/applications/Alacritty.desktop: xdg_data/applications/Alacritty.desktop
+    ~/.local/share/applications/code.desktop: xdg_data/applications/code.desktop
+    ~/.local/share/applications/foot.desktop: xdg_data/applications/foot.desktop
+    ~/.local/share/applications/gitkraken.desktop: xdg_data/applications/gitkraken.desktop
+    ~/.local/share/dark-mode.d: xdg_data/dark-mode.d
+    ~/.local/share/konsole: xdg_data/konsole
+    ~/.local/share/light-mode.d: xdg_data/light-mode.d
+    ~/.local/share/zsh/site-functions/_tmuxinator: xdg_data/zsh/site-functions/_tmuxinator
+    ~/.local/share/siril: xdg_data/siril

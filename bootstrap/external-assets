@@ -1,0 +1,42 @@
+#!/bin/sh
+
+set -eu
+
+if [ "${DOTFILES_DRY_RUN:-0}" = "1" ]; then
+  exit 0
+fi
+
+if [ "$(uname)" = "Darwin" ]; then
+  exit 0
+fi
+
+antigen_version="2.2.3"
+antigen_dir="$HOME/bin"
+antigen_url="https://github.com/zsh-users/antigen/releases/download/v$antigen_version/antigen.zsh"
+antigen_path="$antigen_dir/antigen-$antigen_version.zsh"
+
+if [ ! -f "$antigen_path" ]; then
+  mkdir -p "$antigen_dir"
+  curl -L "$antigen_url" > "$antigen_path"
+fi
+
+betterlockscreen_version="update-cache"
+betterlockscreen_url="https://github.com/ianhattendorf/betterlockscreen/archive/$betterlockscreen_version.tar.gz"
+betterlockscreen_path="$antigen_dir/betterlockscreen"
+betterlockscreen_version_path="$betterlockscreen_path-$betterlockscreen_version"
+
+if [ ! -f "$betterlockscreen_version_path" ]; then
+  mkdir -p "$antigen_dir"
+  curl -L "$betterlockscreen_url" | tar xzv --strip-components=1 -C "$antigen_dir" "betterlockscreen-$betterlockscreen_version/betterlockscreen"
+  mv "$antigen_dir/betterlockscreen" "$betterlockscreen_version_path"
+  ln -s "$betterlockscreen_version_path" "$betterlockscreen_path"
+fi
+
+if ! command -v gem >/dev/null 2>&1; then
+  printf 'RubyGems is required to install tmuxinator\n' >&2
+  exit 1
+fi
+
+if ! gem list -i tmuxinator >/dev/null 2>&1; then
+  gem install --user-install tmuxinator
+fi

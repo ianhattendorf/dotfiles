@@ -1,0 +1,2 @@
+- shell:
+    - [bootstrap/post-install, Run post-install system refresh steps]

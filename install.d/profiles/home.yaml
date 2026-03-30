@@ -1,0 +1,3 @@
+- link:
+    ~/.gitconfig-local: profiles/home/home/.gitconfig-local
+    ~/.config/sway/profile.conf: profiles/home/xdg_config/sway/profile.conf

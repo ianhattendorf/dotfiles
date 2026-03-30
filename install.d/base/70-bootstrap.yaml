@@ -1,0 +1,3 @@
+- shell:
+    - [bootstrap/profile-setup, Validate and announce the selected profile]
+    - [bootstrap/external-assets, Install external tools that are not stored in the repo]
