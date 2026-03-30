@@ -12,6 +12,28 @@
 
 (use-package emacs
   :init
+  ;; Garbage collect when idle
+  (defmacro k-time (&rest body)
+    "Measure and return the time it takes evaluating BODY."
+    `(let ((time (current-time)))
+       ,@body
+       (float-time (time-since time))))
+
+  ;; Set garbage collection threshold to 1GB.
+  (setq gc-cons-threshold #x40000000)
+
+  ;; When idle for 15sec run the GC no matter what.
+  (defvar k-gc-timer
+    (run-with-idle-timer 15 t 'garbage-collect))
+
+  ;; Garbage collect on blur
+  (add-function :after
+                after-focus-change-function
+                (lambda () (unless (frame-focus-state) 'garbage-collect)))
+
+  ;; Increase process read buffer
+  (setq read-process-output-max (* 1024 1024))
+
   ;; Packages
   (setq package-enable-at-startup nil)
 
