@@ -24,12 +24,12 @@ Base install:
 Profile install:
 
 ```sh
-DOTFILES_PROFILE=home ./install
+DOTFILES_PROFILE=personal ./install
 DOTFILES_PROFILE=work ./install
 DOTFILES_PROFILE=simba ./install
 ```
 
-Supported profiles are `home`, `work`, `simba`, `nala`, `mba2020`, and `work-vm`.
+Supported profiles are `personal`, `work`, `simba`, `nala`, `mba2020`, and `work-vm`.
 
 There is no hostname-based install or runtime selection. If you need machine- or context-specific behavior, add it under `profiles/<name>/...` and install it explicitly with `DOTFILES_PROFILE=<name>`.
 

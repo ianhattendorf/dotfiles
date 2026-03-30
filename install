@@ -13,7 +13,7 @@ case "${profile}" in
   ""|base)
     profile=""
     ;;
-  home|work|simba|nala|mba2020|work-vm)
+  personal|work|simba|nala|mba2020|work-vm)
     ;;
   *)
     printf 'Unknown DOTFILES_PROFILE: %s\n' "${profile}" >&2
