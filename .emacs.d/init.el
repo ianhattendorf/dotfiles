@@ -382,6 +382,16 @@
   :straight t
   :commands lsp-ui-mode)
 
+(use-package prettier
+  :straight t)
+
+;; Or add `((tsx...))` to `.dir-locals.el` in project root
+(dir-locals-set-class-variables 'prettier-js
+                                '((tsx-ts-mode . ((eval . (prettier-mode t))))
+                                  (less-css-mode . ((eval . (prettier-mode t))))
+                                  (typescript-ts-mode . ((eval . (prettier-mode t))))))
+(dir-locals-set-directory-class "/home/ian/dev/repos/gitkraken/" 'prettier-js)
+
 ;; ;; optionally if you want to use debugger
 ;; (use-package dap-mode)
 ;; ;; (use-package dap-LANGUAGE) to load the dap adapter for your language
@@ -404,6 +414,19 @@
 (use-package magit
   :straight t
   :bind (("C-x g" . magit-status)))
+
+(use-package aidermacs
+  :straight (:host github :repo "MatthewZMD/aidermacs" :files ("*.el"))
+  :bind (("C-c a" . aidermacs-transient-menu))
+  ;; :config
+  ; Set API_KEY in .bashrc, that will automatically picked up by aider or in elisp
+  ;; (setenv "ANTHROPIC_API_KEY" "sk-...")
+  ; defun my-get-openrouter-api-key yourself elsewhere for security reasons
+  ;; (setenv "OPENROUTER_API_KEY" (my-get-openrouter-api-key))
+  :custom
+  ; See the Configuration section below
+  (aidermacs-default-chat-mode 'architect)
+  (aidermacs-default-model "openrouter/deepseek/deepseek-r1:free"))
 
 (use-package ef-themes
   :straight t
