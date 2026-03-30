@@ -26,3 +26,9 @@ This repo now manages tmuxinator projects in `~/.config/tmuxinator`.
 ```sh
 $ tmuxinator start dotfiles
 ```
+
+For a general-purpose session to open after signing in, use:
+
+```sh
+$ tmuxinator start default
+```

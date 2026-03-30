@@ -1,0 +1,27 @@
+<%
+dir = @args[0] || ENV["HOME"]
+dir = begin
+  File.realpath(File.expand_path(dir))
+rescue StandardError
+  File.expand_path(dir)
+end
+wt = @args[1]
+prefix = wt ? "git wt #{wt} && " : ""
+slugify = ->(value) { value.gsub(%r{[^A-Za-z0-9]+}, "-").gsub(%r{-+}, "-").sub(/\A-/, "").sub(/-\z/, "") }
+session_parts = ["c1", slugify.call(dir)]
+session_parts << slugify.call(wt) if wt
+session_name = session_parts.join("-")
+%>
+name: <%= session_name %>
+root: <%= dir %>
+startup_window: main
+
+windows:
+  - main:
+      layout: even-horizontal
+      panes:
+        - <%= "#{prefix}claude" %>
+        - <%= "#{prefix}git st" %>
+  - scratch:
+      panes:
+        -

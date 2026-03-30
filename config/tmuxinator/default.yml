@@ -1,0 +1,13 @@
+name: default
+root: ~/
+startup_window: home
+
+windows:
+  - home:
+      layout: main-vertical
+      panes:
+        -
+        - clear
+  - scratch:
+      panes:
+        -
