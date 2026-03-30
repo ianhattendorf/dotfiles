@@ -24,3 +24,14 @@ fi
 export EDITOR=vim
 export PATH
 . "$HOME/.cargo/env"
+
+if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
+  case "${XDG_VTNR:-0}" in
+    1|4)
+      exec start-sway
+      ;;
+    5)
+      exec startx
+      ;;
+  esac
+fi

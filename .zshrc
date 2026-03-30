@@ -60,14 +60,6 @@ function initOs {
       initAntigen ~/bin/antigen-2.2.3.zsh
       initAutocomplete
       initTheme
-      if [ ! "$DISPLAY" ]; then
-        # Start Sway on tty1 or tty4, i3 on tty5
-        if [ "$XDG_VTNR" -eq 1 ] || [ "$XDG_VTNR" -eq 4 ]; then
-          exec dbus-run-session start-sway
-        elif [ "$XDG_VTNR" -eq 5 ]; then
-          exec startx
-        fi
-      fi
       ;;
   esac
 }
