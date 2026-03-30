@@ -23,9 +23,17 @@ EOBUNDLES
 
 function initAutocomplete {
   autoload -U +X bashcompinit && bashcompinit
+
+  # terraform
   if [ -f /usr/bin/terraform ]; then
     complete -o nospace -C /usr/bin/terraform terraform
   fi
+
+
+  # bun completions
+  [ -s "/home/ian/.bun/_bun" ] && source "/home/ian/.bun/_bun"
+
+  eval "$(git wt --init zsh)"
 }
 
 function initTheme {
