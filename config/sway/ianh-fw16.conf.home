@@ -1,11 +1,11 @@
 set $output_center DP-4
 set $output_left eDP-2
-set $output_right DP-3
+set $output_right DP-1
 
 output $output_left {
     bg '~/Pictures/wallpaper-1' fill #000000
     position 0,607
-    adaptive_sync on
+    adaptive_sync off
     resolution 2560x1600@165Hz
     scale 1.5
     subpixel rgb
@@ -14,9 +14,8 @@ output $output_left {
 output $output_center {
     bg '~/Pictures/wallpaper-2' fill #000000
     position 1706,0
-    resolution 3840x2160@120Hz
-    adaptive_sync on
-    # render_bit_depth 10
+    resolution 3840x2160@160Hz
+    adaptive_sync off
     render_bit_depth 8
     scale 1.5
     subpixel rgb
@@ -25,9 +24,8 @@ output $output_center {
 output $output_right {
     bg '~/Pictures/wallpaper-portrait' fill #000000
     position 4266,0
-    resolution 3840x2160@144Hz
-    adaptive_sync on
-    # render_bit_depth 10
+    resolution 3840x2160@120Hz
+    adaptive_sync off
     render_bit_depth 8
     scale 1.5
     subpixel rgb

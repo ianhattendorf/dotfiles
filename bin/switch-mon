@@ -11,12 +11,16 @@ input_hdmi_2='0x06'
 input_dp_c='0x07'
 input_dp_1='0x08'
 
-display_1='18'
-display_1_input_us="$input_dp_c"
+display_card1_dp1='6' # rear expansion port
+display_card2_dp3='17' # top right (#4)
+display_card2_dp4='18' # top left (#1)
+
+# Center
+display_1="$display_card2_dp4"
 display_1_input_them="$input_dp_1"
 
-display_2='17'
-display_2_input_us="$input_dp_c"
+# Right
+display_2="$display_card1_dp1"
 display_2_input_them="$input_dp_1"
 
 display_1_input="$display_1_input_them"

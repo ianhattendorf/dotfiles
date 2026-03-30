@@ -1,30 +1,35 @@
 set $output_center DP-1
-set $output_left DP-2
-set $output_right eDP-1
+set $output_left DP-5
+set $output_right eDP-2
 
 output $output_right {
     bg '~/Pictures/wallpaper-1' fill #000000
-    position 4480,240
-    resolution 1920x1200@60Hz
+    position 5120,819
+    resolution 2560x1600@165Hz
+    adaptive_sync off
+    render_bit_depth 8
     subpixel rgb
+    scale 1.5
 }
 
 output $output_center {
     bg '~/Pictures/wallpaper-2' fill #000000
-    position 1920,0
-    resolution 2560x1440@60Hz
+    position 2560,0
+    Resolution 3840x2160@60Hz
     adaptive_sync off
     render_bit_depth 8
     subpixel rgb
+    scale 1.5
 }
 
 output $output_left {
     bg '~/Pictures/wallpaper-2' fill #000000
-    position 0,240
-    Resolution 1920x1200@60Hz
+    position 0,0
+    Resolution 3840x2160@60Hz
     adaptive_sync off
     render_bit_depth 8
     subpixel rgb
+    scale 1.5
 }
 
 workspace 1 output $output_center
