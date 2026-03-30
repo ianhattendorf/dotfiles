@@ -7,7 +7,12 @@ DOTBOT_DIR="vendor/dotbot"
 DOTBOT_BIN="bin/dotbot"
 CONFIG_DIR="${BASEDIR}/install.d"
 
+PROFILE_LOCK="${BASEDIR}/.profile-lock"
+
 profile="${DOTFILES_PROFILE:-}"
+if [[ -z "${profile}" && -f "${PROFILE_LOCK}" ]]; then
+  profile="$(cat "${PROFILE_LOCK}")"
+fi
 
 case "${profile}" in
   ""|base)
@@ -20,6 +25,14 @@ case "${profile}" in
     exit 1
     ;;
 esac
+
+if [[ -n "${profile}" ]]; then
+  if [[ -n "${DOTFILES_PROFILE:-}" ]]; then
+    printf 'Profile: %s (from DOTFILES_PROFILE)\n' "${profile}"
+  else
+    printf 'Profile: %s (from %s)\n' "${profile}" "${PROFILE_LOCK}"
+  fi
+fi
 
 config_paths=(
   "${CONFIG_DIR}/base/00-defaults.yaml"
@@ -62,3 +75,7 @@ git submodule update --init --recursive "${DOTBOT_DIR}"
 DOTFILES_PROFILE="${profile}" \
 DOTFILES_DRY_RUN="${dry_run}" \
 "${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" -d "${BASEDIR}" -c "${tmp_config}" "$@"
+
+if [[ -n "${profile}" ]]; then
+  printf '%s\n' "${profile}" > "${PROFILE_LOCK}"
+fi
