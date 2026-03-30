@@ -2,8 +2,6 @@
 	path = ~/.gitconfig-local
 [user]
 	name = Ian Hattendorf
-	email = ian@ianhattendorf.com
-	signingKey = /home/ian/.ssh/id_ed25519
 [tag]
 	forceSignAnnotated = true
 [commit]

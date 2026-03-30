@@ -1,3 +1,4 @@
 [user]
 	email = ian@ianhattendorf.com
+	signingKey = /home/ian/.ssh/id_ed25519
 
