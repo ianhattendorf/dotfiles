@@ -1,0 +1,19 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "cleanupPeriodDays": 9999,
+  "enabledPlugins": {
+    "code-review@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "sandbox": {
+    "enabled": true
+  },
+  "statusLine": {
+    "command": "/home/ian/.cargo/bin/claude-status-line",
+    "type": "command"
+  }
+}

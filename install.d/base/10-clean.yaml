@@ -1,5 +1,6 @@
 - clean:
     - "~"
+    - "~/.claude"
     - "~/.config"
     - "~/.config/Code/User"
     - "~/.config/weechat"

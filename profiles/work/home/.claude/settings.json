@@ -1,0 +1,275 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "cleanupPeriodDays": 9999,
+  "enabledPlugins": {
+    "atlassian@claude-plugins-official": false,
+    "code-review@claude-plugins-official": true,
+    "figma@claude-plugins-official": false,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "hooks": {
+    "ConfigChange": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "Elicitation": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "ElicitationResult": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "InstructionsLoaded": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      },
+      {
+        "hooks": [
+          {
+            "command": "sleep 600",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PostCompact": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "WorktreeCreate": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "WorktreeRemove": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ]
+  },
+  "sandbox": {
+    "enabled": true
+  },
+  "statusLine": {
+    "command": "/home/ian/.cargo/bin/claude-status-line",
+    "type": "command"
+  }
+}

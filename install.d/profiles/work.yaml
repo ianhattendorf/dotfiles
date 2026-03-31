@@ -1,4 +1,5 @@
 - link:
+    ~/.claude/settings.json: profiles/work/home/.claude/settings.json
     ~/.gitconfig-local: profiles/work/home/.gitconfig-local
     ~/.zshenv: profiles/work/home/.zshenv
     ~/.config/Code/User/settings.json: profiles/work/xdg_config/Code/User/settings.json

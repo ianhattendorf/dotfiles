@@ -68,3 +68,12 @@ ensure_git_repo_at_commit \
   "https://github.com/tmux-plugins/tmux-continuum" \
   "$tmux_plugin_dir/tmux-continuum" \
   "$tmux_continuum_commit"
+
+claude_status_line_commit="729106d93b1153083219af45411f3d445aae5ad9"
+
+if command -v cargo >/dev/null 2>&1; then
+  cargo install --git "https://git.sr.ht/~ianhattendorf/claude-status-line" \
+    --rev "$claude_status_line_commit"
+else
+  printf 'cargo is required to build claude-status-line\n' >&2
+fi
