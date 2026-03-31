@@ -93,17 +93,17 @@
   },
   "custom/power_cpu": {
     "max-length": 40,
-    "exec": "/home/ian/dev/repos/waybar-modules/target/debug/waybar-modules cpu",
+    "exec": "/home/ian/.cargo/bin/waybar-modules cpu",
     "return-type": "json"
   },
   "custom/gpu#0": {
     "max-length": 40,
-    "exec": "/home/ian/dev/repos/waybar-modules/target/debug/waybar-modules gpu 0",
+    "exec": "/home/ian/.cargo/bin/waybar-modules gpu 0",
     "return-type": "json"
   },
   "custom/gpu#1": {
     "max-length": 40,
-    "exec": "/home/ian/dev/repos/waybar-modules/target/debug/waybar-modules gpu 1",
+    "exec": "/home/ian/.cargo/bin/waybar-modules gpu 1",
     "return-type": "json"
   }
 }
