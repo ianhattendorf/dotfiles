@@ -41,7 +41,7 @@ There is no hostname-based install or runtime selection. If you need machine- or
 - `bootstrap/external-assets`
 - `bootstrap/post-install`
 
-`bootstrap/external-assets` installs external tools such as tmuxinator and fetches non-repo assets such as antigen and betterlockscreen.
+`bootstrap/external-assets` installs external tools such as tmuxinator, fetches non-repo assets such as antigen and betterlockscreen, and pins tmux plugins to fixed upstream commits.
 
 ## Tmuxinator
 
@@ -58,3 +58,12 @@ For a general-purpose session to open after signing in, use:
 ```sh
 $ tmuxinator start default
 ```
+
+## Tmux Plugins
+
+Tmux plugins are cloned directly into `~/.tmux/plugins` and checked out to fixed commits during bootstrap.
+
+Configured plugins:
+
+- `tmux-resurrect` at `cff343cf9e81983d3da0c8562b01616f12e8d548`
+- `tmux-continuum` at `0698e8f4b17d6454c71bf5212895ec055c578da0`

@@ -59,6 +59,10 @@ function initTheme {
   fi
 }
 
+function initAliases {
+  alias mux='tmuxinator'
+}
+
 function initOs {
   case `uname` in
     Linux)
@@ -71,6 +75,7 @@ function initOs {
 
 function init {
   initOs
+  initAliases
 }
 
 init

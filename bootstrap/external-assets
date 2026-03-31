@@ -40,3 +40,31 @@ fi
 if ! gem list -i tmuxinator >/dev/null 2>&1; then
   gem install --user-install tmuxinator
 fi
+
+ensure_git_repo_at_commit() {
+  repo_url="$1"
+  repo_path="$2"
+  repo_commit="$3"
+
+  if [ ! -d "$repo_path/.git" ]; then
+    mkdir -p "$(dirname "$repo_path")"
+    git clone "$repo_url" "$repo_path"
+  fi
+
+  git -C "$repo_path" fetch --force origin "$repo_commit"
+  git -C "$repo_path" checkout --detach "$repo_commit"
+}
+
+tmux_plugin_dir="$HOME/.tmux/plugins"
+tmux_resurrect_commit="5cd69050218e5e142152ed52be421d58c39066ad"
+tmux_continuum_commit="0698e8f4b17d6454c71bf5212895ec055c578da0"
+
+ensure_git_repo_at_commit \
+  "https://github.com/ianhattendorf/tmux-resurrect" \
+  "$tmux_plugin_dir/tmux-resurrect" \
+  "$tmux_resurrect_commit"
+
+ensure_git_repo_at_commit \
+  "https://github.com/tmux-plugins/tmux-continuum" \
+  "$tmux_plugin_dir/tmux-continuum" \
+  "$tmux_continuum_commit"
