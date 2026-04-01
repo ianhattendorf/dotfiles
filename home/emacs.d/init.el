@@ -13,9 +13,6 @@
 
 (use-package emacs
   :init
-  ;; Set garbage collection threshold to 1GB.
-  (setq gc-cons-threshold #x40000000)
-
   ;; When idle for 15sec run the GC no matter what.
   (defvar k-gc-timer
     (run-with-idle-timer 15 t 'garbage-collect))
@@ -27,9 +24,6 @@
 
   ;; Increase process read buffer
   (setq read-process-output-max (* 1024 1024))
-
-  ;; Packages
-  (setq package-enable-at-startup nil)
 
   ;; straight.el
   (defvar bootstrap-version)
@@ -53,19 +47,6 @@
   ;; Avoid polluting init.el with customizations
   (setq custom-file "~/.emacs.d/custom.el")
   (load custom-file :noerror)
-
-  ;; Disable GUI elements
-  ;; Leave menu enabled
-  (when (fboundp 'menu-bar-mode) (menu-bar-mode t))
-  (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
-  ;; (when (fboundp 'scroll-bar-mode) (scroll-bar-mode -1))
-
-  ;; Disable splash screen
-  (setq inhibit-startup-screen t)
-
-  ;; Native compilation
-  (setq native-comp-async-report-warnings-errors 'silent)
-  (setq native-compile-prune-cache t)
 
   ;; Backups/autosave
   (setq make-backup-files nil)
