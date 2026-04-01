@@ -6,7 +6,8 @@
 
 ;;; Code:
 
-;;; use-package
+;;; Bootstrap
+
 (eval-when-compile
   (require 'use-package))
 
@@ -117,27 +118,26 @@
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete))
 
-(use-package treesit-auto
-  :straight t
-  :custom
-  (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+;;; Completion Framework
 
-(use-package avy
+(use-package vertico
   :straight t
-  :bind (("C-:" . avy-goto-char)
-         ("C-'" . avy-goto-char-2)
-         ("M-g f" . avy-goto-line)
-         ("M-g w" . avy-goto-word-1)
-         ("M-g e" . avy-goto-word-0)
-         ("C-c C-j" . avy-resume))
-  :config
-  (avy-setup-default))
+  :init
+  (vertico-mode))
 
-(use-package company
-  :straight t)
+(use-package orderless
+  :straight t
+  :init
+  (setq completion-styles '(substring orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles basic partial-completion)))))
+
+(use-package marginalia
+  :straight t
+  :bind (:map minibuffer-local-map
+              ("M-A" . marginalia-cycle))
+  :init
+  (marginalia-mode))
 
 (use-package consult
   :straight t
@@ -258,24 +258,28 @@
   ;; (setq consult-project-function nil)
   )
 
-(use-package marginalia
-  :straight t
-  :bind (:map minibuffer-local-map
-              ("M-A" . marginalia-cycle))
-  :init
-  (marginalia-mode))
+(use-package company
+  :straight t)
 
-(use-package orderless
-  :straight t
-  :init
-  (setq completion-styles '(substring orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles basic partial-completion)))))
+;;; Navigation and Editing
 
-(use-package vertico
+(use-package avy
   :straight t
-  :init
-  (vertico-mode))
+  :bind (("C-:" . avy-goto-char)
+         ("C-'" . avy-goto-char-2)
+         ("M-g f" . avy-goto-line)
+         ("M-g w" . avy-goto-word-1)
+         ("M-g e" . avy-goto-word-0)
+         ("C-c C-j" . avy-resume))
+  :config
+  (avy-setup-default))
+
+(use-package which-key
+  :straight t
+  :config
+  (which-key-mode))
+
+;;; Diagnostics
 
 (use-package flycheck
   :straight t
@@ -287,9 +291,25 @@
   :straight t
   :after (consult flycheck))
 
-(use-package clang-format
-  :bind (("C-c u" . clang-format-buffer)
-         ("C-M-<tab>" . clang-format-region)))
+;;; Version Control
+
+(use-package magit
+  :straight t
+  :bind (("C-x g" . magit-status)))
+
+;;; Language Support
+
+;;;; Tree-sitter
+
+(use-package treesit-auto
+  :straight t
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+
+;;;; C / C++
 
 (use-package c-mode
   :mode ("\\.c\\'"))
@@ -297,8 +317,11 @@
 (use-package c++-mode
   :mode ("\\.cpp\\'" "\\.cxx\\'" "\\.h\\'" "\\.hpp\\'" "\\.hxx\\'"))
 
-;; (use-package json-ts-mode
-;;   :mode ("\\.json\\'"))
+(use-package clang-format
+  :bind (("C-c u" . clang-format-buffer)
+         ("C-M-<tab>" . clang-format-region)))
+
+;;;; JavaScript / TypeScript
 
 (use-package js-mode
   :defer t
@@ -312,18 +335,32 @@
               :repo "an-sh/flow-minor-mode")
   :hook (js-ts-mode . flow-minor-enable-automatically))
 
-;; (use-package yaml-ts-mode
-;;   :mode ("\\.ya?ml\\'"))
+;; (use-package flymake-eslint
+;;   :straight t
+;;   :hook (js-ts-mode . flymake-eslint-enable))
 
-;; (use-package python-ts-mode
-;;   :config
-;;   :mode ("\\.py\\'"))
+(use-package eslint-disable-rule
+  :straight t)
+
+;;;; Rust
 
 (use-package rust-mode
   :straight t
   :config
   (setq rust-format-on-save t)
   :mode ("\\.rs\\'"))
+
+;;;; Other Languages
+
+;; (use-package json-ts-mode
+;;   :mode ("\\.json\\'"))
+
+;; (use-package yaml-ts-mode
+;;   :mode ("\\.ya?ml\\'"))
+
+;; (use-package python-ts-mode
+;;   :config
+;;   :mode ("\\.py\\'"))
 
 ;; (setq warning-suppress-types '((lsp-mode)))
 (use-package slint-mode
@@ -345,6 +382,8 @@
   :bind (:map markdown-mode-map
               ("C-c C-e" . markdown-do)))
 
+;;; LSP and DAP
+
 ;; (use-package yasnippet
 ;;   :straight t)
 
@@ -358,6 +397,14 @@
 ;;                          :build (:not compile))
 ;;   :init
 ;;   (global-lsp-bridge-mode))
+
+;; (use-package dap-cpptools
+;;   :straight t)
+
+(use-package dap-mode
+  :straight t
+  :custom
+  (dap-auto-configure-mode t))
 
 (use-package lsp-mode
   :straight t
@@ -417,25 +464,9 @@
          (lsp-mode . lsp-enable-which-key-integration))
   :commands lsp)
 
-;; optionally
 (use-package lsp-ui
   :straight t
   :commands lsp-ui-mode)
-
-;; (use-package dap-cpptools
-;;   :straight t)
-
-;; optionally if you want to use debugger
-(use-package dap-mode
-  :straight t
-  :custom
-  (dap-auto-configure-mode t))
-
-;; ;; optional if you want which-key integration
-(use-package which-key
-  :straight t
-  :config
-  (which-key-mode))
 
 (use-package lsp-pyright
   :straight t
@@ -443,16 +474,7 @@
                          (require 'lsp-pyright)
                          (lsp))))
 
-;; (use-package flymake-eslint
-;;   :straight t
-;;   :hook (js-ts-mode . flymake-eslint-enable))
-
-(use-package eslint-disable-rule
-  :straight t)
- 
-(use-package magit
-  :straight t
-  :bind (("C-x g" . magit-status)))
+;;; Appearance
 
 (use-package ef-themes
   :straight t
