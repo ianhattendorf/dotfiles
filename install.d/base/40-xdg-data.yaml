@@ -2,6 +2,7 @@
     ~/.local/share/applications/Alacritty.desktop: xdg_data/applications/Alacritty.desktop
     ~/.local/share/applications/code.desktop: xdg_data/applications/code.desktop
     ~/.local/share/applications/foot.desktop: xdg_data/applications/foot.desktop
+    ~/.local/share/applications/foot-plain.desktop: xdg_data/applications/foot-plain.desktop
     ~/.local/share/applications/gitkraken.desktop: xdg_data/applications/gitkraken.desktop
     ~/.local/share/dark-mode.d: xdg_data/dark-mode.d
     ~/.local/share/konsole: xdg_data/konsole
