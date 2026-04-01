@@ -2,7 +2,6 @@
  ("avy" . "933d1f36cca0f71e4acb5fac707e9ae26c536264")
  ("bui.el" . "f3a137628e112a91910fd33c0cff0948fa58d470")
  ("cfrs" . "981bddb3fb9fd9c58aed182e352975bd10ad74c8")
- ("company-mode" . "59626254bbac187fc2b8d7a189aca90976ab36a8")
  ("compat" . "c1308d9a03b148f566694c631bc57b261f5200fa")
  ("consult" . "080e2d6a5b20acf3f6c32ae0e1c88866853f3dfa")
  ("dap-mode" . "b77d9bdb15d89e354b8a20906bebe7789e19fc9b")
