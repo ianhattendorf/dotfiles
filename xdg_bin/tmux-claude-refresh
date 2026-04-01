@@ -2,56 +2,80 @@
 set -euo pipefail
 
 CLAUDE_STATUS="${CLAUDE_STATUS:-claude-status}"
+NOW=$(date +%s)
 
-format_window() {
-  local active=$1 waiting=$2
+format_idle_time() {
+  local ts=$1
+  local then
+  then=$(date -d "$ts" +%s 2>/dev/null) || return
+  local diff=$(( NOW - then ))
+  if (( diff < 60 )); then printf '0m'
+  elif (( diff < 3600 )); then printf '%dm' $(( diff / 60 ))
+  elif (( diff < 86400 )); then printf '%dh' $(( diff / 3600 ))
+  else printf '%dd' $(( diff / 86400 ))
+  fi
+}
+
+format_status() {
+  local active=$1 waiting=$2 idle=$3 idle_latest=$4
   local out=""
   if (( active > 0 )); then
-    out+=" *"
+    out+="*"
     (( active > 1 )) && out+="$active"
   fi
   if (( waiting > 0 )); then
-    out+=" !"
+    (( ${#out} > 0 )) && out+=" "
+    out+="!"
     (( waiting > 1 )) && out+="$waiting"
+  fi
+  if (( idle > 0 )) && [[ -n "$idle_latest" ]]; then
+    (( ${#out} > 0 )) && out+=" "
+    local idle_time
+    idle_time=$(format_idle_time "$idle_latest")
+    if (( idle > 1 )); then
+      out+="${idle}~${idle_time}"
+    else
+      out+="~${idle_time}"
+    fi
   fi
   printf '%s' "$out"
 }
 
-format_session() {
-  local active=$1 waiting=$2
-  local inner=""
-  if (( active > 0 )); then
-    inner+="*"
-    (( active > 1 )) && inner+="$active"
-  fi
-  if (( waiting > 0 )); then
-    (( ${#inner} > 0 )) && inner+=" "
-    inner+="!"
-    (( waiting > 1 )) && inner+="$waiting"
-  fi
-  if [[ -n "$inner" ]]; then
-    printf ' [%s]' "$inner"
-  fi
-}
-
 # Get status data; exit silently if tool unavailable
-data=$("$CLAUDE_STATUS" list --tmux-summary --json 2>/dev/null) || exit 0
+data=$("$CLAUDE_STATUS" list --json 2>/dev/null) || exit 0
 [[ -z "$data" || "$data" == "[]" ]] && data=""
 
 declare -A seen_sessions seen_windows
 
 if [[ -n "$data" ]]; then
-  # Set session-level options
-  while IFS=$'\t' read -r sess_name active waiting; do
-    tmux set -q -t "$sess_name" @claude_status "$(format_session "$active" "$waiting")" 2>/dev/null || true
+  # Aggregate per-session: active, waiting, idle counts + most recent idle timestamp
+  while IFS=$'\t' read -r sess_name active waiting idle idle_latest; do
+    tmux set -q -t "$sess_name" @claude_status "$(format_status "$active" "$waiting" "$idle" "$idle_latest")" 2>/dev/null || true
     seen_sessions["$sess_name"]=1
-  done < <(printf '%s' "$data" | jq -r '.[] | [.session_name, (.status_counts.thinking + .status_counts.tool_use), .status_counts.waiting_for_user] | @tsv')
+  done < <(printf '%s' "$data" | jq -r '
+    [.[] | select(.tmux)] |
+    group_by(.tmux.session_name) | .[] |
+    (.[0].tmux.session_name) as $sess |
+    ([.[] | select(.status == "thinking" or .status == "tool_use")] | length) as $active |
+    ([.[] | select(.status == "waiting_for_user")] | length) as $waiting |
+    ([.[] | select(.status == "idle")] | length) as $idle |
+    ([.[] | select(.status == "idle") | .updated_at] | sort | last // "") as $idle_latest |
+    [$sess, $active, $waiting, $idle, $idle_latest] | @tsv')
 
-  # Set window-level options
-  while IFS=$'\t' read -r sess_name win_idx active waiting; do
-    tmux set -q -w -t "$sess_name:$win_idx" @claude_status "$(format_window "$active" "$waiting")" 2>/dev/null || true
+  # Aggregate per-window
+  while IFS=$'\t' read -r sess_name win_idx active waiting idle idle_latest; do
+    tmux set -q -w -t "$sess_name:$win_idx" @claude_status "$(format_status "$active" "$waiting" "$idle" "$idle_latest")" 2>/dev/null || true
     seen_windows["$sess_name:$win_idx"]=1
-  done < <(printf '%s' "$data" | jq -r '.[] | .session_name as $s | .windows[] | [$s, .window_index, (.status_counts.thinking + .status_counts.tool_use), .status_counts.waiting_for_user] | @tsv')
+  done < <(printf '%s' "$data" | jq -r '
+    [.[] | select(.tmux)] |
+    group_by(.tmux.session_name + ":" + (.tmux.window_index | tostring)) | .[] |
+    (.[0].tmux.session_name) as $sess |
+    (.[0].tmux.window_index) as $widx |
+    ([.[] | select(.status == "thinking" or .status == "tool_use")] | length) as $active |
+    ([.[] | select(.status == "waiting_for_user")] | length) as $waiting |
+    ([.[] | select(.status == "idle")] | length) as $idle |
+    ([.[] | select(.status == "idle") | .updated_at] | sort | last // "") as $idle_latest |
+    [$sess, $widx, $active, $waiting, $idle, $idle_latest] | @tsv')
 fi
 
 # Clean up stale options and prevent session-to-window fallthrough.
