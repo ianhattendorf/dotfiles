@@ -247,6 +247,18 @@
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
   (add-hook 'completion-at-point-functions #'cape-file))
 
+(use-package embark
+  :straight t
+  :bind (("C-." . embark-act)
+         ("C-;" . embark-dwim)
+         ("C-h B" . embark-bindings))
+  :init
+  (setq prefix-help-command #'embark-prefix-help-command))
+
+(use-package embark-consult
+  :straight t
+  :hook (embark-collect-mode . consult-preview-at-point-mode))
+
 ;;; Navigation and Editing
 
 (use-package avy
