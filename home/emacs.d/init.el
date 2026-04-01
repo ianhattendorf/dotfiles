@@ -137,7 +137,7 @@
          ("M-y" . consult-yank-pop)                ;; orig. yank-pop
          ;; M-g bindings in `goto-map'
          ("M-g e" . consult-compile-error)
-         ("M-g f" . consult-flycheck)               ;; Alternative: consult-flycheck
+         ("M-g f" . consult-flymake)
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
@@ -276,15 +276,9 @@
 
 ;;; Diagnostics
 
-(use-package flycheck
-  :straight t
-  :init (global-flycheck-mode)
-  :bind (("M-n" . flycheck-next-error)
-         ("M-p" . flycheck-previous-error)))
-
-(use-package consult-flycheck
-  :straight t
-  :after (consult flycheck))
+(use-package flymake
+  :bind (("M-n" . flymake-goto-next-error)
+         ("M-p" . flymake-goto-prev-error)))
 
 ;;; Version Control
 
@@ -358,78 +352,44 @@
 
 ;;; LSP and DAP
 
-(use-package dap-mode
-  :straight t
+(use-package eglot
+  :hook ((c-mode . eglot-ensure)
+         (c-ts-mode . eglot-ensure)
+         (c++-mode . eglot-ensure)
+         (c++-ts-mode . eglot-ensure)
+         (terraform-mode . eglot-ensure)
+         (js-mode . eglot-ensure)
+         (js-ts-mode . eglot-ensure)
+         (typescript-mode . eglot-ensure)
+         (typescript-ts-mode . eglot-ensure)
+         (python-mode . eglot-ensure)
+         (python-ts-mode . eglot-ensure)
+         (rust-mode . eglot-ensure)
+         (rust-ts-mode . eglot-ensure))
   :custom
-  (dap-auto-configure-mode t))
-
-(use-package lsp-mode
-  :straight t
-  :init
-  ;; set prefix for lsp-command-keymap (few alternatives - "C-l", "C-c l")
-  (setq lsp-keymap-prefix "C-c l")
+  (eglot-autoshutdown t)
   :config
-  (defun lsp-booster--advice-json-parse (old-fn &rest args)
-    "Try to parse bytecode instead of json."
-    (or
-     (when (equal (following-char) ?#)
-       (let ((bytecode (read (current-buffer))))
-         (when (byte-code-function-p bytecode)
-           (funcall bytecode))))
-     (apply old-fn args)))
-  (advice-add (if (progn (require 'json)
-                         (fboundp 'json-parse-buffer))
-                  'json-parse-buffer
-                'json-read)
-              :around
-              #'lsp-booster--advice-json-parse)
+  (defvar eglot-format-on-save-modes
+    '(c-mode c-ts-mode c++-mode c++-ts-mode rust-mode rust-ts-mode)
+    "Modes for which eglot should format the buffer on save.")
+  (defun eglot-format-on-save ()
+    "Format buffer via eglot on save for selected modes."
+    (when (and (bound-and-true-p eglot--managed-mode)
+               (member major-mode eglot-format-on-save-modes))
+      (eglot-format-buffer)))
+  (add-hook 'before-save-hook #'eglot-format-on-save))
 
-  (defun lsp-booster--advice-final-command (old-fn cmd &optional test?)
-    "Prepend emacs-lsp-booster command to lsp CMD."
-    (let ((orig-result (funcall old-fn cmd test?)))
-      (if (and (not test?)                             ;; for check lsp-server-present?
-               (not (file-remote-p default-directory)) ;; see lsp-resolve-final-command, it would add extra shell wrapper
-               lsp-use-plists
-               (not (functionp 'json-rpc-connection))  ;; native json-rpc
-               (executable-find "emacs-lsp-booster"))
-          (progn
-            (when-let ((command-from-exec-path (executable-find (car orig-result))))  ;; resolve command from exec-path (in case not found in $PATH)
-              (setcar orig-result command-from-exec-path))
-            (message "Using emacs-lsp-booster for %s!" orig-result)
-            (cons "emacs-lsp-booster" orig-result))
-        orig-result)))
-  (advice-add 'lsp-resolve-final-command :around #'lsp-booster--advice-final-command)
-  :custom
-  (lsp-format-buffer-on-save t)
-  (lsp-format-buffer-on-save-list '(c++-ts-mode c++-mode c-ts-mode c-mode rust-ts-mode rust-mode))
+(use-package eglot-booster
+  :straight '(eglot-booster
+              :type git
+              :host github
+              :repo "jdtsmith/eglot-booster")
+  :after eglot
   :config
-  (require 'dap-cpptools)
-  :hook ((c-mode . lsp)
-         (c-ts-mode . lsp)
-         (c++-mode . lsp)
-         (c++-ts-mode . lsp)
-         (terraform-mode . lsp)
-         (js-mode . lsp)
-         (js-ts-mode . lsp)
-         (typescript-mode . lsp)
-         (typescript-ts-mode . lsp)
-         (python-mode . lsp)
-         (python-ts-mode . lsp)
-         (rust-mode . lsp)
-         (rust-ts-mode . lsp)
-         ;; if you want which-key integration
-         (lsp-mode . lsp-enable-which-key-integration))
-  :commands lsp)
+  (eglot-booster-mode))
 
-(use-package lsp-ui
-  :straight t
-  :commands lsp-ui-mode)
-
-(use-package lsp-pyright
-  :straight t
-  :hook (python-mode . (lambda ()
-                         (require 'lsp-pyright)
-                         (lsp))))
+(use-package dape
+  :straight t)
 
 ;;; Appearance
 

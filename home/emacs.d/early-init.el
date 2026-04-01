@@ -23,7 +23,4 @@
 (setq native-comp-async-report-warnings-errors 'silent)
 (setq native-compile-prune-cache t)
 
-;; lsp-mode plist optimization
-(setenv "LSP_USE_PLISTS" "true")
-
 ;;; early-init.el ends here
