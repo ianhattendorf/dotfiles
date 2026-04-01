@@ -10,7 +10,6 @@
  ("ef-themes" . "4396d6d789cfa86a8f32f7d3039b1bd45b94e5e6")
  ("el-get" . "b966060fd99c2bdf1aae76be190f2e26473cb298")
  ("eldoc" . "3fc1a6b854691b69715ff8073278431ec41636c8")
- ("emacs-which-key" . "38d4308d1143b61e4004b6e7a940686784e51500")
  ("emacsmirror-mirror" . "daef71ec16315dc7b4f7847c723a4a889587b228")
  ("eslint-disable-rule" . "54771405e09e2cf5cb8f47aab2818e77d3046f53")
  ("f.el" . "931b6d0667fe03e7bf1c6c282d6d8d7006143c52")
