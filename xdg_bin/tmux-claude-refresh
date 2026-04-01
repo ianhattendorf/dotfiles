@@ -1,0 +1,77 @@
+#!/bin/bash
+set -euo pipefail
+
+CLAUDE_STATUS="${CLAUDE_STATUS:-claude-status}"
+
+format_window() {
+  local active=$1 waiting=$2
+  local out=""
+  if (( active > 0 )); then
+    out+=" *"
+    (( active > 1 )) && out+="$active"
+  fi
+  if (( waiting > 0 )); then
+    out+=" !"
+    (( waiting > 1 )) && out+="$waiting"
+  fi
+  printf '%s' "$out"
+}
+
+format_session() {
+  local active=$1 waiting=$2
+  local inner=""
+  if (( active > 0 )); then
+    inner+="*"
+    (( active > 1 )) && inner+="$active"
+  fi
+  if (( waiting > 0 )); then
+    (( ${#inner} > 0 )) && inner+=" "
+    inner+="!"
+    (( waiting > 1 )) && inner+="$waiting"
+  fi
+  if [[ -n "$inner" ]]; then
+    printf ' [%s]' "$inner"
+  fi
+}
+
+# Get status data; exit silently if tool unavailable
+data=$("$CLAUDE_STATUS" list --tmux-summary --json 2>/dev/null) || exit 0
+[[ -z "$data" || "$data" == "[]" ]] && data=""
+
+declare -A seen_sessions seen_windows
+
+if [[ -n "$data" ]]; then
+  # Set session-level options
+  while IFS=$'\t' read -r sess_name active waiting; do
+    tmux set -q -t "$sess_name" @claude_status "$(format_session "$active" "$waiting")" 2>/dev/null || true
+    seen_sessions["$sess_name"]=1
+  done < <(printf '%s' "$data" | jq -r '.[] | [.session_name, (.status_counts.thinking + .status_counts.tool_use), .status_counts.waiting_for_user] | @tsv')
+
+  # Set window-level options
+  while IFS=$'\t' read -r sess_name win_idx active waiting; do
+    tmux set -q -w -t "$sess_name:$win_idx" @claude_status "$(format_window "$active" "$waiting")" 2>/dev/null || true
+    seen_windows["$sess_name:$win_idx"]=1
+  done < <(printf '%s' "$data" | jq -r '.[] | .session_name as $s | .windows[] | [$s, .window_index, (.status_counts.thinking + .status_counts.tool_use), .status_counts.waiting_for_user] | @tsv')
+fi
+
+# Clean up stale options and prevent session-to-window fallthrough.
+# If a session has @claude_status set but a window within it does not,
+# the window-status-format would fall through to the session value.
+# We must explicitly set empty string on such windows to block this.
+while IFS= read -r sess; do
+  [[ -z "$sess" ]] && continue
+  if [[ -z "${seen_sessions[$sess]:-}" ]]; then
+    tmux set -q -u -t "$sess" @claude_status 2>/dev/null || true
+  fi
+  while IFS= read -r win; do
+    [[ -z "$win" ]] && continue
+    if [[ -z "${seen_windows[$sess:$win]:-}" ]]; then
+      if [[ -n "${seen_sessions[$sess]:-}" ]]; then
+        # Session has status but this window doesn't -- block fallthrough
+        tmux set -q -w -t "$sess:$win" @claude_status "" 2>/dev/null || true
+      else
+        tmux set -q -u -w -t "$sess:$win" @claude_status 2>/dev/null || true
+      fi
+    fi
+  done < <(tmux list-windows -t "$sess" -F '#{window_index}' 2>/dev/null)
+done < <(tmux list-sessions -F '#{session_name}' 2>/dev/null)
