@@ -41,11 +41,11 @@
   (defvar bootstrap-version)
   (let ((bootstrap-file
          (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-        (bootstrap-version 6))
+        (bootstrap-version 7))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
           (url-retrieve-synchronously
-           "https://raw.githubusercontent.com/radian-software/straight.el/d4cd480395f3d593e1987fbe7b26b38cd4918b9c/install.el"
+           "https://raw.githubusercontent.com/radian-software/straight.el/09b789a8596cacca6bbff866500373541a85ffa2/install.el"
            'silent 'inhibit-cookies)
         (goto-char (point-max))
         (eval-print-last-sexp)))
@@ -230,8 +230,8 @@
    consult-theme :preview-key '(:debounce 0.2 any)
    consult-ripgrep consult-git-grep consult-grep
    consult-bookmark consult-recent-file consult-xref
-   consult--source-bookmark consult--source-file-register
-   consult--source-recent-file consult--source-project-recent-file
+   consult-source-bookmark consult-source-file-register
+   consult-source-recent-file consult-source-project-recent-file
    ;; :preview-key "M-."
    :preview-key '(:debounce 0.4 any))
 
@@ -282,6 +282,10 @@
   :init (global-flycheck-mode)
   :bind (("M-n" . flycheck-next-error)
          ("M-p" . flycheck-previous-error)))
+
+(use-package consult-flycheck
+  :straight t
+  :after (consult flycheck))
 
 (use-package clang-format
   :bind (("C-c u" . clang-format-buffer)
@@ -468,10 +472,6 @@
 ;  (setq ef-themes-mixed-fonts t
 ;        ef-themes-variable-pitch-ui t)
 
-  ;; Read the doc string or manual for this one.  The symbols can be
-  ;; combined in any order.
-  (setq ef-themes-region '(intense no-extend neutral))
-
   ;; Disable all other themes to avoid awkward blending:
   (mapc #'disable-theme custom-enabled-themes)
 
@@ -499,8 +499,7 @@
   :straight t
   :after ef-themes
   :config
-  (setq auto-dark-light-theme 'ef-cyprus)
-  (setq auto-dark-dark-theme 'ef-elea-dark)
+  (setq auto-dark-themes '((ef-elea-dark) (ef-cyprus)))
   (setq ef-themes-to-toggle '(ef-cyprus ef-elea-dark))
   (auto-dark-mode t))
 
