@@ -5,7 +5,6 @@
     ~/.emacs.d/early-init.el: home/emacs.d/early-init.el
     ~/.emacs.d/init.el: home/emacs.d/init.el
     ~/.emacs.d/straight/versions/default.el: home/emacs.d/straight/versions/default.el
-    ~/.emacs.d/user-lisp/setup-ligatures.el: home/emacs.d/user-lisp/setup-ligatures.el
     ~/.gemrc: home/.gemrc
     ~/.gitconfig: home/.gitconfig
     ~/.gitconfig-local: home/.gitconfig-local

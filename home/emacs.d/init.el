@@ -13,13 +13,6 @@
 
 (use-package emacs
   :init
-  ;; Garbage collect when idle
-  (defmacro k-time (&rest body)
-    "Measure and return the time it takes evaluating BODY."
-    `(let ((time (current-time)))
-       ,@body
-       (float-time (time-since time))))
-
   ;; Set garbage collection threshold to 1GB.
   (setq gc-cons-threshold #x40000000)
 
@@ -30,7 +23,7 @@
   ;; Garbage collect on blur
   (add-function :after
                 after-focus-change-function
-                (lambda () (unless (frame-focus-state) 'garbage-collect)))
+                (lambda () (unless (frame-focus-state) (garbage-collect))))
 
   ;; Increase process read buffer
   (setq read-process-output-max (* 1024 1024))
@@ -267,9 +260,7 @@
   :straight t
   :bind (("C-:" . avy-goto-char)
          ("C-'" . avy-goto-char-2)
-         ("M-g f" . avy-goto-line)
          ("M-g w" . avy-goto-word-1)
-         ("M-g e" . avy-goto-word-0)
          ("C-c C-j" . avy-resume))
   :config
   (avy-setup-default))
@@ -311,13 +302,8 @@
 
 ;;;; C / C++
 
-(use-package c-mode
-  :mode ("\\.c\\'"))
-
-(use-package c++-mode
-  :mode ("\\.cpp\\'" "\\.cxx\\'" "\\.h\\'" "\\.hpp\\'" "\\.hxx\\'"))
-
 (use-package clang-format
+  :straight t
   :bind (("C-c u" . clang-format-buffer)
          ("C-M-<tab>" . clang-format-region)))
 
@@ -335,10 +321,6 @@
               :repo "an-sh/flow-minor-mode")
   :hook (js-ts-mode . flow-minor-enable-automatically))
 
-;; (use-package flymake-eslint
-;;   :straight t
-;;   :hook (js-ts-mode . flymake-eslint-enable))
-
 (use-package eslint-disable-rule
   :straight t)
 
@@ -347,22 +329,10 @@
 (use-package rust-mode
   :straight t
   :config
-  (setq rust-format-on-save t)
-  :mode ("\\.rs\\'"))
+  (setq rust-format-on-save t))
 
 ;;;; Other Languages
 
-;; (use-package json-ts-mode
-;;   :mode ("\\.json\\'"))
-
-;; (use-package yaml-ts-mode
-;;   :mode ("\\.ya?ml\\'"))
-
-;; (use-package python-ts-mode
-;;   :config
-;;   :mode ("\\.py\\'"))
-
-;; (setq warning-suppress-types '((lsp-mode)))
 (use-package slint-mode
   :straight t
   :mode ("\\.slint\\'"))
@@ -383,23 +353,6 @@
               ("C-c C-e" . markdown-do)))
 
 ;;; LSP and DAP
-
-;; (use-package yasnippet
-;;   :straight t)
-
-;; (use-package yasnippet-snippets
-;;   :straight t)
-
-;; dnf install python3-{epc,orjson,sexpdata,six,setuptools,paramiko,rapidfuzz,watchdog,packaging
-;; (use-package lsp-bridge
-;;   :straight '(lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge"
-;;                          :files (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
-;;                          :build (:not compile))
-;;   :init
-;;   (global-lsp-bridge-mode))
-
-;; (use-package dap-cpptools
-;;   :straight t)
 
 (use-package dap-mode
   :straight t
@@ -525,6 +478,7 @@
   (setq ef-themes-to-toggle '(ef-cyprus ef-elea-dark))
   (auto-dark-mode t))
 
+(put 'downcase-region 'disabled nil)
+
 (provide 'init)
 ;;; init.el ends here
-(put 'downcase-region 'disabled nil)

@@ -1,5 +1,4 @@
-(("ace-window" . "77115afc1b0b9f633084cf7479c767988106c196")
- ("auto-dark-emacs" . "6d1e8d2fc493dccbf05c9191611805c7e7881c70")
+(("auto-dark-emacs" . "6d1e8d2fc493dccbf05c9191611805c7e7881c70")
  ("avy" . "933d1f36cca0f71e4acb5fac707e9ae26c536264")
  ("bui.el" . "f3a137628e112a91910fd33c0cff0948fa58d470")
  ("cfrs" . "981bddb3fb9fd9c58aed182e352975bd10ad74c8")
