@@ -7,10 +7,10 @@ rescue StandardError
 end
 wt = @args[1]
 prefix = wt ? "git wt #{wt} && " : ""
-slugify = ->(value) { value.gsub(%r{[^A-Za-z0-9]+}, "-").gsub(%r{-+}, "-").sub(/\A-/, "").sub(/-\z/, "") }
+slugify = ->(value) { value.sub(/\A#{Regexp.escape(ENV["HOME"])}/, "~").gsub(%r{[^A-Za-z0-9~]+}, "-").gsub(%r{-+}, "-").sub(/\A-/, "").sub(/-\z/, "") }
 session_parts = ["c1", slugify.call(dir)]
 session_parts << slugify.call(wt) if wt
-session_name = session_parts.join("-")
+session_name = session_parts.join("-").gsub(/-?~-?/, "~")
 %>
 name: <%= session_name %>
 root: <%= dir %>
