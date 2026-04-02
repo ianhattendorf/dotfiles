@@ -73,9 +73,16 @@ function initOs {
   esac
 }
 
+function initTmux {
+  if [ -n "$TMUX" ]; then
+    tmux set-environment -g PATH "$PATH"
+  fi
+}
+
 function init {
   initOs
   initAliases
+  initTmux
 }
 
 init
