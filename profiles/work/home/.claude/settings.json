@@ -27,7 +27,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -65,7 +65,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -81,7 +81,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           }
@@ -93,7 +93,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           }
@@ -116,7 +116,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -132,7 +132,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -159,7 +159,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -175,7 +175,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -191,7 +191,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -207,7 +207,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -223,7 +223,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -239,7 +239,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -255,7 +255,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },
@@ -293,7 +293,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
           },

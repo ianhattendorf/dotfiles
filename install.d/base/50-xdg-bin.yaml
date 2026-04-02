@@ -1,4 +1,4 @@
 - link:
     ~/.local/bin/switch-mon: xdg_bin/switch-mon
-    ~/.local/bin/tmux-claude-refresh: xdg_bin/tmux-claude-refresh
+    ~/.local/bin/tmux-agent-refresh: xdg_bin/tmux-agent-refresh
     ~/.local/bin/weechat.sh: xdg_bin/weechat.sh

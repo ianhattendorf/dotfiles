@@ -1,189 +1,190 @@
 {
+  "cleanupPeriodDays": 9999,
   "attribution": {
     "commit": "",
     "pr": ""
   },
-  "cleanupPeriodDays": 9999,
+  "hooks": {
+    "Elicitation": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "/home/ian/.cargo/bin/claude-status-line"
+  },
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
   },
-  "hooks": {
-    "Elicitation": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PermissionDenied": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PostToolUse": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "StopFailure": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SubagentStart": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/claude-status hook",
-            "timeout": 10,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ]
-  },
   "sandbox": {
     "enabled": true
   },
-  "statusLine": {
-    "command": "/home/ian/.cargo/bin/claude-status-line",
-    "type": "command"
-  }
+  "model": "opusplan"
 }
