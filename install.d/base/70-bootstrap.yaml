@@ -1,3 +1,9 @@
 - shell:
-    - [bootstrap/profile-setup, Validate and announce the selected profile]
-    - [bootstrap/external-assets, Install external tools that are not stored in the repo]
+    - command: bootstrap/profile-setup
+      description: Validate and announce the selected profile
+      stdout: true
+      stderr: true
+    - command: bootstrap/external-assets
+      description: Install external tools that are not stored in the repo
+      stdout: true
+      stderr: true

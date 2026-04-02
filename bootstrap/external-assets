@@ -82,6 +82,14 @@ if command -v cargo >/dev/null 2>&1; then
     --rev "$claude_status_line_commit"
   cargo install --git "https://git.sr.ht/~ianhattendorf/waybar-modules" \
     --rev "$waybar_modules_commit"
+
+  cargo install emacs-lsp-booster
 else
-  printf 'cargo is required to build agent-status, claude-status-line, and waybar-modules\n' >&2
+  printf 'cargo is required to build agent-status, claude-status-line, waybar-modules, and emacs-lsp-booster\n' >&2
+fi
+
+if command -v npm >/dev/null 2>&1; then
+  npm install -g typescript-language-server typescript
+else
+  printf 'npm is required to install typescript-language-server\n' >&2
 fi
