@@ -5,172 +5,196 @@
     "pr": ""
   },
   "hooks": {
-    "Elicitation": [
+    "CwdChanged": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
+      }
+    ],
+    "Elicitation": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "ElicitationResult": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": ""
       }
     ],
     "Notification": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "PermissionDenied": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "PermissionRequest": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "PostToolUseFailure": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "SessionEnd": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "SessionStart": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "Stop": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "StopFailure": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "SubagentStart": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "SubagentStop": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ],
     "UserPromptSubmit": [
       {
-        "matcher": "",
         "hooks": [
           {
-            "type": "command",
             "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10
+            "timeout": 10,
+            "type": "command"
           }
-        ]
+        ],
+        "matcher": ""
       }
     ]
   },

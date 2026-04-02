@@ -23,6 +23,18 @@
         "matcher": ""
       }
     ],
+    "CwdChanged": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
     "Elicitation": [
       {
         "hooks": [
@@ -44,6 +56,16 @@
         "hooks": [
           {
             "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      },
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10,
             "type": "command"
           }
         ],

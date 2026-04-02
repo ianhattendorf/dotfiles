@@ -1,0 +1,9 @@
+#!/bin/bash
+set -euo pipefail
+
+AGENT_STATUS="${AGENT_STATUS:-agent-status}"
+
+pane=$("$AGENT_STATUS" prev "$@" 2>/dev/null) || exit 0
+[ -z "$pane" ] && exit 0
+
+tmux switch-client -t "$pane"
