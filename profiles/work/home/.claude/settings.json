@@ -16,7 +16,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -27,7 +27,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -38,7 +43,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -49,7 +54,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -60,7 +65,24 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "hooks": [
+          {
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
             "type": "command"
           }
         ],
@@ -71,16 +93,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      },
-      {
-        "hooks": [
-          {
-            "command": "sleep 600",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
             "timeout": 10,
             "type": "command"
           }
@@ -92,7 +105,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -103,7 +116,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -114,7 +132,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -125,7 +148,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -136,7 +159,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -147,7 +175,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -158,7 +191,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -169,7 +207,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -180,7 +223,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -191,7 +239,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -202,7 +255,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -213,7 +271,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -224,7 +282,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -235,7 +293,12 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "/home/ian/.cargo/bin/claude-status hook",
+            "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -246,7 +309,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
@@ -257,7 +320,7 @@
       {
         "hooks": [
           {
-            "command": "/home/ian/dev/workspaces/gitlens-ai-status/ai_hooks/target/gk ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
