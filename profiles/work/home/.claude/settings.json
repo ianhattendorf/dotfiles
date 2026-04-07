@@ -31,6 +31,10 @@
             "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "type": "command"
           }
         ],
         "matcher": ""
@@ -107,6 +111,10 @@
             "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
             "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "type": "command"
           }
         ],
         "matcher": ""
@@ -118,6 +126,10 @@
           {
             "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
             "type": "command"
           }
         ],
