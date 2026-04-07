@@ -8,6 +8,7 @@
     "atlassian@claude-plugins-official": false,
     "code-review@claude-plugins-official": true,
     "figma@claude-plugins-official": false,
+    "gopls-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
   },
