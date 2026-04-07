@@ -2,15 +2,14 @@
 
 set -eu
 
-case "${DOTFILES_PROFILE:-}" in
-  ""|base)
-    exit 0
-    ;;
-  home|work|simba|nala|mba2020|work-vm)
-    printf 'Applying profile: %s\n' "${DOTFILES_PROFILE}"
-    ;;
-  *)
-    printf 'Unknown DOTFILES_PROFILE: %s\n' "${DOTFILES_PROFILE}" >&2
-    exit 1
-    ;;
-esac
+profile="${DOTFILES_PROFILE:-}"
+if [ -z "${profile}" ] || [ "${profile}" = "base" ]; then
+  exit 0
+fi
+
+if [ ! -f "install.d/profiles/${profile}.yaml" ]; then
+  printf 'Unknown DOTFILES_PROFILE: %s\n' "${profile}" >&2
+  exit 1
+fi
+
+printf 'Applying profile: %s\n' "${profile}"

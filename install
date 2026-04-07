@@ -14,17 +14,14 @@ if [[ -z "${profile}" && -f "${PROFILE_LOCK}" ]]; then
   profile="$(cat "${PROFILE_LOCK}")"
 fi
 
-case "${profile}" in
-  ""|base)
-    profile=""
-    ;;
-  personal|work|simba|nala|mba2020|work-vm)
-    ;;
-  *)
+if [[ -n "${profile}" && "${profile}" != "base" ]]; then
+  if [[ ! -f "${CONFIG_DIR}/profiles/${profile}.yaml" ]]; then
     printf 'Unknown DOTFILES_PROFILE: %s\n' "${profile}" >&2
     exit 1
-    ;;
-esac
+  fi
+else
+  profile=""
+fi
 
 if [[ -n "${profile}" ]]; then
   if [[ -n "${DOTFILES_PROFILE:-}" ]]; then
