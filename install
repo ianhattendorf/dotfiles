@@ -76,6 +76,6 @@ DOTFILES_PROFILE="${profile}" \
 DOTFILES_DRY_RUN="${dry_run}" \
 "${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" -d "${BASEDIR}" -c "${tmp_config}" "$@"
 
-if [[ -n "${profile}" ]]; then
+if [[ -n "${profile}" && "${dry_run}" -eq 0 ]]; then
   printf '%s\n' "${profile}" > "${PROFILE_LOCK}"
 fi
