@@ -56,13 +56,22 @@ for arg in "$@"; do
 done
 
 tmp_config="$(mktemp)"
+profile_filter=""
+if [[ -n "${profile}" ]]; then
+  profile_filter="$(mktemp)"
+  sed -n 's/^\([[:space:]]*~\/[^:]*:\).*/\1/p' "${CONFIG_DIR}/profiles/${profile}.yaml" > "${profile_filter}"
+fi
 cleanup() {
-  rm -f "${tmp_config}"
+  rm -f "${tmp_config}" "${profile_filter:-}"
 }
 trap cleanup EXIT
 
 for config_path in "${config_paths[@]}"; do
-  cat "${config_path}" >> "${tmp_config}"
+  if [[ -n "${profile_filter}" && -s "${profile_filter}" && "${config_path}" != *"/profiles/"* ]]; then
+    grep -vFf "${profile_filter}" "${config_path}" >> "${tmp_config}"
+  else
+    cat "${config_path}" >> "${tmp_config}"
+  fi
   printf '\n' >> "${tmp_config}"
 done
 
