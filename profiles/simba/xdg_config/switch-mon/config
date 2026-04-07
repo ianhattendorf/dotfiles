@@ -1,0 +1,13 @@
+# Simba profile (desktop)
+# Sway outputs: DP-1 (center), DP-3 (right)
+#
+# Input codes (VCP 0x60):
+#   0x05 = HDMI-1    0x06 = HDMI-2
+#   0x07 = DP (USB-C)    0x08 = DP-1
+monitors="center right"
+
+center_output="DP-1"
+center_input="0x05"  # HDMI-1 — other machine
+
+right_output="DP-3"
+right_input="0x07"   # DP (USB-C) — other machine

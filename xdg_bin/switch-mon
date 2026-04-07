@@ -1,30 +1,56 @@
 #!/bin/sh
+#
+# switch-mon - Switch external monitors to another machine's input (KVM-style)
+#
+# Resolves Sway output names to DDC/CI buses via sysfs, then sends the
+# input-switch VCP command. Config is per-profile at ~/.config/switch-mon/config.
+#
+# Usage: switch-mon [<monitor-name>|all]
+#   e.g.: switch-mon center
+#         switch-mon right
+#         switch-mon all       (default)
 
 set -eu
 
-monitor_choice="${1:-all}"
+config="${XDG_CONFIG_HOME:-$HOME/.config}/switch-mon/config"
+if [ ! -f "$config" ]; then
+  echo "error: no config at $config" >&2
+  exit 1
+fi
+# shellcheck source=/dev/null
+. "$config"
 
 vcp_input='0x60'
+choice="${1:-all}"
 
-input_hdmi_1='0x05'
-input_hdmi_2='0x06'
-input_dp_c='0x07'
-input_dp_1='0x08'
+# Resolve a Sway output name (e.g. "DP-4") to a ddcutil i2c bus number
+# by walking /sys/class/drm/card*-<output>/i2c-*
+resolve_bus() {
+  _output="$1"
+  for _dir in /sys/class/drm/card*-"${_output}"/; do
+    [ -d "$_dir" ] || continue
+    for _i2c in "$_dir"/i2c-*; do
+      [ -e "$_i2c" ] || continue
+      basename "$_i2c" | cut -d- -f2
+      return
+    done
+  done
+  echo "error: no i2c bus found for output $_output" >&2
+  return 1
+}
 
-display_1='6'
-display_1_input_us="$input_dp_1"
-display_1_input_them="$input_dp_c"
+switch_monitor() {
+  _name="$1"
+  eval "_sway_output=\${${_name}_output}"
+  eval "_target_input=\${${_name}_input}"
 
-display_2='8'
-display_2_input_us="$input_dp_1"
-display_2_input_them="$input_dp_c"
+  _bus=$(resolve_bus "$_sway_output") || return 1
+  echo "Switching $_name ($_sway_output, bus $_bus) to input $_target_input"
+  ddcutil --bus "$_bus" setvcp "$vcp_input" "$_target_input" || true
+}
 
-display_1_input="$display_1_input_them"
-display_2_input="$display_2_input_them"
-
-if [ "$monitor_choice" = "1" ] || [ "$monitor_choice" = "all" ]; then
-  ddcutil --bus "$display_1" setvcp "$vcp_input" "$display_1_input" || true
-fi
-if [ "$monitor_choice" = "2" ] || [ "$monitor_choice" = "all" ]; then
-  ddcutil --bus "$display_2" setvcp "$vcp_input" "$display_2_input" || true
-fi
+for _mon in $monitors; do
+  if [ "$choice" = "$_mon" ] || [ "$choice" = "all" ]; then
+    switch_monitor "$_mon"
+  fi
+done

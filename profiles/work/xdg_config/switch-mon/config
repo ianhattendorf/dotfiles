@@ -1,0 +1,13 @@
+# Work profile (Framework Laptop 16)
+# Sway outputs: DP-4 (center), DP-1 (right), eDP-2 (laptop)
+#
+# Input codes (VCP 0x60):
+#   0x05 = HDMI-1    0x06 = HDMI-2
+#   0x07 = DP (USB-C)    0x08 = DP-1
+monitors="center right"
+
+center_output="DP-4"
+center_input="0x08"  # DP-1 — other machine
+
+right_output="DP-1"
+right_input="0x08"   # DP-1 — other machine

@@ -4,3 +4,4 @@
     ~/.zshenv: profiles/work/home/.zshenv
     ~/.config/Code/User/settings.json: profiles/work/xdg_config/Code/User/settings.json
     ~/.config/sway/profile.conf: profiles/work/xdg_config/sway/profile.conf
+    ~/.config/switch-mon/config: profiles/work/xdg_config/switch-mon/config
