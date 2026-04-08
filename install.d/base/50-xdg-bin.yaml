@@ -3,4 +3,5 @@
     ~/.local/bin/tmux-agent-next: xdg_bin/tmux-agent-next
     ~/.local/bin/tmux-agent-prev: xdg_bin/tmux-agent-prev
     ~/.local/bin/tmux-agent-refresh: xdg_bin/tmux-agent-refresh
+    ~/.local/bin/foot-mosh: xdg_bin/foot-mosh
     ~/.local/bin/weechat.sh: xdg_bin/weechat.sh

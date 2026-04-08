@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Exec=foot --maximized mosh %u -- tmux a
+Exec=foot-mosh
 Icon=foot
 Terminal=false
 Categories=System;TerminalEmulator;
