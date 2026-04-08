@@ -23,7 +23,14 @@
                 (lambda () (unless (frame-focus-state) (garbage-collect))))
 
   ;; Increase process read buffer
-  (setq read-process-output-max (* 1024 1024))
+  (setq read-process-output-max (* 4 1024 1024))
+
+  ;; Performance: skip bidi for LTR-only text
+  (setq-default bidi-paragraph-direction 'left-to-right)
+  (setq bidi-inhibit-bpa t)
+
+  ;; Defer fontification during fast input
+  (setq redisplay-skip-fontification-on-input t)
 
   ;; straight.el
   (defvar bootstrap-version)
@@ -43,6 +50,10 @@
   (customize-set-variable 'user-full-name "Ian Hattendorf")
   (customize-set-variable 'user-mail-address "ian@ianhattendorf.com")
   (customize-set-variable 'initial-scratch-message nil)
+
+  ;; Kill ring behavior
+  (setq save-interprogram-paste-before-kill t
+        kill-do-not-save-duplicates t)
 
   ;; Avoid polluting init.el with customizations
   (setq custom-file "~/.emacs.d/custom.el")
@@ -89,9 +100,45 @@
 
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete))
+  (setq tab-always-indent 'complete)
+
+  ;; Regex builder: string syntax (no double-escaping)
+  (setq reb-re-syntax 'string)
+
+  ;; Prevent ffap DNS lookup freezes
+  (setq ffap-machine-p-known 'reject)
+
+  ;; Proportional window resizing on split
+  (setq window-combination-resize t)
+
+  ;; After C-u C-SPC, just C-SPC to keep popping marks
+  (setq set-mark-command-repeat-pop t)
+
+  ;; Auto-focus help windows
+  (setq help-window-select t)
+
+  ;; No phantom cursors in unfocused windows
+  (setq-default cursor-in-non-selected-windows nil)
+  (setq highlight-nonselected-windows nil))
 
 ;;; Completion Framework
+
+(use-package savehist
+  :init
+  (savehist-mode)
+  :config
+  (setq savehist-additional-variables
+        '(search-ring regexp-search-ring kill-ring))
+  (defun savehist-unpropertize-kill-ring ()
+    (setq kill-ring (mapcar #'substring-no-properties kill-ring)))
+  (add-hook 'savehist-save-hook #'savehist-unpropertize-kill-ring))
+
+(use-package saveplace
+  :init
+  (save-place-mode)
+  :config
+  (advice-add 'save-place-find-file-hook :after
+              (lambda (&rest _) (when buffer-file-name (recenter)))))
 
 (use-package vertico
   :straight t
@@ -260,6 +307,18 @@
   :hook (embark-collect-mode . consult-preview-at-point-mode))
 
 ;;; Navigation and Editing
+
+(use-package winner
+  :init
+  (winner-mode +1)
+  :config
+  (defun toggle-delete-other-windows ()
+    "Delete other windows, or restore previous layout via `winner-undo'."
+    (interactive)
+    (if (one-window-p)
+        (winner-undo)
+      (delete-other-windows)))
+  (global-set-key (kbd "C-x 1") #'toggle-delete-other-windows))
 
 (use-package avy
   :straight t
