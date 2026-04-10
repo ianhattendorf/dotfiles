@@ -75,6 +75,33 @@ claude_status_line_commit="729106d93b1153083219af45411f3d445aae5ad9"
 
 waybar_modules_commit="3c6fa2a956364611417460344266b91e041ffe2f"
 
+install_git_wt() {
+  git_wt_version="v0.26.2"
+  git_wt_linux_amd64_url="https://github.com/k1LoW/git-wt/releases/download/$git_wt_version/git-wt_${git_wt_version}_linux_amd64.tar.gz"
+  git_wt_install_dir="$HOME/go/bin"
+
+  case "$(uname -m)" in
+    x86_64|amd64)
+      git_wt_tmp_dir="$(mktemp -d)"
+      trap 'rm -rf "$git_wt_tmp_dir"' EXIT HUP INT TERM
+
+      mkdir -p "$git_wt_install_dir"
+      curl -L "$git_wt_linux_amd64_url" | tar xz -C "$git_wt_tmp_dir"
+      install -m 0755 "$git_wt_tmp_dir/git-wt" "$git_wt_install_dir/git-wt"
+      ;;
+    *)
+      if command -v go >/dev/null 2>&1; then
+        mkdir -p "$git_wt_install_dir"
+        GOBIN="$git_wt_install_dir" go install "github.com/k1LoW/git-wt@$git_wt_version"
+      else
+        printf 'go is required to install git-wt on non-amd64 platforms\n' >&2
+      fi
+      ;;
+  esac
+}
+
+install_git_wt
+
 if command -v cargo >/dev/null 2>&1; then
   cargo install --git "https://git.sr.ht/~ianhattendorf/agent-status" \
     --rev "$agent_status_commit"
