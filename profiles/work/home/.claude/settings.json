@@ -17,7 +17,7 @@
       {
         "hooks": [
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -33,7 +33,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -49,7 +49,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -60,17 +60,12 @@
       {
         "hooks": [
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      },
-      {
-        "hooks": [
-          {
             "command": "/home/ian/.cargo/bin/agent-status hook",
             "timeout": 10,
+            "type": "command"
+          },
+          {
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -81,7 +76,7 @@
       {
         "hooks": [
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -97,7 +92,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -113,7 +108,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -129,7 +124,8 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code --blocking",
+            "timeout": 330,
             "type": "command"
           }
         ],
@@ -140,7 +136,7 @@
       {
         "hooks": [
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -156,7 +152,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -172,7 +168,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -183,7 +179,7 @@
       {
         "hooks": [
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -199,7 +195,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -215,7 +211,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -231,7 +227,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -247,7 +243,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -263,7 +259,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -279,7 +275,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -295,7 +291,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -306,7 +302,7 @@
       {
         "hooks": [
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -317,7 +313,7 @@
       {
         "hooks": [
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
@@ -333,29 +329,7 @@
             "type": "command"
           },
           {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "WorktreeCreate": [
-      {
-        "hooks": [
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "WorktreeRemove": [
-      {
-        "hooks": [
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
             "type": "command"
           }
         ],
