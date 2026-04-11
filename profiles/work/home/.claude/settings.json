@@ -1,9 +1,338 @@
 {
+  "cleanupPeriodDays": 9999,
   "attribution": {
     "commit": "",
     "pr": ""
   },
-  "cleanupPeriodDays": 9999,
+  "hooks": {
+    "ConfigChange": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "CwdChanged": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "Elicitation": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "ElicitationResult": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "InstructionsLoaded": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code --blocking",
+            "timeout": 330
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "TeammateIdle": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "/home/ian/.cargo/bin/claude-status-line"
+  },
   "enabledPlugins": {
     "atlassian@claude-plugins-official": false,
     "code-review@claude-plugins-official": true,
@@ -12,336 +341,8 @@
     "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true
   },
-  "hooks": {
-    "ConfigChange": [
-      {
-        "hooks": [
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "CwdChanged": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "Elicitation": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "ElicitationResult": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "InstructionsLoaded": [
-      {
-        "hooks": [
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "Notification": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PermissionDenied": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PermissionRequest": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code --blocking",
-            "timeout": 330,
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PostCompact": [
-      {
-        "hooks": [
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PostToolUse": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PostToolUseFailure": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "PreToolUse": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "StopFailure": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SubagentStart": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SubagentStop": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "TaskCompleted": [
-      {
-        "hooks": [
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "TeammateIdle": [
-      {
-        "hooks": [
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "command": "/home/ian/.cargo/bin/agent-status hook",
-            "timeout": 10,
-            "type": "command"
-          },
-          {
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ]
-  },
   "sandbox": {
     "enabled": true
   },
-  "statusLine": {
-    "command": "/home/ian/.cargo/bin/claude-status-line",
-    "type": "command"
-  }
+  "effortLevel": "high"
 }

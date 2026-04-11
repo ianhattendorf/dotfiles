@@ -7,4 +7,3 @@ export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$HOME/go/bin:$BUN_INSTALL/bin:$PATH"
-export CLAUDE_CODE_EFFORT_LEVEL=max
