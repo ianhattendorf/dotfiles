@@ -1,5 +1,4 @@
 - link:
-    ~/.profile: profiles/simba/home/.profile
     ~/.config/i3/profile.sh: profiles/simba/xdg_config/i3/profile.sh
     ~/.config/mpv/hwdec.conf: profiles/simba/xdg_config/mpv/hwdec.conf
     ~/.config/sway/profile.conf: profiles/simba/xdg_config/sway/profile.conf
