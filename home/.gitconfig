@@ -57,3 +57,5 @@
 [wt]
 	basedir = ../{gitroot}.worktrees
 	copy = .claude/settings.local.json
+[gpg "ssh"]
+	allowedSignersFile = /home/ian/.ssh/allowed_signers

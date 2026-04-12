@@ -14,6 +14,7 @@
     ~/.npmrc: home/.npmrc
     ~/.profile: home/.profile
     ~/.rpmmacros: home/.rpmmacros
+    ~/.ssh/allowed_signers: home/.ssh/allowed_signers
     ~/.vim: home/vim
     ~/.vimrc: home/.vimrc
     ~/.Xclients: home/.Xclients
