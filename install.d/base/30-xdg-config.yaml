@@ -20,6 +20,7 @@
     ~/.config/plasma-locale-settings.sh: xdg_config/plasma-locale-settings.sh
     ~/.config/plasma-localerc: xdg_config/plasma-localerc
     ~/.config/plasma-workspace/env: xdg_config/plasma-workspace/env
+    ~/.config/pnpm/rc: xdg_config/pnpm/rc
     ~/.config/redshift: xdg_config/redshift
     ~/.config/sway/config: xdg_config/sway/config
     ~/.config/sway/environment: xdg_config/sway/environment
