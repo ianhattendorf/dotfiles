@@ -1,0 +1,8 @@
+#!/bin/sh
+# Pipe tmux copy buffer to the system clipboard via OSC 52.
+# Writes directly to the client TTY, bypassing tmux's terminal
+# processing (which may re-encode OSC 52 with an ST terminator
+# that mosh doesn't support).
+tty=$(tmux display-message -p '#{client_tty}')
+data=$(base64 | tr -d '\n')
+printf '\033]52;c;%s\a' "$data" > "$tty"
