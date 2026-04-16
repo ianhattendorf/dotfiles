@@ -344,5 +344,5 @@
   "sandbox": {
     "enabled": true
   },
-  "effortLevel": "high"
+  "effortLevel": "xhigh"
 }
