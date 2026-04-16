@@ -71,7 +71,7 @@ ensure_git_repo_at_commit \
 
 agent_status_commit="7cc2617892d1fc8eb62e9039b8ac0eb27302cdcd"
 
-claude_status_line_commit="729106d93b1153083219af45411f3d445aae5ad9"
+claude_status_line_commit="1edb04bafc9826aee0981cd3cddc4ba6375edc11"
 
 waybar_modules_commit="3c6fa2a956364611417460344266b91e041ffe2f"
 
