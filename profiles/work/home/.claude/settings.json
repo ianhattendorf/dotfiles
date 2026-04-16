@@ -122,6 +122,16 @@
             "timeout": 330
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c '[ -n \"$GK_INTERNAL\" ] && exit 0; nc -z 127.0.0.1 43605 >/dev/null 2>&1 || exit 0; exec curl -fsS -X POST http://127.0.0.1:43605/hooks/claude-code-external -H \"Content-Type: application/json\" -d @-'",
+            "statusMessage": "gk-managed",
+            "timeout": 86400
+          }
+        ]
       }
     ],
     "PostCompact": [
@@ -149,6 +159,24 @@
             "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PORT=$(cat ~/.insights/port 2>/dev/null || echo 3000); TOKEN=$(cat ~/.insights/token 2>/dev/null); curl -sf --max-time 2 -X POST http://127.0.0.1:$PORT/hooks/post-tool-use -H 'Content-Type: application/json' -H \"X-Insights-Token: $TOKEN\" --data-binary @- 2>/dev/null || true"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c '[ -n \"$GK_INTERNAL\" ] && exit 0; nc -z 127.0.0.1 43605 >/dev/null 2>&1 || exit 0; exec curl -fsS -X POST http://127.0.0.1:43605/hooks/claude-code-external -H \"Content-Type: application/json\" -d @-'",
+            "statusMessage": "gk-managed"
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
@@ -165,12 +193,34 @@
             "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PORT=$(cat ~/.insights/port 2>/dev/null || echo 3000); TOKEN=$(cat ~/.insights/token 2>/dev/null); curl -sf --max-time 2 -X POST http://127.0.0.1:$PORT/hooks/post-tool-use-failure -H 'Content-Type: application/json' -H \"X-Insights-Token: $TOKEN\" --data-binary @- 2>/dev/null || true"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c '[ -n \"$GK_INTERNAL\" ] && exit 0; nc -z 127.0.0.1 43605 >/dev/null 2>&1 || exit 0; exec curl -fsS -X POST http://127.0.0.1:43605/hooks/claude-code-external -H \"Content-Type: application/json\" -d @-'",
+            "statusMessage": "gk-managed"
+          }
+        ]
       }
     ],
     "PreCompact": [
       {
         "matcher": "",
         "hooks": [
+          {
+            "type": "command",
+            "command": "PORT=$(cat ~/.insights/port 2>/dev/null || echo 3000); TOKEN=$(cat ~/.insights/token 2>/dev/null); curl -sf --max-time 2 -X POST http://127.0.0.1:$PORT/hooks/pre-compact -H 'Content-Type: application/json' -H \"X-Insights-Token: $TOKEN\" --data-binary @- 2>/dev/null || true"
+          },
           {
             "type": "command",
             "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
@@ -192,6 +242,25 @@
             "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PORT=$(cat ~/.insights/port 2>/dev/null || echo 3000); TOKEN=$(cat ~/.insights/token 2>/dev/null); curl -sf --max-time 2 -X POST http://127.0.0.1:$PORT/hooks/pre-tool-use -H 'Content-Type: application/json' -H \"X-Insights-Token: $TOKEN\" --data-binary @- 2>/dev/null || true"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c '[ -n \"$GK_INTERNAL\" ] && exit 0; nc -z 127.0.0.1 43605 >/dev/null 2>&1 || exit 0; exec curl -fsS -X POST http://127.0.0.1:43605/hooks/claude-code-external -H \"Content-Type: application/json\" -d @-'",
+            "statusMessage": "gk-managed",
+            "timeout": 86400
+          }
+        ]
       }
     ],
     "SessionEnd": [
@@ -206,6 +275,24 @@
           {
             "type": "command",
             "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PORT=$(cat ~/.insights/port 2>/dev/null || echo 3000); TOKEN=$(cat ~/.insights/token 2>/dev/null); curl -sf --max-time 5 -X POST http://127.0.0.1:$PORT/hooks/session-end -H 'Content-Type: application/json' -H \"X-Insights-Token: $TOKEN\" --data-binary @- >/dev/null 2>/dev/null; [ -f ~/.insights/last-scorecard.txt ] && { cat ~/.insights/last-scorecard.txt > /dev/tty 2>/dev/null || cat ~/.insights/last-scorecard.txt; }; true"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c '[ -n \"$GK_INTERNAL\" ] && exit 0; nc -z 127.0.0.1 43605 >/dev/null 2>&1 || exit 0; exec curl -fsS -X POST http://127.0.0.1:43605/hooks/claude-code-external -H \"Content-Type: application/json\" -d @-'",
+            "statusMessage": "gk-managed"
           }
         ]
       }
@@ -224,6 +311,24 @@
             "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PORT=$(cat ~/.insights/port 2>/dev/null || echo 3000); TOKEN=$(cat ~/.insights/token 2>/dev/null); curl -sf --max-time 3 -X POST http://127.0.0.1:$PORT/hooks/session-start -H 'Content-Type: application/json' -H \"X-Insights-Token: $TOKEN\" --data-binary @- 2>/dev/null || echo '[insights] Insights Engine not running — session telemetry disabled.' >&2"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c '[ -n \"$GK_INTERNAL\" ] && exit 0; nc -z 127.0.0.1 43605 >/dev/null 2>&1 || exit 0; exec curl -fsS -X POST http://127.0.0.1:43605/hooks/claude-code-external -H \"Content-Type: application/json\" -d @-'",
+            "statusMessage": "gk-managed"
+          }
+        ]
       }
     ],
     "Stop": [
@@ -238,6 +343,24 @@
           {
             "type": "command",
             "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PORT=$(cat ~/.insights/port 2>/dev/null || echo 3000); TOKEN=$(cat ~/.insights/token 2>/dev/null); curl -sf --max-time 2 -X POST http://127.0.0.1:$PORT/hooks/stop -H 'Content-Type: application/json' -H \"X-Insights-Token: $TOKEN\" --data-binary @- 2>/dev/null || true"
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh -c '[ -n \"$GK_INTERNAL\" ] && exit 0; nc -z 127.0.0.1 43605 >/dev/null 2>&1 || exit 0; exec curl -fsS -X POST http://127.0.0.1:43605/hooks/claude-code-external -H \"Content-Type: application/json\" -d @-'",
+            "statusMessage": "gk-managed"
           }
         ]
       }
@@ -272,6 +395,15 @@
             "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PORT=$(cat ~/.insights/port 2>/dev/null || echo 3000); TOKEN=$(cat ~/.insights/token 2>/dev/null); curl -sf --max-time 2 -X POST http://127.0.0.1:$PORT/hooks/subagent-start -H 'Content-Type: application/json' -H \"X-Insights-Token: $TOKEN\" --data-binary @- 2>/dev/null || true"
+          }
+        ]
       }
     ],
     "SubagentStop": [
@@ -286,6 +418,15 @@
           {
             "type": "command",
             "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "PORT=$(cat ~/.insights/port 2>/dev/null || echo 3000); TOKEN=$(cat ~/.insights/token 2>/dev/null); curl -sf --max-time 2 -X POST http://127.0.0.1:$PORT/hooks/subagent-stop -H 'Content-Type: application/json' -H \"X-Insights-Token: $TOKEN\" --data-binary @- 2>/dev/null || true"
           }
         ]
       }
