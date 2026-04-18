@@ -1,2 +1,3 @@
 - link:
+    ~/.npmrc: home/.npmrc
     ~/.config/i3/profile.sh: profiles/work-vm/xdg_config/i3/profile.sh

@@ -1,3 +1,4 @@
 - link:
     ~/.gitconfig-local: profiles/personal/home/.gitconfig-local
+    ~/.npmrc: home/.npmrc
     ~/.config/sway/profile.conf: profiles/personal/xdg_config/sway/profile.conf

@@ -1,2 +1,3 @@
 - link:
+    ~/.npmrc: home/.npmrc
     ~/.config/sway/profile.conf: profiles/mba2020/xdg_config/sway/profile.conf
