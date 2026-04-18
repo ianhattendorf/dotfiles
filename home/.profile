@@ -13,9 +13,8 @@ if [ -f ~/.cargo/env ]; then
   . ~/.cargo/env
 fi
 
-if [ -d $HOME/.nvm ]; then
-  export NVM_DIR="$HOME/.nvm"
-fi
+export NVM_DIR="$HOME/.config/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 if [ -f /usr/local/opt/nvm/nvm.sh ]; then
   . /usr/local/opt/nvm/nvm.sh
