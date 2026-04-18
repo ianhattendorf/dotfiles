@@ -74,8 +74,30 @@ function initOs {
 }
 
 function initTmux {
+  function syncFromTmuxEnvironment {
+    local name="$1"
+    local tmux_env current_value
+
+    tmux_env="$(tmux show-environment "$name" 2>/dev/null)" || return 0
+
+    case "$tmux_env" in
+      -"$name")
+        unset "$name"
+        ;;
+      "$name="*)
+        current_value="${(P)name-}"
+        if [ "$current_value" != "${tmux_env#*=}" ]; then
+          typeset -gx "$tmux_env"
+        fi
+        ;;
+    esac
+  }
+
   if [ -n "$TMUX" ]; then
     tmux set-environment -g PATH "$PATH"
+    syncFromTmuxEnvironment SWAYSOCK
+    syncFromTmuxEnvironment WAYLAND_DISPLAY
+    syncFromTmuxEnvironment DISPLAY
   fi
 }
 
