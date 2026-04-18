@@ -137,8 +137,21 @@
   :init
   (save-place-mode)
   :config
-  (advice-add 'save-place-find-file-hook :after
-              (lambda (&rest _) (when buffer-file-name (recenter)))))
+   (advice-add 'save-place-find-file-hook :after
+              (lambda (&rest _)
+                (when-let ((win (get-buffer-window (current-buffer) t)))
+                  (with-selected-window win
+                    (recenter))))))
+
+ ;; (advice-add 'save-place-find-file-hook :after
+ ;;              (lambda (&rest _)
+ ;;                (when (and buffer-file-name
+ ;;                           (eq (window-buffer) (current-buffer)))
+ ;;                  (recenter)))))
+
+
+  ;; (advice-add 'save-place-find-file-hook :after
+  ;;             (lambda (&rest _) (when buffer-file-name (recenter)))))
 
 (use-package vertico
   :straight t
