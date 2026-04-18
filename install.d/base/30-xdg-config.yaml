@@ -32,6 +32,7 @@
     ~/.config/tmux: xdg_config/tmux
     ~/.config/tmuxinator: xdg_config/tmuxinator
     ~/.config/waybar: xdg_config/waybar
+    ~/.config/xdg-desktop-portal/sway-portals.conf: xdg_config/xdg-desktop-portal/sway-portals.conf
     ~/.config/weechat/alias.conf: xdg_config/weechat/alias.conf
     ~/.config/weechat/aspell.conf: xdg_config/weechat/aspell.conf
     ~/.config/weechat/autosort.conf: xdg_config/weechat/autosort.conf
