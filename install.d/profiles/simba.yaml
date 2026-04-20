@@ -1,6 +1,16 @@
 - link:
     ~/.npmrc: home/.npmrc
+    ~/.config/dotfiles/session-env.sh: profiles/simba/xdg_config/dotfiles/session-env.sh
+    ~/.config/environment.d/90-ssh-auth-sock.conf: profiles/simba/xdg_config/environment.d/90-ssh-auth-sock.conf
     ~/.config/i3/profile.sh: profiles/simba/xdg_config/i3/profile.sh
     ~/.config/mpv/hwdec.conf: profiles/simba/xdg_config/mpv/hwdec.conf
     ~/.config/sway/profile.conf: profiles/simba/xdg_config/sway/profile.conf
     ~/.config/switch-mon/config: profiles/simba/xdg_config/switch-mon/config
+    ~/.config/systemd/user/ssh-tpm-agent.service: profiles/simba/xdg_config/systemd/user/ssh-tpm-agent.service
+    ~/.config/systemd/user/ssh-tpm-agent.socket: profiles/simba/xdg_config/systemd/user/ssh-tpm-agent.socket
+
+- shell:
+    - command: bootstrap/ssh-tpm-agent
+      description: Enable ssh-tpm-agent for the simba profile
+      stdout: true
+      stderr: true

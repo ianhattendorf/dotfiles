@@ -67,3 +67,17 @@ Configured plugins:
 
 - `tmux-resurrect` at `cff343cf9e81983d3da0c8562b01616f12e8d548`
 - `tmux-continuum` at `0698e8f4b17d6454c71bf5212895ec055c578da0`
+
+## Simba TPM SSH Agent
+
+The `simba` profile uses `ssh-tpm-agent` as `SSH_AUTH_SOCK` at `$XDG_RUNTIME_DIR/ssh-tpm-agent.sock`.
+The profile install links the systemd user units and enables `ssh-tpm-agent.socket`.
+
+Create or inspect TPM-backed SSH keys locally on Simba:
+
+```sh
+ssh-tpm-keygen
+ssh-tpm-keygen --print-pubkey ~/.ssh/id_ecdsa.tpm
+```
+
+TPM sealed private key files are machine-bound and should remain local; do not add `.tpm` keys to this repo.

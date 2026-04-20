@@ -1,7 +1,12 @@
 # .profile
 
 export XDG_CONFIG_HOME="${XDG_CONFIG_HOME:=$HOME/.config}"
-export SSH_AUTH_SOCK=$XDG_RUNTIME_DIR/ssh-agent.socket
+if [ -r "$XDG_CONFIG_HOME/dotfiles/session-env.sh" ]; then
+  . "$XDG_CONFIG_HOME/dotfiles/session-env.sh"
+fi
+if [ -z "${SSH_AUTH_SOCK:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ]; then
+  export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
+fi
 export HOSTNAME_SHORT=$(hostname --short)
 export WEECHAT_HOME="$XDG_CONFIG_HOME/weechat"
 

@@ -95,6 +95,8 @@ function initTmux {
 
   if [ -n "$TMUX" ]; then
     tmux set-environment -g PATH "$PATH"
+    tmux set-environment -g SSH_AUTH_SOCK "${SSH_AUTH_SOCK:-}"
+    syncFromTmuxEnvironment SSH_AUTH_SOCK
     syncFromTmuxEnvironment SWAYSOCK
     syncFromTmuxEnvironment WAYLAND_DISPLAY
     syncFromTmuxEnvironment DISPLAY

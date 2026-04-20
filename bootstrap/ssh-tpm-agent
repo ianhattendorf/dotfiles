@@ -1,0 +1,21 @@
+#!/bin/sh
+
+set -eu
+
+if [ "${DOTFILES_DRY_RUN:-0}" = "1" ]; then
+  exit 0
+fi
+
+if [ "${DOTFILES_PROFILE:-}" != "simba" ]; then
+  exit 0
+fi
+
+agent_path="$HOME/go/bin/ssh-tpm-agent"
+
+if [ ! -x "$agent_path" ]; then
+  printf 'ssh-tpm-agent is not installed at %s\n' "$agent_path" >&2
+  exit 1
+fi
+
+systemctl --user daemon-reload
+systemctl --user enable --now ssh-tpm-agent.socket
