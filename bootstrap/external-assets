@@ -102,6 +102,20 @@ install_git_wt() {
 
 install_git_wt
 
+install_ssh_tpm_agent() {
+  ssh_tpm_agent_commit="1a96091a3dddce53bbf74892229cdce570b3d047" # v0.8.0
+  ssh_tpm_agent_install_dir="$HOME/go/bin"
+
+  if command -v go >/dev/null 2>&1; then
+    mkdir -p "$ssh_tpm_agent_install_dir"
+    GOBIN="$ssh_tpm_agent_install_dir" go install "github.com/foxboron/ssh-tpm-agent/cmd/...@$ssh_tpm_agent_commit"
+  else
+    printf 'go is required to install ssh-tpm-agent\n' >&2
+  fi
+}
+
+install_ssh_tpm_agent
+
 if command -v cargo >/dev/null 2>&1; then
   cargo install --git "https://git.sr.ht/~ianhattendorf/agent-status" \
     --rev "$agent_status_commit"
