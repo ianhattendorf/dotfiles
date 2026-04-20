@@ -41,7 +41,7 @@ There is no hostname-based install or runtime selection. If you need machine- or
 - `bootstrap/external-assets`
 - `bootstrap/post-install`
 
-`bootstrap/external-assets` installs external tools such as tmuxinator, fetches non-repo assets such as antigen and betterlockscreen, and pins tmux plugins to fixed upstream commits.
+`bootstrap/external-assets` installs external tools such as tmuxinator, fetches non-repo assets such as Antidote and betterlockscreen, and pins tmux plugins to fixed upstream commits.
 
 ## Tmuxinator
 

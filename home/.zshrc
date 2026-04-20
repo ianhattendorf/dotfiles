@@ -6,89 +6,71 @@ function fallbackPrompt {
   RPROMPT=''
 }
 
-function clearAntigenGeneratedState {
-  local adotdir="${ADOTDIR:-$HOME/.antigen}"
-
-  rm -f -- \
-    "$adotdir/.lock" \
-    "$adotdir/init.zsh" \
-    "$adotdir/init.zsh.zwc" \
-    "$adotdir/.zcompdump" \
-    "$adotdir/.zcompdump.zwc" \
-    "${ZDOTDIR:-$HOME}/.zshrc.zwc"
-}
-
-function antigenPromptReady {
+function zshPromptReady {
   [[ "${options[prompt_subst]}" == "on" ]] &&
     [[ -n "${fg[red]-}" ]] &&
     (( $+functions[git_prompt_info] )) &&
     (( $+functions[git_prompt_status] ))
 }
 
-function applyAntigenConfig {
-  local antigen_path="$1"
+function loadAntidotePlugins {
+  local manifest="$1"
+  local generated="$2"
+  local generated_tmp="${generated}.$$"
 
-  source "$antigen_path" || return 1
+  if [ ! -f "$manifest" ]; then
+    >&2 echo "Failed to init Antidote, plugin manifest not found at: $manifest"
+    fallbackPrompt
+    return 1
+  fi
 
-  antigen use oh-my-zsh || return 1
+  if [ ! -f "$generated" ] || [ "$manifest" -nt "$generated" ]; then
+    antidote bundle < "$manifest" >| "$generated_tmp" && mv -f "$generated_tmp" "$generated" || {
+      rm -f "$generated_tmp"
+      >&2 echo "Failed to generate Antidote plugin bundle from: $manifest"
+      fallbackPrompt
+      return 1
+    }
+  fi
 
-  antigen bundles <<EOBUNDLES || return 1
-  command-not-found
-  nvm
-  rupa/z
-  zsh-users/zsh-autosuggestions
-  zsh-users/zsh-syntax-highlighting
-EOBUNDLES
-
-  antigen theme kphoen || return 1
-
-  antigen apply || return 1
+  source "$generated" || {
+    >&2 echo "Failed to source Antidote plugin bundle at: $generated"
+    fallbackPrompt
+    return 1
+  }
 }
 
-function initAntigen {
-  local antigen_path="$1"
-  local adotdir="${ADOTDIR:-$HOME/.antigen}"
-  local lock_file="$adotdir/init.lock"
-  local lock_fd
+function initAntidote {
+  local antidote_path="${XDG_DATA_HOME:-$HOME/.local/share}/antidote/antidote.zsh"
+  local zcache="${XDG_CACHE_HOME:-$HOME/.cache}/antidote"
+  local zdotdir="${ZDOTDIR:-$HOME}"
 
-  if [ ! -f "$antigen_path" ]; then
-    >&2 echo "Failed to init antigen, not found at: $antigen_path"
+  if [ ! -f "$antidote_path" ]; then
+    >&2 echo "Failed to init Antidote, not found at: $antidote_path"
     fallbackPrompt
     return 1
   fi
 
-  mkdir -p "$adotdir"
-  touch "$lock_file" 2>/dev/null || {
-    >&2 echo "Failed to create Antigen init lock at: $lock_file"
+  mkdir -p "$zcache" || {
+    >&2 echo "Failed to create Antidote cache dir at: $zcache"
     fallbackPrompt
     return 1
   }
 
-  zmodload zsh/system 2>/dev/null || {
-    >&2 echo "Failed to load zsh/system for Antigen locking"
+  export ANTIDOTE_HOME="$zcache"
+  source "$antidote_path" || {
+    >&2 echo "Failed to source Antidote at: $antidote_path"
     fallbackPrompt
     return 1
   }
+  loadAntidotePlugins "$zdotdir/.zsh_plugins.txt" "$zcache/zsh_plugins.zsh"
+}
 
-  if ! zsystem flock -f lock_fd -t 60 "$lock_file"; then
-    >&2 echo "Timed out waiting for Antigen initialization lock"
-    fallbackPrompt
-    return 1
-  fi
+function initAntidoteAfterCompinit {
+  local zcache="${XDG_CACHE_HOME:-$HOME/.cache}/antidote"
+  local zdotdir="${ZDOTDIR:-$HOME}"
 
-  applyAntigenConfig "$antigen_path"
-  if ! antigenPromptReady; then
-    clearAntigenGeneratedState
-    applyAntigenConfig "$antigen_path"
-  fi
-
-  zsystem flock -u "$lock_fd"
-
-  if ! antigenPromptReady; then
-    >&2 echo "Failed to initialize Antigen prompt; using fallback prompt"
-    fallbackPrompt
-    return 1
-  fi
+  loadAntidotePlugins "$zdotdir/.zsh_plugins_after_compinit.txt" "$zcache/zsh_plugins_after_compinit.zsh"
 }
 
 function initAutocomplete {
@@ -134,10 +116,20 @@ function initAliases {
 }
 
 function initOs {
+  local antidote_status
+
   case `uname` in
     Linux)
-      initAntigen ~/bin/antigen-2.2.3.zsh
+      initAntidote
+      antidote_status=$?
       initAutocomplete
+      if [ "$antidote_status" -eq 0 ]; then
+        initAntidoteAfterCompinit
+      fi
+      if [ "$antidote_status" -eq 0 ] && ! zshPromptReady; then
+        >&2 echo "Failed to initialize Zsh prompt; using fallback prompt"
+        fallbackPrompt
+      fi
       initTheme
       ;;
   esac

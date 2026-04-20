@@ -10,30 +10,34 @@ if [ "$(uname)" = "Darwin" ]; then
   exit 0
 fi
 
-antigen_version="2.2.3"
-antigen_dir="$HOME/bin"
-antigen_url="https://github.com/zsh-users/antigen/releases/download/v$antigen_version/antigen.zsh"
-antigen_path="$antigen_dir/antigen-$antigen_version.zsh"
-antigen_link="$antigen_dir/antigen.zsh"
+antidote_version="v2.1.0"
+antidote_dir="${XDG_DATA_HOME:-$HOME/.local/share}/antidote"
+antidote_ref="refs/tags/$antidote_version"
 
-if [ ! -f "$antigen_path" ]; then
-  mkdir -p "$antigen_dir"
-  curl -L "$antigen_url" > "$antigen_path"
-fi
-
-if [ ! -L "$antigen_link" ] || [ "$(readlink "$antigen_link")" != "$antigen_path" ]; then
-  ln -sfn "$antigen_path" "$antigen_link"
+if [ ! -d "$antidote_dir/.git" ]; then
+  mkdir -p "$(dirname "$antidote_dir")"
+  git clone --depth 1 --branch "$antidote_version" \
+    "https://github.com/mattmc3/antidote.git" \
+    "$antidote_dir"
+elif [ "$(git -C "$antidote_dir" rev-parse HEAD)" != \
+  "$(git -C "$antidote_dir" rev-parse --verify "$antidote_ref^{}" 2>/dev/null || true)" ]; then
+  git -C "$antidote_dir" fetch --force --depth 1 origin \
+    "$antidote_ref:$antidote_ref"
+  git -C "$antidote_dir" checkout --detach "$antidote_version"
+else
+  :
 fi
 
 betterlockscreen_version="update-cache"
 betterlockscreen_url="https://github.com/ianhattendorf/betterlockscreen/archive/$betterlockscreen_version.tar.gz"
-betterlockscreen_path="$antigen_dir/betterlockscreen"
+betterlockscreen_dir="$HOME/bin"
+betterlockscreen_path="$betterlockscreen_dir/betterlockscreen"
 betterlockscreen_version_path="$betterlockscreen_path-$betterlockscreen_version"
 
 if [ ! -f "$betterlockscreen_version_path" ]; then
-  mkdir -p "$antigen_dir"
-  curl -L "$betterlockscreen_url" | tar xzv --strip-components=1 -C "$antigen_dir" "betterlockscreen-$betterlockscreen_version/betterlockscreen"
-  mv "$antigen_dir/betterlockscreen" "$betterlockscreen_version_path"
+  mkdir -p "$betterlockscreen_dir"
+  curl -L "$betterlockscreen_url" | tar xzv --strip-components=1 -C "$betterlockscreen_dir" "betterlockscreen-$betterlockscreen_version/betterlockscreen"
+  mv "$betterlockscreen_dir/betterlockscreen" "$betterlockscreen_version_path"
   ln -s "$betterlockscreen_version_path" "$betterlockscreen_path"
 fi
 

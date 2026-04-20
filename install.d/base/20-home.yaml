@@ -18,5 +18,7 @@
     ~/.vimrc: home/.vimrc
     ~/.Xclients: home/.Xclients
     ~/.zprofile: home/.zprofile
+    ~/.zsh_plugins.txt: home/.zsh_plugins.txt
+    ~/.zsh_plugins_after_compinit.txt: home/.zsh_plugins_after_compinit.txt
     ~/.zshenv: home/.zshenv
     ~/.zshrc: home/.zshrc
