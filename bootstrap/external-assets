@@ -14,10 +14,15 @@ antigen_version="2.2.3"
 antigen_dir="$HOME/bin"
 antigen_url="https://github.com/zsh-users/antigen/releases/download/v$antigen_version/antigen.zsh"
 antigen_path="$antigen_dir/antigen-$antigen_version.zsh"
+antigen_link="$antigen_dir/antigen.zsh"
 
 if [ ! -f "$antigen_path" ]; then
   mkdir -p "$antigen_dir"
   curl -L "$antigen_url" > "$antigen_path"
+fi
+
+if [ ! -L "$antigen_link" ] || [ "$(readlink "$antigen_link")" != "$antigen_path" ]; then
+  ln -sfn "$antigen_path" "$antigen_link"
 fi
 
 betterlockscreen_version="update-cache"
