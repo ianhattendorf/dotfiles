@@ -415,6 +415,11 @@
   :straight t
   :mode ("\\.overlay\\'" "\\.dts\\'" "\\.dtsi\\'"))
 
+(use-package csv-mode
+  :straight t
+  :mode ("\\.[cC][sS][vV]\\'" "\\.[tT][sS][vV]\\'")
+  :hook (csv-mode . csv-align-mode))
+
 (use-package markdown-mode
   :straight t
   :mode ("README\\.md\\'" . gfm-mode)
