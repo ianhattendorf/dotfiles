@@ -1,5 +1,6 @@
 - link:
     ~/.npmrc: home/.npmrc
+    ~/.gitconfig-local: profiles/simba/home/.gitconfig-local
     ~/.config/dotfiles/session-env.sh: profiles/simba/xdg_config/dotfiles/session-env.sh
     ~/.config/environment.d/90-ssh-auth-sock.conf: profiles/simba/xdg_config/environment.d/90-ssh-auth-sock.conf
     ~/.config/i3/profile.sh: profiles/simba/xdg_config/i3/profile.sh
