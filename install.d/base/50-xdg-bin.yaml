@@ -5,4 +5,5 @@
     ~/.local/bin/tmux-agent-refresh: xdg_bin/tmux-agent-refresh
     ~/.local/bin/tmux-yank: xdg_bin/tmux-yank
     ~/.local/bin/foot-mosh: xdg_bin/foot-mosh
+    ~/.local/bin/foot-ssh: xdg_bin/foot-ssh
     ~/.local/bin/weechat.sh: xdg_bin/weechat.sh
