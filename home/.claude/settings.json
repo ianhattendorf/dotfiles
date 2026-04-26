@@ -277,5 +277,6 @@
   "sandbox": {
     "enabled": true
   },
-  "model": "opusplan"
+  "model": "opusplan",
+  "theme": "auto"
 }
