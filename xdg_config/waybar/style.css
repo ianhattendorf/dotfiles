@@ -72,6 +72,10 @@ window#waybar {
 
 #battery.warning:not(.charging) {
     background: @warning;
+}
+
+#battery.critical:not(.charging) {
+    background: @warning;
     animation-name: blink;
     animation-duration: 0.5s;
     animation-timing-function: linear;
