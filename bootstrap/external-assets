@@ -78,7 +78,7 @@ ensure_git_repo_at_commit \
   "$tmux_plugin_dir/tmux-continuum" \
   "$tmux_continuum_commit"
 
-agent_status_commit="7cc2617892d1fc8eb62e9039b8ac0eb27302cdcd"
+agent_status_commit="3ec9d69cf07d6c22e31970a8bc15675c2bec723b"
 
 claude_status_line_commit="1edb04bafc9826aee0981cd3cddc4ba6375edc11"
 
