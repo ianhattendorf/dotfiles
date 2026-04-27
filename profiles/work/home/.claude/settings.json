@@ -551,5 +551,8 @@
   "sandbox": {
     "enabled": true
   },
-  "effortLevel": "xhigh"
+  "effortLevel": "xhigh",
+  "theme": "auto",
+  "autoCompactEnabled": false,
+  "disableAutoMode": "disable"
 }

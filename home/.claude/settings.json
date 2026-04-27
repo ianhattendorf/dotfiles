@@ -278,5 +278,6 @@
     "enabled": true
   },
   "model": "opusplan",
-  "theme": "auto"
+  "theme": "auto",
+  "disableAutoMode": "disable"
 }
