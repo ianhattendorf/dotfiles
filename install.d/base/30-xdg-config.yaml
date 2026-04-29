@@ -9,6 +9,7 @@
     ~/.config/touchpadxlibinputrc: xdg_config/touchpadxlibinputrc
     ~/.config/Code/User/settings.json: xdg_config/Code/User/settings.json
     ~/.config/dunst: xdg_config/dunst
+    ~/.config/environment.d/90-ssh-auth-sock.conf: xdg_config/environment.d/90-ssh-auth-sock.conf
     ~/.config/fish: xdg_config/fish
     ~/.config/foot: xdg_config/foot
     ~/.config/i3/config: xdg_config/i3/config

@@ -169,7 +169,15 @@ function initTmux {
 
   if [ -n "$TMUX" ]; then
     tmux set-environment -g PATH "$PATH"
-    tmux set-environment -g SSH_AUTH_SOCK "${SSH_AUTH_SOCK:-}"
+    if [ -n "${SSH_AUTH_SOCK:-}" ] && [ -S "$SSH_AUTH_SOCK" ]; then
+      tmux set-environment -g SSH_AUTH_SOCK "$SSH_AUTH_SOCK"
+    fi
+    if [ -n "${SWAYSOCK:-}" ] && [ -S "$SWAYSOCK" ]; then
+      tmux set-environment -g SWAYSOCK "$SWAYSOCK"
+    fi
+    if [ -n "${WAYLAND_DISPLAY:-}" ]; then
+      tmux set-environment -g WAYLAND_DISPLAY "$WAYLAND_DISPLAY"
+    fi
     syncFromTmuxEnvironment SSH_AUTH_SOCK
     syncFromTmuxEnvironment SWAYSOCK
     syncFromTmuxEnvironment WAYLAND_DISPLAY
