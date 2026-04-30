@@ -3,3 +3,9 @@ startup_mode = "Maximized"
 
 [general]
 import = ["~/.config/alacritty/tempus_dawn.toml"]
+
+[keyboard]
+bindings = [
+  { key = "Return", mods = "Alt",   chars = "\u001B\r" },
+  { key = "Return", mods = "Shift", chars = "\u001B[13;2u" },
+]
