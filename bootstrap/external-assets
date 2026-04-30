@@ -24,6 +24,30 @@ else
   :
 fi
 
+if [ "$(uname)" = "Darwin" ]; then
+  if command -v brew >/dev/null 2>&1; then
+    if ! command -v npm >/dev/null 2>&1; then
+      brew install node
+    fi
+    if ! command -v rustup-init >/dev/null 2>&1 && ! command -v rustup >/dev/null 2>&1 && ! command -v cargo >/dev/null 2>&1; then
+      brew install rustup
+    fi
+    if [ ! -x "$HOME/.cargo/bin/cargo" ] && command -v rustup-init >/dev/null 2>&1; then
+      rustup-init -y --default-toolchain stable --no-modify-path
+    fi
+    brew_ruby_bin="$(brew --prefix ruby 2>/dev/null)/bin"
+    if [ ! -x "$brew_ruby_bin/gem" ]; then
+      brew install ruby
+      brew_ruby_bin="$(brew --prefix ruby)/bin"
+    fi
+    [ -d "$brew_ruby_bin" ] && PATH="$brew_ruby_bin:$PATH"
+    [ -d "$HOME/.cargo/bin" ] && PATH="$HOME/.cargo/bin:$PATH"
+    export PATH
+  else
+    printf 'Homebrew is required to bootstrap cargo, gem, and npm on macOS\n' >&2
+  fi
+fi
+
 if [ "$(uname)" != "Darwin" ]; then
   betterlockscreen_version="update-cache"
   betterlockscreen_url="https://github.com/ianhattendorf/betterlockscreen/archive/$betterlockscreen_version.tar.gz"
@@ -149,8 +173,10 @@ if command -v cargo >/dev/null 2>&1; then
     --rev "$agent_status_commit"
   cargo install --git "https://git.sr.ht/~ianhattendorf/claude-status-line" \
     --rev "$claude_status_line_commit"
-  cargo install --git "https://git.sr.ht/~ianhattendorf/waybar-modules" \
-    --rev "$waybar_modules_commit"
+  if [ "$(uname)" != "Darwin" ]; then
+    cargo install --git "https://git.sr.ht/~ianhattendorf/waybar-modules" \
+      --rev "$waybar_modules_commit"
+  fi
 
   cargo install emacs-lsp-booster
 else
