@@ -26,6 +26,9 @@ fi
 
 if [ "$(uname)" = "Darwin" ]; then
   if command -v brew >/dev/null 2>&1; then
+    if ! brew list bash >/dev/null 2>&1; then
+      brew install bash
+    fi
     if ! command -v npm >/dev/null 2>&1; then
       brew install node
     fi
