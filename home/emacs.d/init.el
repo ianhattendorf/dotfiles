@@ -515,6 +515,8 @@
   :straight t
   :after ef-themes
   :config
+  (when (eq system-type 'darwin)
+    (setq auto-dark-detection-method 'ns))
   (setq auto-dark-themes '((ef-elea-dark) (ef-cyprus)))
   (setq ef-themes-to-toggle '(ef-cyprus ef-elea-dark))
   (auto-dark-mode t))
