@@ -1,5 +1,6 @@
 - link:
-    ~/.config/alacritty: xdg_config/alacritty
+    ~/.config/alacritty/alacritty.toml: xdg_config/alacritty/alacritty.toml
+    ~/.config/alacritty/tempus_dawn.toml: xdg_config/alacritty/tempus_dawn.toml
     ~/.config/kcminputrc: xdg_config/kcminputrc
     ~/.config/kglobalshortcutsrc: xdg_config/kglobalshortcutsrc
     ~/.config/khotkeysrc: xdg_config/khotkeysrc
