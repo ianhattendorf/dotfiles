@@ -9,7 +9,9 @@ if [ -z "${SSH_AUTH_SOCK:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ]; then
   export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 fi
 #export GK_OUT_DIR_WITH_SPACES=1
-. "$HOME/.cargo/env"
+if [ -f "$HOME/.cargo/env" ]; then
+  . "$HOME/.cargo/env"
+fi
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$HOME/go/bin:$BUN_INSTALL/bin:$PATH"

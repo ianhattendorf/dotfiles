@@ -58,6 +58,7 @@
 	basedir = ../{gitroot}.worktrees
 	copy = .claude/settings.local.json
 [gpg "ssh"]
-	allowedSignersFile = /home/ian/.ssh/allowed_signers
+	allowedSignersFile = ~/.ssh/allowed_signers
+	program = ssh-keygen
 [pull]
 	rebase = true

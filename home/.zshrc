@@ -88,7 +88,7 @@ function initAutocomplete {
   fi
 
   # bun completions
-  [ -s "/home/ian/.bun/_bun" ] && source "/home/ian/.bun/_bun"
+  [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
   eval "$(git wt --init zsh)"
 }
@@ -131,6 +131,18 @@ function initOs {
         fallbackPrompt
       fi
       initTheme
+      ;;
+    Darwin)
+      initAntidote
+      antidote_status=$?
+      initAutocomplete
+      if [ "$antidote_status" -eq 0 ]; then
+        initAntidoteAfterCompinit
+      fi
+      if [ "$antidote_status" -eq 0 ] && ! zshPromptReady; then
+        >&2 echo "Failed to initialize Zsh prompt; using fallback prompt"
+        fallbackPrompt
+      fi
       ;;
   esac
 }

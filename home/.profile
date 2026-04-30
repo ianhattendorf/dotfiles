@@ -7,7 +7,7 @@ fi
 if [ -z "${SSH_AUTH_SOCK:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ]; then
   export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 fi
-export HOSTNAME_SHORT=$(hostname --short)
+export HOSTNAME_SHORT=$(hostname -s)
 export WEECHAT_HOME="$XDG_CONFIG_HOME/weechat"
 
 # User specific environment and startup programs
@@ -27,7 +27,13 @@ fi
 
 export EDITOR=vim
 export PATH
-. "$HOME/.cargo/env"
+if [ -f "$HOME/.cargo/env" ]; then
+  . "$HOME/.cargo/env"
+fi
+
+if [ -x /opt/homebrew/bin/brew ]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
 
 if [ -z "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ]; then
   case "${XDG_VTNR:-0}" in
