@@ -43,8 +43,31 @@ config_paths=(
   "${CONFIG_DIR}/base/80-post-install.yaml"
 )
 
+chain=()
 if [[ -n "${profile}" ]]; then
-  config_paths+=("${CONFIG_DIR}/profiles/${profile}.yaml")
+  seen=":"
+  cur="${profile}"
+  while [[ -n "${cur}" ]]; do
+    yaml="${CONFIG_DIR}/profiles/${cur}.yaml"
+    if [[ ! -f "${yaml}" ]]; then
+      printf 'Unknown profile in chain: %s\n' "${cur}" >&2
+      exit 1
+    fi
+    if [[ "${seen}" == *":${cur}:"* ]]; then
+      printf 'Profile inheritance cycle at: %s\n' "${cur}" >&2
+      exit 1
+    fi
+    seen="${seen}${cur}:"
+    chain=("${cur}" "${chain[@]}")
+    if [[ ${#chain[@]} -gt 8 ]]; then
+      printf 'Profile chain too deep\n' >&2
+      exit 1
+    fi
+    cur="$(sed -n '1s/^# parent: \([A-Za-z0-9_-]*\)$/\1/p' "${yaml}")"
+  done
+  for p in "${chain[@]}"; do
+    config_paths+=("${CONFIG_DIR}/profiles/${p}.yaml")
+  done
 fi
 
 dry_run=0
@@ -57,9 +80,13 @@ done
 
 tmp_config="$(mktemp)"
 profile_filter=""
-if [[ -n "${profile}" ]]; then
+chain_paths=":"
+if [[ ${#chain[@]} -gt 0 ]]; then
   profile_filter="$(mktemp)"
-  sed -n 's/^\([[:space:]]*~\/[^:]*:\).*/\1/p' "${CONFIG_DIR}/profiles/${profile}.yaml" > "${profile_filter}"
+  for p in "${chain[@]}"; do
+    sed -n 's/^\([[:space:]]*~\/[^:]*:\).*/\1/p' "${CONFIG_DIR}/profiles/${p}.yaml" >> "${profile_filter}"
+    chain_paths="${chain_paths}${CONFIG_DIR}/profiles/${p}.yaml:"
+  done
 fi
 cleanup() {
   rm -f "${tmp_config}" "${profile_filter:-}"
@@ -67,7 +94,7 @@ cleanup() {
 trap cleanup EXIT
 
 for config_path in "${config_paths[@]}"; do
-  if [[ -n "${profile_filter}" && -s "${profile_filter}" && "${config_path}" != *"/profiles/"* ]]; then
+  if [[ -n "${profile_filter}" && -s "${profile_filter}" && "${chain_paths}" != *":${config_path}:"* ]]; then
     grep -vFf "${profile_filter}" "${config_path}" >> "${tmp_config}"
   else
     cat "${config_path}" >> "${tmp_config}"

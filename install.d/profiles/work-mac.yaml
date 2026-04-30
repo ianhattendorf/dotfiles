@@ -1,3 +1,4 @@
+# parent: work
 - link:
     ~/.gitconfig-local: profiles/work-mac/home/.gitconfig-local
     ~/.config/dotfiles/session-env.sh: profiles/work-mac/xdg_config/dotfiles/session-env.sh

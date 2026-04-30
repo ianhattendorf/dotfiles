@@ -1,7 +1,7 @@
 [user]
 	email = ian.hattendorf@gitkraken.com
 	name = Ian Hattendorf
-	signingkey = /home/ian/.ssh/id_ed25519
+	signingkey = ~/.ssh/id_ed25519
 [tag]
 	forceSignAnnotated = true
 [commit]
@@ -10,5 +10,5 @@
 	program = gpg
         format = ssh
 [gpg "ssh"]
-	allowedSignersFile = /home/ian/.ssh/allowed_signers.valid
+	allowedSignersFile = ~/.ssh/allowed_signers.valid
 	program = ssh-keygen

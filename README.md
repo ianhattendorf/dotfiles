@@ -29,9 +29,21 @@ DOTFILES_PROFILE=work ./install
 DOTFILES_PROFILE=simba ./install
 ```
 
-Supported profiles are `personal`, `work`, `simba`, `nala`, `mba2020`, and `work-vm`.
+Supported profiles are `personal`, `work`, `work-mac`, `simba`, `nala`, `mba2020`, and `work-vm`.
 
 There is no hostname-based install or runtime selection. If you need machine- or context-specific behavior, add it under `profiles/<name>/...` and install it explicitly with `DOTFILES_PROFILE=<name>`.
+
+## Profile Inheritance
+
+A profile YAML may declare a parent on its first line as a YAML comment:
+
+```yaml
+# parent: work
+- link:
+    ...
+```
+
+The installer resolves the chain (oldest ancestor first, child last), appends each YAML to the Dotbot config in order, and lets the child override any duplicate target via Dotbot's `force: true` default. `work-mac` inherits from `work` so all OS-portable work content lives in the `work` profile and only macOS-specific overrides (signing key path, brew tmux path, Alt-arrow word-motion bindings) live in `work-mac`.
 
 ## Bootstrap Phases
 

@@ -1,9 +1,0 @@
-export XZ_DEFAULTS="--threads=0"
-#export KUBECONFIG=~/.kube/sandbox.conf
-#export KUBECONFIG=~/.kube/minikube.conf
-export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
-#export GK_OUT_DIR_WITH_SPACES=1
-. "$HOME/.cargo/env"
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$HOME/go/bin:$BUN_INSTALL/bin:$PATH"

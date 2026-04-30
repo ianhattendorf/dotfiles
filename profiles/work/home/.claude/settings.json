@@ -77,7 +77,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -88,12 +88,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -104,12 +104,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -120,12 +120,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -136,7 +136,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -147,12 +147,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -163,12 +163,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -179,12 +179,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code --blocking",
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code --blocking",
             "timeout": 330
           }
         ]
@@ -206,7 +206,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -217,12 +217,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       },
@@ -251,12 +251,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       },
@@ -289,7 +289,7 @@
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -300,12 +300,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       },
@@ -335,12 +335,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       },
@@ -369,12 +369,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       },
@@ -403,12 +403,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       },
@@ -437,12 +437,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -453,12 +453,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       },
@@ -478,12 +478,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       },
@@ -503,7 +503,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -514,7 +514,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -525,12 +525,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/home/ian/.cargo/bin/agent-status hook",
+            "command": "~/.cargo/bin/agent-status hook",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"/home/ian/.local/bin/gk\" ai hook run --host claude-code"
+            "command": "\"~/.local/bin/gk\" ai hook run --host claude-code"
           }
         ]
       }
@@ -538,7 +538,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "/home/ian/.cargo/bin/claude-status-line"
+    "command": "~/.cargo/bin/claude-status-line"
   },
   "enabledPlugins": {
     "atlassian@claude-plugins-official": false,
