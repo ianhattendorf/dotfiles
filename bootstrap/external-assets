@@ -6,10 +6,6 @@ if [ "${DOTFILES_DRY_RUN:-0}" = "1" ]; then
   exit 0
 fi
 
-if [ "$(uname)" = "Darwin" ]; then
-  exit 0
-fi
-
 antidote_version="v2.1.0"
 antidote_dir="${XDG_DATA_HOME:-$HOME/.local/share}/antidote"
 antidote_ref="refs/tags/$antidote_version"
@@ -28,17 +24,19 @@ else
   :
 fi
 
-betterlockscreen_version="update-cache"
-betterlockscreen_url="https://github.com/ianhattendorf/betterlockscreen/archive/$betterlockscreen_version.tar.gz"
-betterlockscreen_dir="$HOME/bin"
-betterlockscreen_path="$betterlockscreen_dir/betterlockscreen"
-betterlockscreen_version_path="$betterlockscreen_path-$betterlockscreen_version"
+if [ "$(uname)" != "Darwin" ]; then
+  betterlockscreen_version="update-cache"
+  betterlockscreen_url="https://github.com/ianhattendorf/betterlockscreen/archive/$betterlockscreen_version.tar.gz"
+  betterlockscreen_dir="$HOME/bin"
+  betterlockscreen_path="$betterlockscreen_dir/betterlockscreen"
+  betterlockscreen_version_path="$betterlockscreen_path-$betterlockscreen_version"
 
-if [ ! -f "$betterlockscreen_version_path" ]; then
-  mkdir -p "$betterlockscreen_dir"
-  curl -L "$betterlockscreen_url" | tar xzv --strip-components=1 -C "$betterlockscreen_dir" "betterlockscreen-$betterlockscreen_version/betterlockscreen"
-  mv "$betterlockscreen_dir/betterlockscreen" "$betterlockscreen_version_path"
-  ln -s "$betterlockscreen_version_path" "$betterlockscreen_path"
+  if [ ! -f "$betterlockscreen_version_path" ]; then
+    mkdir -p "$betterlockscreen_dir"
+    curl -L "$betterlockscreen_url" | tar xzv --strip-components=1 -C "$betterlockscreen_dir" "betterlockscreen-$betterlockscreen_version/betterlockscreen"
+    mv "$betterlockscreen_dir/betterlockscreen" "$betterlockscreen_version_path"
+    ln -s "$betterlockscreen_version_path" "$betterlockscreen_path"
+  fi
 fi
 
 if ! command -v gem >/dev/null 2>&1; then

@@ -6,5 +6,9 @@ if [ "${DOTFILES_DRY_RUN:-0}" = "1" ]; then
   exit 0
 fi
 
+if [ "$(uname)" = "Darwin" ]; then
+  exit 0
+fi
+
 systemctl --user daemon-reload
 update-desktop-database "$HOME/.local/share/applications"
