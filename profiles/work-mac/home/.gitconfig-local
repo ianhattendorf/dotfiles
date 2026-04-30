@@ -1,0 +1,6 @@
+[user]
+	email = ian.hattendorf@gitkraken.com
+	name = Ian Hattendorf
+	signingkey = /Users/ianh/.ssh/id_ed25519
+[gpg "ssh"]
+	program = /usr/bin/ssh-keygen

@@ -1,0 +1,4 @@
+- link:
+    ~/.gitconfig-local: profiles/work-mac/home/.gitconfig-local
+    ~/.config/dotfiles/session-env.sh: profiles/work-mac/xdg_config/dotfiles/session-env.sh
+    ~/.config/alacritty/alacritty.toml: profiles/work-mac/xdg_config/alacritty/alacritty.toml

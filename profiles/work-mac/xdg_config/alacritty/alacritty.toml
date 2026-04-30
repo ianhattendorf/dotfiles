@@ -1,0 +1,14 @@
+[terminal.shell]
+program = "/opt/homebrew/bin/tmux"
+
+[window]
+startup_mode = "Maximized"
+
+[general]
+import = ["~/.config/alacritty/tempus_dawn.toml"]
+
+[keyboard]
+bindings = [
+  { key = "Right", mods = "Alt", chars = "\u001BF" },
+  { key = "Left",  mods = "Alt", chars = "\u001BB" },
+]
