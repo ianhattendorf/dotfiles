@@ -1,6 +1,7 @@
 - link:
     ~/.bash_profile: home/.bash_profile
     ~/.bashrc: home/.bashrc
+    ~/.claude/CLAUDE.md: home/.claude/CLAUDE.md
     ~/.claude/settings.json: home/.claude/settings.json
     ~/.emacs.d/early-init.el: home/emacs.d/early-init.el
     ~/.emacs.d/init.el: home/emacs.d/init.el
