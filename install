@@ -58,7 +58,7 @@ if [[ -n "${profile}" ]]; then
       exit 1
     fi
     seen="${seen}${cur}:"
-    chain=("${cur}" "${chain[@]}")
+    chain=("${cur}" ${chain[@]+"${chain[@]}"})
     if [[ ${#chain[@]} -gt 8 ]]; then
       printf 'Profile chain too deep\n' >&2
       exit 1
