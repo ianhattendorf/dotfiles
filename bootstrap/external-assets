@@ -29,9 +29,23 @@ if [ "$(uname)" = "Darwin" ]; then
     if ! brew list bash >/dev/null 2>&1; then
       brew install bash
     fi
-    if ! command -v npm >/dev/null 2>&1; then
-      brew install node
+    nvm_version="v0.40.1"
+    nvm_dir="$HOME/.config/nvm"
+    nvm_installed_version=""
+    if [ -s "$nvm_dir/nvm.sh" ]; then
+      nvm_installed_version="v$(NVM_DIR="$nvm_dir" bash -c '. "$NVM_DIR/nvm.sh" >/dev/null && nvm --version' 2>/dev/null || true)"
     fi
+    if [ "$nvm_installed_version" != "$nvm_version" ]; then
+      NVM_DIR="$nvm_dir" PROFILE=/dev/null \
+        bash -c "curl -fsSL 'https://raw.githubusercontent.com/nvm-sh/nvm/$nvm_version/install.sh' | bash"
+    fi
+    export NVM_DIR="$nvm_dir"
+    set +u
+    # shellcheck disable=SC1091
+    . "$NVM_DIR/nvm.sh"
+    nvm install --lts
+    nvm alias default 'lts/*'
+    set -u
     if ! command -v rustup-init >/dev/null 2>&1 && ! command -v rustup >/dev/null 2>&1 && ! command -v cargo >/dev/null 2>&1; then
       brew install rustup
     fi

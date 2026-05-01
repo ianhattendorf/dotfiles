@@ -21,10 +21,6 @@ fi
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
-if [ -f /usr/local/opt/nvm/nvm.sh ]; then
-  . /usr/local/opt/nvm/nvm.sh
-fi
-
 export EDITOR=vim
 export PATH
 if [ -f "$HOME/.cargo/env" ]; then
