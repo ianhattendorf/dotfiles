@@ -1,5 +1,4 @@
 #!/bin/sh
 
-hosts=$(awk '/^Host / && !/\*/ { for (i=2; i<=NF; i++) if ($i !~ /\./) print $i }' ~/.ssh/config 2>/dev/null)
-host=$(printf '%s\n' $hosts | fuzzel --dmenu --prompt="Host: ")
-[ -n "$host" ] && exec foot --maximized mosh "$host" -- tmux a
+host=$(pick-ssh-host) || exit
+exec foot --maximized mosh "$host" -- tmux a

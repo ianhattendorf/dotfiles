@@ -1,0 +1,23 @@
+#!/bin/sh
+# Pick a non-wildcard, non-FQDN host from ~/.ssh/config.
+# Prints the chosen host on stdout. Exits non-zero on cancel / no hosts.
+
+hosts=$(awk '/^Host / && !/\*/ { for (i=2; i<=NF; i++) if ($i !~ /\./) print $i }' ~/.ssh/config 2>/dev/null)
+[ -z "$hosts" ] && exit 1
+
+if command -v fuzzel >/dev/null 2>&1; then
+  printf '%s\n' $hosts | fuzzel --dmenu --prompt="Host: "
+elif command -v choose >/dev/null 2>&1; then
+  printf '%s\n' $hosts | choose
+elif [ "$(uname)" = "Darwin" ]; then
+  # shellcheck disable=SC2086
+  osascript - $hosts <<'OSA'
+on run argv
+  set choice to (choose from list argv given prompt:"Host:")
+  if choice is false then error number -128
+  return item 1 of choice
+end run
+OSA
+else
+  printf '%s\n' $hosts | fzf --prompt="Host: "
+fi
