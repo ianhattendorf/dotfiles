@@ -81,6 +81,9 @@
   ;; Disable bell
   (setq ring-bell-function #'ignore)
 
+  ;; Start maximized
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+
   ;; Smooth scrolling
   (setq pixel-scroll-precision-large-scroll-height 40.0)
   (setq pixel-scroll-precision-interpolate-page t)
