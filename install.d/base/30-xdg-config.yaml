@@ -8,6 +8,7 @@
     ~/.config/kxkbrc: xdg_config/kxkbrc
     ~/.config/touchpadxlibinputrc: xdg_config/touchpadxlibinputrc
     ~/.config/Code/User/settings.json: xdg_config/Code/User/settings.json
+    ~/.config/darkman/config.yaml: xdg_config/darkman/config.yaml
     ~/.config/dunst: xdg_config/dunst
     ~/.config/environment.d/90-ssh-auth-sock.conf: xdg_config/environment.d/90-ssh-auth-sock.conf
     ~/.config/fish: xdg_config/fish
