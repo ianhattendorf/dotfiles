@@ -549,7 +549,24 @@
     "typescript-lsp@claude-plugins-official": true
   },
   "sandbox": {
-    "enabled": true
+    "enabled": true,
+    "excludedCommands": [
+      "git fetch *",
+      "git pull *",
+      "git push *",
+      "git clone *",
+      "git ls-remote *",
+      "git remote update *",
+      "git submodule update *",
+      "git commit *",
+      "git rebase *",
+      "git merge *",
+      "git cherry-pick *",
+      "git tag *",
+      "git revert *",
+      "gh *",
+      "pnpm *"
+    ]
   },
   "effortLevel": "xhigh",
   "theme": "auto",
