@@ -167,16 +167,28 @@ function initTmux {
     esac
   }
 
+  # Write to both global and current session env: -g seeds future sessions,
+  # the session-scoped write overwrites any "-VAR" removal marker that
+  # update-environment may have left behind from a prior client attach.
+  function pushToTmuxEnvironment {
+    local name="$1" value="$2"
+    tmux set-environment -g "$name" "$value"
+    tmux set-environment "$name" "$value"
+  }
+
   if [ -n "$TMUX" ]; then
     tmux set-environment -g PATH "$PATH"
     if [ -n "${SSH_AUTH_SOCK:-}" ] && [ -S "$SSH_AUTH_SOCK" ]; then
-      tmux set-environment -g SSH_AUTH_SOCK "$SSH_AUTH_SOCK"
+      pushToTmuxEnvironment SSH_AUTH_SOCK "$SSH_AUTH_SOCK"
     fi
     if [ -n "${SWAYSOCK:-}" ] && [ -S "$SWAYSOCK" ]; then
-      tmux set-environment -g SWAYSOCK "$SWAYSOCK"
+      pushToTmuxEnvironment SWAYSOCK "$SWAYSOCK"
     fi
     if [ -n "${WAYLAND_DISPLAY:-}" ]; then
-      tmux set-environment -g WAYLAND_DISPLAY "$WAYLAND_DISPLAY"
+      pushToTmuxEnvironment WAYLAND_DISPLAY "$WAYLAND_DISPLAY"
+    fi
+    if [ -n "${DISPLAY:-}" ]; then
+      pushToTmuxEnvironment DISPLAY "$DISPLAY"
     fi
     syncFromTmuxEnvironment SSH_AUTH_SOCK
     syncFromTmuxEnvironment SWAYSOCK
