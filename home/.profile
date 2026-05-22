@@ -12,7 +12,7 @@ export WEECHAT_HOME="$XDG_CONFIG_HOME/weechat"
 
 # User specific environment and startup programs
 
-PATH=$PATH:$HOME/.local/bin:$HOME/go/bin:$HOME/bin
+PATH=$PATH:$HOME/.local/bin:$HOME/go/bin
 
 if [ -f ~/.cargo/env ]; then
   . ~/.cargo/env

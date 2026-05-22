@@ -45,6 +45,11 @@ if [ "$(uname)" = "Darwin" ]; then
     . "$NVM_DIR/nvm.sh"
     nvm install --lts
     nvm alias default 'lts/*'
+    nvm_default_version="$(nvm version default)"
+    if [ -n "$nvm_default_version" ] && [ "$nvm_default_version" != "N/A" ]; then
+      ln -sfn "$NVM_DIR/versions/node/$nvm_default_version" "$NVM_DIR/current"
+    fi
+    corepack enable
     set -u
     if ! command -v rustup-init >/dev/null 2>&1 && ! command -v rustup >/dev/null 2>&1 && ! command -v cargo >/dev/null 2>&1; then
       brew install rustup

@@ -14,4 +14,16 @@ if [ -f "$HOME/.cargo/env" ]; then
 fi
 # bun
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$HOME/go/bin:$BUN_INSTALL/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/go/bin:$BUN_INSTALL/bin:$PATH"
+# nvm: mount the default node's bin so non-login/non-interactive zsh
+# (GUI apps) sees node, npm, and corepack-managed pnpm/yarn shims.
+# nvm.sh itself is not sourced here (too slow for .zshenv); login and
+# interactive shells still pick it up via .profile.
+nvm_current_bin="${NVM_DIR:-$HOME/.config/nvm}/current/bin"
+if [ -d "$nvm_current_bin" ]; then
+  case ":$PATH:" in
+    *":$nvm_current_bin:"*) ;;
+    *) export PATH="$nvm_current_bin:$PATH" ;;
+  esac
+fi
+unset nvm_current_bin
