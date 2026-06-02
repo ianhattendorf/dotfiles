@@ -177,6 +177,9 @@ install_git_wt() {
 install_git_wt
 
 install_ssh_tpm_agent() {
+  # ssh-tpm-agent is Linux-only (kernel keyring syscalls, TPM); skip elsewhere.
+  [ "$(uname)" = "Linux" ] || return 0
+
   ssh_tpm_agent_commit="1a96091a3dddce53bbf74892229cdce570b3d047" # v0.8.0
   ssh_tpm_agent_install_dir="$HOME/go/bin"
 
