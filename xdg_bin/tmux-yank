@@ -4,5 +4,15 @@
 # processing (which may re-encode OSC 52 with an ST terminator
 # that mosh doesn't support).
 tty=$(tmux display-message -p '#{client_tty}')
+term=$(tmux display-message -p '#{client_termname}')
 data=$(base64 | tr -d '\n')
-printf '\033]52;c;%s\a' "$data" > "$tty"
+
+case "$term" in
+  tmux*|screen*)
+    # Nested tmux: ask the outer tmux to pass the OSC 52 sequence through.
+    printf '\033Ptmux;\033\033]52;c;%s\a\033\\' "$data" > "$tty"
+    ;;
+  *)
+    printf '\033]52;c;%s\a' "$data" > "$tty"
+    ;;
+esac
