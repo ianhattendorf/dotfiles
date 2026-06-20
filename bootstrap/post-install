@@ -11,4 +11,5 @@ if [ "$(uname)" = "Darwin" ]; then
 fi
 
 systemctl --user daemon-reload
+systemctl --user enable --now ssh-agent.socket
 update-desktop-database "$HOME/.local/share/applications"
