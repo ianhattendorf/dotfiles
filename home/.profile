@@ -12,19 +12,18 @@ export WEECHAT_HOME="$XDG_CONFIG_HOME/weechat"
 
 # User specific environment and startup programs
 
-PATH=$PATH:$HOME/.local/bin:$HOME/go/bin
-
-if [ -f ~/.cargo/env ]; then
-  . ~/.cargo/env
-fi
+PATH=$PATH:$HOME/.local/bin:$HOME/go/bin:${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin
 
 export NVM_DIR="$HOME/.config/nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
 export EDITOR=vim
 export PATH
-if [ -f "$HOME/.cargo/env" ]; then
+if [ -r "$HOME/.cargo/env" ]; then
   . "$HOME/.cargo/env"
+elif [ -d "$HOME/.cargo/bin" ]; then
+  PATH="$HOME/.cargo/bin:$PATH"
+  export PATH
 fi
 
 if [ -x /opt/homebrew/bin/brew ]; then

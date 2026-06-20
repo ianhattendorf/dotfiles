@@ -9,12 +9,14 @@ if [ -z "${SSH_AUTH_SOCK:-}" ] && [ -n "${XDG_RUNTIME_DIR:-}" ]; then
   export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/ssh-agent.socket"
 fi
 #export GK_OUT_DIR_WITH_SPACES=1
-if [ -f "$HOME/.cargo/env" ]; then
+if [ -r "$HOME/.cargo/env" ]; then
   . "$HOME/.cargo/env"
+elif [ -d "$HOME/.cargo/bin" ]; then
+  export PATH="$HOME/.cargo/bin:$PATH"
 fi
 # bun
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$HOME/.local/bin:$HOME/go/bin:$BUN_INSTALL/bin:$PATH"
+export PATH="$HOME/.local/bin:$HOME/go/bin:${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin:$BUN_INSTALL/bin:$PATH"
 # nvm: mount the default node's bin so non-login/non-interactive zsh
 # (GUI apps) sees node, npm, and corepack-managed pnpm/yarn shims.
 # nvm.sh itself is not sourced here (too slow for .zshenv); login and
