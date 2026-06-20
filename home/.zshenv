@@ -16,7 +16,8 @@ elif [ -d "$HOME/.cargo/bin" ]; then
 fi
 # bun
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$HOME/.local/bin:$HOME/go/bin:${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin:$BUN_INSTALL/bin:$PATH"
+export DOTNET_ROOT="$HOME/.dotnet"
+export PATH="$HOME/.local/bin:$HOME/go/bin:$HOME/.dotnet:${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin:$BUN_INSTALL/bin:$PATH"
 # nvm: mount the default node's bin so non-login/non-interactive zsh
 # (GUI apps) sees node, npm, and corepack-managed pnpm/yarn shims.
 # nvm.sh itself is not sourced here (too slow for .zshenv); login and

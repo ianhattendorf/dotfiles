@@ -134,6 +134,28 @@ if [ "$(uname)" = "Linux" ]; then
   install_fedora_dependencies
 fi
 
+install_dotnet() {
+  dotnet_channel="10.0"
+  dotnet_install_dir="$HOME/.dotnet"
+
+  if [ -x "$dotnet_install_dir/dotnet" ] && \
+    "$dotnet_install_dir/dotnet" --list-sdks 2>/dev/null | grep -q "^${dotnet_channel}\\."; then
+    return 0
+  fi
+
+  dotnet_tmp_dir="$(mktemp -d)"
+  trap 'rm -rf "$dotnet_tmp_dir"' EXIT HUP INT TERM
+
+  mkdir -p "$dotnet_install_dir"
+  curl -fsSL "https://dot.net/v1/dotnet-install.sh" -o "$dotnet_tmp_dir/dotnet-install.sh"
+  sh "$dotnet_tmp_dir/dotnet-install.sh" \
+    --channel "$dotnet_channel" \
+    --install-dir "$dotnet_install_dir" \
+    --no-path
+}
+
+install_dotnet
+
 if [ "$(uname)" != "Darwin" ]; then
   betterlockscreen_version="update-cache"
   betterlockscreen_url="https://github.com/ianhattendorf/betterlockscreen/archive/$betterlockscreen_version.tar.gz"
