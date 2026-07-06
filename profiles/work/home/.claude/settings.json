@@ -68,7 +68,21 @@
       "Bash(dirname:*)",
       "Bash(realpath:*)",
       "Bash(pwd:*)",
-      "mcp__vscode-inspector__*"
+      "mcp__vscode-inspector__*",
+      "Read(~/dev/**)"
+    ],
+    "deny": [
+      "Read(~/dev/certs/**)",
+      "Read(~/dev/**/.env)",
+      "Read(~/dev/**/.env.local)"
+    ],
+    "ask": [
+      "Read(~/dev/**/*.pem)",
+      "Read(~/dev/**/*.key)",
+      "Read(~/dev/**/*.p12)",
+      "Read(~/dev/**/*.pfx)",
+      "Read(~/dev/**/id_rsa*)",
+      "Read(~/dev/**/id_ed25519*)"
     ]
   },
   "hooks": {
