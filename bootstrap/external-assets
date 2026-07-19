@@ -92,6 +92,12 @@ install_fedora_dependencies() {
     fi
   fi
 
+  swaync_copr_repo="/etc/yum.repos.d/_copr:copr.fedorainfracloud.org:erikreider:SwayNotificationCenter.repo"
+  if [ ! -f "$swaync_copr_repo" ]; then
+    # shellcheck disable=SC2086
+    $dnf_cmd -y copr enable erikreider/SwayNotificationCenter
+  fi
+
   fedora_packages="
     cargo
     curl
@@ -106,6 +112,7 @@ install_fedora_dependencies() {
     pkgconf-pkg-config
     ruby-devel
     rubygems
+    SwayNotificationCenter
     tar
     unzip
   "
