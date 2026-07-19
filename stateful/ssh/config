@@ -6,3 +6,6 @@ Host simba simba.internal.ianhattendorf.com
 
 Host mba2020 mba2020.internal.ianhattendorf.com
     Hostname mba2020.internal.ianhattendorf.com
+
+Host fedora
+    Hostname 10.42.34.131
