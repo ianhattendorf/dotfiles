@@ -26,10 +26,11 @@ Profile install:
 ```sh
 DOTFILES_PROFILE=personal ./install
 DOTFILES_PROFILE=work ./install
+DOTFILES_PROFILE=fedora ./install
 DOTFILES_PROFILE=simba ./install
 ```
 
-Supported profiles are `personal`, `work`, `work-mac`, `simba`, `nala`, `mba2020`, and `work-vm`.
+Supported profiles are `personal`, `work`, `work-mac`, `fedora`, `simba`, `nala`, `mba2020`, and `work-vm`.
 
 There is no hostname-based install or runtime selection. If you need machine- or context-specific behavior, add it under `profiles/<name>/...` and install it explicitly with `DOTFILES_PROFILE=<name>`.
 
@@ -80,12 +81,12 @@ Configured plugins:
 - `tmux-resurrect` at `cff343cf9e81983d3da0c8562b01616f12e8d548`
 - `tmux-continuum` at `0698e8f4b17d6454c71bf5212895ec055c578da0`
 
-## Simba TPM SSH Agent
+## TPM SSH Agent
 
-The `simba` profile uses `ssh-tpm-agent` as `SSH_AUTH_SOCK` at `$XDG_RUNTIME_DIR/ssh-tpm-agent.sock`.
-The profile install links the systemd user units and enables `ssh-tpm-agent.socket`.
+The `fedora` and `simba` profiles use `ssh-tpm-agent` as `SSH_AUTH_SOCK` at `$XDG_RUNTIME_DIR/ssh-tpm-agent.sock`.
+Their profile installs link the systemd user units and enable `ssh-tpm-agent.socket`.
 
-Create or inspect TPM-backed SSH keys locally on Simba:
+Create or inspect TPM-backed SSH keys locally on the TPM host:
 
 ```sh
 ssh-tpm-keygen

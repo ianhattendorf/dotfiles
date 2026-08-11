@@ -1,0 +1,12 @@
+# parent: personal
+- link:
+    ~/.config/dotfiles/session-env.sh: profiles/fedora/xdg_config/dotfiles/session-env.sh
+    ~/.config/environment.d/90-ssh-auth-sock.conf: profiles/fedora/xdg_config/environment.d/90-ssh-auth-sock.conf
+    ~/.config/systemd/user/ssh-tpm-agent.service: profiles/fedora/xdg_config/systemd/user/ssh-tpm-agent.service
+    ~/.config/systemd/user/ssh-tpm-agent.socket: profiles/fedora/xdg_config/systemd/user/ssh-tpm-agent.socket
+
+- shell:
+    - command: bootstrap/ssh-tpm-agent
+      description: Enable ssh-tpm-agent for the fedora profile
+      stdout: true
+      stderr: true
