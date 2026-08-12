@@ -1,7 +1,7 @@
 [user]
 	name = Ian Hattendorf
 	email = ian@ianhattendorf.com
-	signingkey = /home/ian/.ssh/id_ed25519
+	signingkey = /home/ian/.ssh/id_ecdsa_tpm.pub
 [tag]
 	forceSignAnnotated = true
 [commit]

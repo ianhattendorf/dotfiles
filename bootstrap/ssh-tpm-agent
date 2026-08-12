@@ -6,9 +6,10 @@ if [ "${DOTFILES_DRY_RUN:-0}" = "1" ]; then
   exit 0
 fi
 
-if [ "${DOTFILES_PROFILE:-}" != "simba" ]; then
-  exit 0
-fi
+case "${DOTFILES_PROFILE:-}" in
+  fedora|simba) ;;
+  *) exit 0 ;;
+esac
 
 agent_path="$HOME/go/bin/ssh-tpm-agent"
 
