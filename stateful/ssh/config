@@ -9,3 +9,12 @@ Host mba2020 mba2020.internal.ianhattendorf.com
 
 Host fedora
     Hostname 10.42.34.131
+
+Host switch-1
+      HostName switch-1
+      User root
+      IdentityFile ~/.ssh/id_rsa_brocade
+      IdentitiesOnly yes
+      KexAlgorithms +diffie-hellman-group1-sha1
+      HostKeyAlgorithms +ssh-rsa
+      PubkeyAcceptedAlgorithms +ssh-rsa
