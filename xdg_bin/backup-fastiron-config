@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: backup-fastiron-config [SSH_HOST] [OUTPUT_DIRECTORY]
+
+Back up the active FastIron running configuration through its interactive SSH
+CLI. SSH_HOST defaults to switch-1. OUTPUT_DIRECTORY defaults to
+$XDG_STATE_HOME/fastiron-config-backups, or
+$HOME/.local/state/fastiron-config-backups when XDG_STATE_HOME is unset.
+
+The SSH key must already be available to ssh-agent. The selected SSH host must
+be configured in ~/.ssh/config with the required legacy FastIron algorithms.
+EOF
+}
+
+case ${1:-} in
+  -h|--help)
+    usage
+    exit 0
+    ;;
+esac
+
+ssh_host=${1:-switch-1}
+state_root=${XDG_STATE_HOME:-"$HOME/.local/state"}
+backup_dir=${2:-"$state_root/fastiron-config-backups"}
+
+[[ "$ssh_host" =~ ^[A-Za-z0-9._-]+$ ]] || {
+  echo "SSH_HOST may contain only letters, numbers, periods, underscores, and hyphens." >&2
+  exit 2
+}
+
+for required_command in expect grep mktemp sed sha256sum ssh tr; do
+  command -v "$required_command" >/dev/null || {
+    echo "Required command not found: $required_command" >&2
+    exit 1
+  }
+done
+
+umask 077
+mkdir -p -- "$backup_dir"
+chmod 700 -- "$backup_dir"
+
+timestamp=$(date -u +%Y%m%dT%H%M%SZ)
+backup_file="$backup_dir/$ssh_host-running-$timestamp.cfg"
+[[ ! -e "$backup_file" ]] || {
+  echo "Refusing to overwrite existing backup: $backup_file" >&2
+  exit 1
+}
+raw_file=$(mktemp "$backup_dir/.$ssh_host-running.XXXXXX.raw")
+filtered_file=$(mktemp "$backup_dir/.$ssh_host-running.XXXXXX.cfg")
+
+cleanup() {
+  rm -f -- "$raw_file" "$filtered_file"
+}
+trap cleanup EXIT
+
+if ! expect - "$ssh_host" "$raw_file" <<'EXPECT'
+set timeout 90
+match_max 1000000
+
+set ssh_host [lindex $argv 0]
+set raw_file [lindex $argv 1]
+
+log_user 0
+log_file -a -noappend $raw_file
+spawn ssh -tt -- $ssh_host
+
+expect {
+  -re {Enter passphrase for key[^\r\n]*: ?$} {
+    send_user "SSH key is not loaded. Run ssh-add for the FastIron key, then retry.\n"
+    exit 10
+  }
+  -re {Are you sure you want to continue connecting[^\r\n]*\? ?$} {
+    send_user "SSH host key is not trusted. Connect manually once, verify it, then retry.\n"
+    exit 11
+  }
+  -re {SSH@[^\r\n>]+> ?$} {
+    send -- "enable\r"
+    expect {
+      -re {SSH@[^\r\n#]+# ?$} {}
+      -re {[Pp]assword: ?$} {
+        send_user "FastIron enable requires a password; refusing to store or capture it.\n"
+        exit 12
+      }
+      timeout {
+        send_user "Timed out waiting for the privileged FastIron prompt.\n"
+        exit 13
+      }
+      eof {
+        send_user "SSH closed before the privileged FastIron prompt appeared.\n"
+        exit 14
+      }
+    }
+  }
+  -re {SSH@[^\r\n#]+# ?$} {}
+  timeout {
+    send_user "Timed out waiting for the FastIron CLI prompt.\n"
+    exit 15
+  }
+  eof {
+    send_user "SSH closed before the FastIron CLI prompt appeared.\n"
+    exit 16
+  }
+}
+
+send -- "skip\r"
+expect {
+  -re {SSH@[^\r\n#]+# ?$} {}
+  timeout {
+    send_user "Timed out while disabling FastIron pagination.\n"
+    exit 17
+  }
+  eof {
+    send_user "SSH closed while disabling FastIron pagination.\n"
+    exit 18
+  }
+}
+
+send -- "show running-config\r"
+expect {
+  -re {SSH@[^\r\n#]+# ?$} {}
+  timeout {
+    send_user "Timed out while retrieving the FastIron configuration.\n"
+    exit 19
+  }
+  eof {
+    send_user "SSH closed while retrieving the FastIron configuration.\n"
+    exit 20
+  }
+}
+
+send -- "exit\r"
+expect eof
+EXPECT
+then
+  echo "FastIron backup failed; no backup was retained." >&2
+  exit 1
+fi
+
+tr -d '\r' <"$raw_file" |
+  sed -n '/^Current configuration:/,/^end$/p' >"$filtered_file"
+
+if ! grep -q '^Current configuration:$' "$filtered_file" ||
+  ! grep -qx 'end' "$filtered_file" ||
+  grep -q -- '--More--' "$filtered_file"; then
+  echo "FastIron returned an incomplete or paginated configuration; no backup was retained." >&2
+  exit 1
+fi
+
+chmod 600 -- "$filtered_file"
+mv -- "$filtered_file" "$backup_file"
+
+echo "Backup saved: $backup_file"
+sha256sum -- "$backup_file"

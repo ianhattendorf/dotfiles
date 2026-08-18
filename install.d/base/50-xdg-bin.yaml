@@ -1,4 +1,5 @@
 - link:
+    ~/.local/bin/backup-fastiron-config: xdg_bin/backup-fastiron-config
     ~/.local/bin/switch-mon: xdg_bin/switch-mon
     ~/.local/bin/tmux-agent-next: xdg_bin/tmux-agent-next
     ~/.local/bin/tmux-agent-prev: xdg_bin/tmux-agent-prev
