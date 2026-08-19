@@ -146,6 +146,14 @@ EOF
 	cat > "$HOME/.bashrc.d/tpm-ssh.sh" <<EOF
 export SSH_ASKPASS="\$HOME/.local/bin/tpm-pin-askpass"
 export SSH_ASKPASS_REQUIRE=force
+# Only the esysdb store (tpm2_ptool) exists, but the module still probes its FAPI
+# backend on every load and spams warnings ("Provisioning was not executed") to stderr
+# of every git ssh operation. Provisioning FAPI on swtpm is a rabbit hole (no EK cert,
+# SRK handle collision with the ptool store), and we don't use it — silence both the
+# tss2 logger and tpm2-pkcs11's own warning lines instead. TPM2_PKCS11_BACKEND=esysdb
+# is documented for this but empirically doesn't stop the probe (tested on 1.10.1).
+export TSS2_LOG=fapi+NONE
+export TPM2_PKCS11_LOG_LEVEL=0
 EOF
 
 	mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
