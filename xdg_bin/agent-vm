@@ -1,0 +1,530 @@
+#!/usr/bin/env bash
+# Contained Fedora guest for coding agents (Claude Code, codex, kepler tasks).
+#
+# The VM is the containment boundary: damage from an agent stays in the guest, never the
+# host. The guest is continuously updated (OS, agents, toolchain) — there is no rollback;
+# recovery is destroy + recreate from the provisioning script. The guest holds no GitHub
+# credentials: public repos clone directly, private repos are seeded from the host, and
+# work comes back via host-initiated fetch.
+#
+#   bootstrap                    one-time host setup: image dir, SSH key, egress rules
+#   create                       build a guest from nothing, seed kepler, provision
+#   provision                    re-run provisioning against the live guest
+#   seed <path> [name]           push a host repo into the guest (for private repos)
+#   push [--repo name] [branch]  send the current HEAD to the guest
+#   fetch [--repo name] <branch> bring a guest branch back as vm/<branch>
+#   claude [args...]             run Claude Code in tmux inside the guest (auto mode)
+#   codex [args...]              run codex in tmux inside the guest
+#   fixtures                     rebuild the scenario repos
+#   egress                       reapply the host-side nftables egress rules
+#   ssh [cmd...]                 shell in
+#   start | stop | status | destroy
+set -euo pipefail
+
+CONF_DIR=${AGENT_VM_CONF_DIR:-${XDG_CONFIG_HOME:-$HOME/.config}}
+VM_ASSETS=${AGENT_VM_ASSETS:-$HOME/dotfiles/vm}
+
+# shellcheck source=/dev/null
+[[ -f $VM_ASSETS/agent-vm.conf ]] && . "$VM_ASSETS/agent-vm.conf"
+# shellcheck source=/dev/null
+[[ -f $CONF_DIR/agent-vm.conf ]] && . "$CONF_DIR/agent-vm.conf"
+
+: "${VM_LIBVIRT_URI:=qemu:///system}"
+
+# Every libvirt call goes through here so the URI is never left to the ambient default,
+# which for a non-root user is qemu:///session — a different hypervisor with no networks,
+# no storage pools, and none of our domains.
+virsh() { command virsh -c "$VM_LIBVIRT_URI" "$@"; }
+
+# No curl here is allowed to hang silently. Metadata fetches are hard-bounded; the image
+# download can't use --max-time (it legitimately takes minutes) so it aborts on a stall
+# instead — a dead mirror should fail fast, not wait forever with no output.
+CURL_OPTS=(--connect-timeout 15 --max-time 60 --retry 3 --retry-delay 3)
+CURL_DOWNLOAD_OPTS=(--connect-timeout 15 --retry 3 --retry-delay 5 --speed-limit 10240 --speed-time 30)
+
+BASE_IMG=$VM_IMAGE_DIR/base.qcow2
+SYSTEM_IMG=$VM_IMAGE_DIR/system.qcow2
+STATE_IMG=$VM_IMAGE_DIR/state.qcow2
+# kepler's own repo layout in the guest; it reuses clones it finds here, so provisioning,
+# seeding, and kepler tasks all share one checkout per repo.
+GUEST_REPOS=/home/$VM_USER/kepler/repositories
+DEFAULT_REPO=vscode-gitlens
+
+EGRESS_NFT=/etc/nftables/agent-vm-egress.nft
+EGRESS_UNIT=agent-vm-egress.service
+
+die() { printf '\033[1;31merror:\033[0m %s\n' "$1" >&2; exit 1; }
+note() { printf '\033[1;34m==>\033[0m %s\n' "$1"; }
+
+confirm() {
+	local reply
+	read -rp "$1 [y/N] " reply
+	[[ $reply == [yY]* ]]
+}
+
+domain_exists() { virsh dominfo "$VM_NAME" >/dev/null 2>&1; }
+domain_running() { [[ $(virsh domstate "$VM_NAME" 2>/dev/null) == running ]]; }
+
+# Prefer the live lease, but fall back to the reserved address: domifaddr can come back
+# empty for a moment after a restart even though the guest is answering.
+# The `|| true` on every capture below is load-bearing: with `set -e` + `pipefail`, a grep
+# that legitimately matches nothing fails its pipeline and aborts the whole script, so the
+# explicit emptiness checks that follow would never get to report anything useful.
+guest_ip() {
+	local ip
+	ip=$(virsh -q domifaddr "$VM_NAME" 2>/dev/null \
+		| awk '/ipv4/ { split($4, a, "/"); print a[1]; exit }') || true
+	echo "${ip:-$VM_IP}"
+}
+
+# Must run BEFORE virt-install: the guest DHCPs on its first boot, so a reservation added
+# afterwards wouldn't take effect until the next lease renewal.
+ensure_dhcp_reservation() {
+	local existing squatter
+	existing=$(virsh net-dumpxml default | grep -oE "<host mac='$VM_MAC'[^/]*/>" | head -1) || true
+	# Name matters too: it's the label dnsmasq hands out as the guest hostname, and a stale
+	# one (e.g. from before a rename) would linger forever behind the ip-only check.
+	[[ $existing == *"ip='$VM_IP'"* && $existing == *"name='$VM_NAME'"* ]] && return 0
+
+	[[ -n $existing ]] \
+		&& virsh net-update default delete ip-dhcp-host "$existing" --live --config >/dev/null
+
+	# Clear anything else holding the address we want, or the add below is rejected.
+	squatter=$(virsh net-dumpxml default | grep -oE "<host [^/]*ip='$VM_IP'/>" | head -1) || true
+	[[ -n $squatter ]] \
+		&& virsh net-update default delete ip-dhcp-host "$squatter" --live --config >/dev/null
+
+	note "Reserving $VM_IP for $VM_MAC"
+	virsh net-update default add ip-dhcp-host \
+		"<host mac='$VM_MAC' name='$VM_NAME' ip='$VM_IP'/>" --live --config >/dev/null
+
+	# `--live` only SIGHUPs dnsmasq, which re-reads its hosts and lease files but NOT the
+	# dhcp-host lines in its config — so a brand-new reservation is silently ignored until
+	# dnsmasq actually restarts, and the guest keeps drawing from the dynamic range. Any other
+	# guest on this network blips briefly; ours doesn't exist yet at this point in `create`.
+	note 'Restarting default network so dnsmasq reloads the reservation'
+	virsh net-destroy default >/dev/null && virsh net-start default >/dev/null
+}
+
+# Host keys change on every rebuild, so pinning them would mean editing known_hosts
+# constantly. The guest lives on a private NAT we control, so accept and move on.
+SSH_OPTS=(-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR)
+
+vm_ssh() {
+	local ip
+	ip=$(guest_ip) || true
+	[[ -n ${ip:-} ]] || die 'guest has no IP yet — is it running?'
+	ssh -i "$VM_SSH_KEY" "${SSH_OPTS[@]}" "$VM_USER@$ip" "$@"
+}
+
+git_over_ssh() {
+	GIT_SSH_COMMAND="ssh -i $VM_SSH_KEY ${SSH_OPTS[*]}" git "$@"
+}
+
+require_host_tools() {
+	command -v virsh >/dev/null || die 'virsh not found — run: sudo dnf install @virtualization'
+	virsh -q uri >/dev/null 2>&1 || die "cannot reach $VM_LIBVIRT_URI — check you are in the
+libvirt group (re-login after usermod) and that virtqemud.socket or libvirtd.socket is active"
+	virsh -q net-list 2>/dev/null | grep -q default \
+		|| die "libvirt 'default' network is not active on $VM_LIBVIRT_URI — run: virsh -c $VM_LIBVIRT_URI net-start default"
+	[[ -f $VM_SSH_KEY ]] || die "missing $VM_SSH_KEY — run: agent-vm bootstrap"
+	# No sudo needed: the image dir is traversable, and prompting for a password just to
+	# stat a directory means an extra prompt for every command.
+	test -d "$VM_IMAGE_DIR" || die "missing $VM_IMAGE_DIR — run: agent-vm bootstrap"
+}
+
+wait_for_ssh() {
+	local deadline=$((SECONDS + ${1:-300}))
+	note 'Waiting for SSH'
+	while ((SECONDS < deadline)); do
+		if [[ -n $(guest_ip) ]] && vm_ssh -o ConnectTimeout=5 true 2>/dev/null; then
+			return 0
+		fi
+		sleep 3
+	done
+	die 'guest did not come up on SSH'
+}
+
+# --- image handling -----------------------------------------------------------
+
+# The Fedora Cloud filename changes on every respin, so read it out of the signed
+# CHECKSUM file rather than hard-coding a URL that will rot.
+resolve_base_image() {
+	local index files sums body
+	index="$FEDORA_MIRROR/$FEDORA_RELEASE/Cloud/x86_64/images/"
+
+	note "Resolving image from $index"
+
+	# Parse hrefs first, then filter with plain substring matches. Do NOT try to bound a
+	# greedy character class with a literal suffix (`Fedora-Cloud-[0-9A-Za-z.-]+-CHECKSUM`):
+	# the class happily swallows "CHECKSUM" itself and grep won't backtrack, so it silently
+	# matches nothing.
+	files=$(curl -fsSL "${CURL_OPTS[@]}" "$index" \
+		| grep -oE 'href="[^"]+"' | sed -e 's/^href="//' -e 's/"$//') \
+		|| die "could not list $index"
+
+	sums=$(grep CHECKSUM <<<"$files" | sort | tail -1) || true
+	[[ -n $sums ]] || die "no CHECKSUM file at $index"
+
+	# Generic is the plain cloud image; the other qcow2 there is UEFI-UKI, which we don't want.
+	IMAGE_FILE=$(grep Generic <<<"$files" | grep '\.qcow2$' | sort | tail -1) || true
+	[[ -n $IMAGE_FILE ]] || die "no Generic qcow2 at $index"
+
+	body=$(curl -fsSL "${CURL_OPTS[@]}" "$index$sums") || die "could not fetch $sums"
+	IMAGE_SHA=$(grep -F "($IMAGE_FILE) = " <<<"$body" | sed 's/.* = //') || true
+	[[ ${#IMAGE_SHA} -eq 64 ]] || die "no usable sha256 for $IMAGE_FILE in $sums"
+
+	IMAGE_URL="$index$IMAGE_FILE"
+	note "Image: $IMAGE_FILE"
+}
+
+fetch_base_image() {
+	if test -f "$BASE_IMG"; then
+		note "Base image present ($(basename "$BASE_IMG"))"
+		return
+	fi
+
+	resolve_base_image
+
+	# Staged somewhere user-writable so the multi-minute download needs no sudo at all.
+	# Downloading as root meant sudo's 5-minute timestamp expired mid-transfer and prompted
+	# again afterwards. Keeping the partial file across runs also makes -C - resumable.
+	local stage=${XDG_CACHE_HOME:-$HOME/.cache}/agent-vm
+	local part=$stage/$IMAGE_FILE
+	mkdir -p "$stage"
+
+	note "Downloading $IMAGE_FILE"
+	curl -fL --progress-bar "${CURL_DOWNLOAD_OPTS[@]}" -C - -o "$part" "$IMAGE_URL"
+
+	note 'Verifying sha256'
+	local actual
+	actual=$(sha256sum "$part" | cut -d' ' -f1)
+	if [[ $actual != "$IMAGE_SHA" ]]; then
+		rm -f "$part"
+		die "checksum mismatch: expected $IMAGE_SHA, got $actual"
+	fi
+
+	sudo mv "$part" "$BASE_IMG"
+}
+
+render_cloud_init() {
+	local out=$1 pubkey
+	pubkey=$(<"$VM_SSH_KEY.pub")
+	sed -e "s|__VM_USER__|$VM_USER|g" \
+		-e "s|__SSH_PUBKEY__|$pubkey|g" \
+		"$VM_ASSETS/cloud-init/user-data.yaml" > "$out"
+}
+
+sync_assets() {
+	note 'Syncing provisioning assets to guest'
+	local ip
+	ip=$(guest_ip)
+	vm_ssh 'rm -rf ~/.agent-vm && mkdir -p ~/.agent-vm'
+	scp -i "$VM_SSH_KEY" "${SSH_OPTS[@]}" -q -r \
+		"$VM_ASSETS/provision.sh" "$VM_ASSETS/fixtures" "$VM_USER@$ip:.agent-vm/"
+	vm_ssh 'chmod +x ~/.agent-vm/provision.sh ~/.agent-vm/fixtures/*.sh'
+}
+
+run_provision() {
+	vm_ssh -t "GITLENS_REMOTE='$GITLENS_REMOTE' bash ~/.agent-vm/provision.sh"
+}
+
+# virt-install attaches the NoCloud seed ISO from /var/lib/libvirt/boot for the first boot
+# only — it normally leaves the PERSISTENT config media-free, so this is usually a no-op and
+# checking --inactive is the point. If a future virt-install ever does persist the reference,
+# a cleanup of that path (outside our image dir) would make `virsh start` fail on a missing
+# source, so drop it when it's actually there.
+eject_cloudinit_media() {
+	local target
+	target=$(virsh domblklist "$VM_NAME" --inactive 2>/dev/null | awk '/cloudinit/ { print $1; exit }') || true
+	[[ -n ${target:-} ]] || return 0
+
+	note "Ejecting cloud-init media ($target)"
+	virsh change-media "$VM_NAME" "$target" --eject --config >/dev/null 2>&1 || true
+}
+
+install_egress() {
+	note 'Installing host-side egress restrictions'
+	sudo install -D -m 0644 "$VM_ASSETS/nftables-agent-vm.nft" "$EGRESS_NFT"
+	sudo install -D -m 0644 "$VM_ASSETS/agent-vm-egress.service" "/etc/systemd/system/$EGRESS_UNIT"
+	sudo systemctl daemon-reload
+	sudo systemctl enable "$EGRESS_UNIT" >/dev/null
+	# restart, not `enable --now`: an already-active oneshot wouldn't re-run ExecStart,
+	# so edits to the .nft file would never land.
+	sudo systemctl restart "$EGRESS_UNIT"
+	sudo nft list table inet agent_vm_egress >/dev/null || die 'egress table failed to load'
+	note 'Egress rules active (guest: public internet only; no LAN, no host)'
+}
+
+# --- subcommands ----------------------------------------------------------------
+
+cmd_bootstrap() {
+	note "Creating $VM_IMAGE_DIR"
+	sudo mkdir -p "$VM_IMAGE_DIR"
+	# qcow2 on btrfs: disable COW so the filesystem isn't copy-on-writing an
+	# already-copy-on-write image. Reflink copies still work.
+	sudo chattr +C "$VM_IMAGE_DIR" 2>/dev/null || true
+	[[ -f $VM_SSH_KEY ]] || ssh-keygen -t ed25519 -N '' -f "$VM_SSH_KEY" -C agent-vm
+	install_egress
+	note 'Done. Ensure you are in the libvirt group and virtqemud/virtnetworkd are running.'
+}
+
+cmd_create() {
+	require_host_tools
+	domain_exists && die "$VM_NAME already exists — use 'destroy' first"
+
+	fetch_base_image
+	ensure_dhcp_reservation
+
+	note "Creating system disk (${VM_DISK_GB}G)"
+	sudo cp --reflink=auto "$BASE_IMG" "$SYSTEM_IMG"
+	sudo qemu-img resize -q "$SYSTEM_IMG" "${VM_DISK_GB}G"
+
+	# Never clobber an existing state disk — it holds the guest's SSH host keys (kepler's
+	# pinned target) and kepler-server's session database.
+	if ! sudo test -f "$STATE_IMG"; then
+		note "Creating persistent state disk (${VM_STATE_GB}G)"
+		sudo qemu-img create -q -f qcow2 "$STATE_IMG" "${VM_STATE_GB}G"
+	else
+		note 'Reusing existing state disk'
+	fi
+
+	local ud
+	ud=$(mktemp)
+	render_cloud_init "$ud"
+
+	# Emulated TPM for the non-exportable deploy key (see provision.sh). Attached at
+	# define time because TPMs can't be hot-plugged.
+	local tpm_args=()
+	[[ ${VM_TPM:-1} -eq 1 ]] && tpm_args=(--tpm 'model=tpm-crb,backend.type=emulator,backend.version=2.0')
+
+	note "Defining $VM_NAME"
+	sudo virt-install \
+		--connect "$VM_LIBVIRT_URI" \
+		--name "$VM_NAME" \
+		--memory "$VM_MEMORY" \
+		--vcpus "$VM_VCPUS" \
+		--cpu host-passthrough \
+		--disk "path=$SYSTEM_IMG,format=qcow2,bus=virtio" \
+		--disk "path=$STATE_IMG,format=qcow2,bus=virtio" \
+		--import \
+		--osinfo "$VM_OSINFO" \
+		--network "network=default,model=virtio,mac=$VM_MAC" \
+		"${tpm_args[@]}" \
+		--graphics none \
+		--noautoconsole \
+		--cloud-init "user-data=$ud"
+	rm -f "$ud"
+
+	wait_for_ssh
+	sync_assets
+
+	# Seed BEFORE provisioning so the kepler dependency install + smoke test run on the
+	# first build, not on a later manual re-provision.
+	if [[ -n ${KEPLER_HOST_REPO:-} && -d $KEPLER_HOST_REPO/.git ]]; then
+		cmd_seed "$KEPLER_HOST_REPO"
+	else
+		note "warning: KEPLER_HOST_REPO (${KEPLER_HOST_REPO:-unset}) not found — skipping kepler seed"
+	fi
+
+	run_provision
+	eject_cloudinit_media
+
+	# Continuously-used VM: come back up with the host.
+	virsh autostart "$VM_NAME" >/dev/null
+
+	note "Ready. Next: 'agent-vm claude' and 'agent-vm codex' to log the agents in."
+}
+
+cmd_provision() {
+	domain_running || die 'guest is not running'
+	sync_assets
+	run_provision
+}
+
+# Host-initiated transfer for PRIVATE repos: the guest deliberately holds no GitHub
+# credentials, so anything it can't clone anonymously gets pushed in from the host.
+# Re-running seed updates the guest to the host's current state.
+cmd_seed() {
+	local src=${1:?usage: agent-vm seed <host-repo-path> [name]}
+	src=$(cd "$src" 2>/dev/null && pwd) || die "no such directory: $1"
+	git -C "$src" rev-parse --git-dir >/dev/null 2>&1 || die "$src is not a git repository"
+	local name=${2:-$(basename "$src")}
+	local dest=$GUEST_REPOS/$name
+	local ip origin_url def_branch cur_branch
+	ip=$(guest_ip) || die 'guest not reachable'
+
+	origin_url=$(git -C "$src" remote get-url origin 2>/dev/null) || true
+	# Prefer the upstream default branch; fall back to whatever the host has checked out.
+	def_branch=$(git -C "$src" symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null \
+		| sed 's|^origin/||') || true
+	cur_branch=$(git -C "$src" symbolic-ref --short HEAD 2>/dev/null) || true
+	[[ -n $def_branch ]] || def_branch=${cur_branch:-main}
+
+	note "Seeding $name -> $dest ($def_branch)"
+	# `create` seeds BEFORE provisioning (so the kepler smoke test runs on the first
+	# build), which means the guest may not have git yet — the cloud image doesn't ship it.
+	vm_ssh 'command -v git >/dev/null 2>&1 || sudo dnf install -y -q git'
+	# updateInstead lets the host push straight into the guest's checked-out branch and
+	# have the worktree refreshed, instead of git refusing the push. It requires the guest
+	# worktree to be clean — a dirty one fails the push, which is the right guardrail.
+	vm_ssh "mkdir -p '$GUEST_REPOS' \
+		&& { [ -d '$dest/.git' ] || git init -q -b '$def_branch' '$dest'; } \
+		&& git -C '$dest' config receive.denyCurrentBranch updateInstead"
+
+	# Origin URL is METADATA ONLY: kepler resolves repos by remote URL, so the seeded clone
+	# must carry it to be recognized. Fetching it from inside will not work, by design.
+	if [[ -n $origin_url ]]; then
+		vm_ssh "git -C '$dest' remote set-url origin '$origin_url' 2>/dev/null \
+			|| git -C '$dest' remote add origin '$origin_url'"
+	fi
+
+	local refspecs=("+refs/heads/$def_branch:refs/heads/$def_branch")
+	[[ -n $cur_branch && $cur_branch != "$def_branch" ]] \
+		&& refspecs+=("+refs/heads/$cur_branch:refs/heads/$cur_branch")
+	git_over_ssh -C "$src" push "ssh://$VM_USER@$ip$dest" "${refspecs[@]}"
+
+	# Belt and braces for the very first seed: updateInstead materializes pushes into a
+	# BORN branch, but the initial push lands on an unborn HEAD.
+	vm_ssh "git -C '$dest' checkout -qf '$def_branch' && git -C '$dest' log --oneline -1"
+}
+
+# --repo picks the target checkout under the guest's kepler/repositories; the default is
+# the GitLens clone that provisioning creates.
+cmd_push() {
+	local repo=$DEFAULT_REPO
+	[[ ${1:-} == --repo ]] && { repo=${2:?--repo needs a name}; shift 2; }
+	local dest=$GUEST_REPOS/$repo
+	local branch=${1:-wip/$(git rev-parse --abbrev-ref HEAD | tr '/' '-')}
+	local ip
+	ip=$(guest_ip) || die 'guest not reachable'
+
+	# A branch that's currently checked out in the guest can't be pushed to, so park
+	# the guest on a detached HEAD first.
+	vm_ssh "git -C $dest checkout -q --detach" || true
+
+	note "Pushing HEAD -> $branch"
+	git_over_ssh push -f "ssh://$VM_USER@$ip$dest" "HEAD:refs/heads/$branch"
+	vm_ssh "git -C $dest checkout -q '$branch' && git -C $dest log --oneline -1"
+
+	# Only reinstall when the lockfile actually moved — pnpm install isn't free.
+	vm_ssh "cd $dest && git diff --quiet HEAD@{1} HEAD -- pnpm-lock.yaml 2>/dev/null || pnpm install --frozen-lockfile"
+}
+
+cmd_fetch() {
+	local repo=$DEFAULT_REPO
+	[[ ${1:-} == --repo ]] && { repo=${2:?--repo needs a name}; shift 2; }
+	local branch=${1:?usage: agent-vm fetch [--repo name] <branch>}
+	local ip
+	ip=$(guest_ip) || die 'guest not reachable'
+
+	note "Fetching $branch -> vm/$branch"
+	git_over_ssh fetch "ssh://$VM_USER@$ip$GUEST_REPOS/$repo" "+refs/heads/$branch:refs/heads/vm/$branch"
+	git --no-pager log --oneline -5 "vm/$branch"
+	note "Review with: git diff main..vm/$branch"
+}
+
+# One tmux session per agent so both can run side by side. cwd lands in the GitLens
+# checkout when it exists, else $HOME.
+run_agent() {
+	local tool=$1 flags=$2
+	shift 2
+	local args=$*
+	vm_ssh -t "d=$GUEST_REPOS/$DEFAULT_REPO; [ -d \"\$d\" ] || d=\$HOME; \
+		tmux new -As $tool -c \"\$d\" '$tool $flags $args; exec bash'"
+}
+
+cmd_claude() {
+	# Auto rather than bypassPermissions: the VM already bounds the damage, so the
+	# classifier is free upside — it still stops on the genuinely destructive calls.
+	run_agent claude '--permission-mode auto' "$@"
+}
+
+cmd_codex() {
+	# No default approval flags — pass codex's own (e.g. --full-auto) as args if wanted.
+	run_agent codex '' "$@"
+}
+
+cmd_fixtures() {
+	vm_ssh -t 'bash ~/.agent-vm/fixtures/build-all.sh'
+}
+
+cmd_destroy() {
+	domain_exists || die "$VM_NAME does not exist"
+	confirm "Destroy $VM_NAME and its system disk?" || exit 1
+
+	domain_running && virsh destroy "$VM_NAME" >/dev/null
+	# Deliberately NOT --remove-all-storage: that would take the state disk with it.
+	# --tpm removes the swtpm state — the TPM-resident key dies with the domain, which is
+	# the point of a non-exportable key (deregister it on GitHub when you retire the VM).
+	virsh undefine "$VM_NAME" --tpm >/dev/null 2>&1 || virsh undefine "$VM_NAME" >/dev/null
+	sudo rm -f "$SYSTEM_IMG"
+	# Rollback artifacts from the claude-vm era; nothing references them anymore.
+	sudo rm -f "$VM_IMAGE_DIR/golden.qcow2" "$VM_IMAGE_DIR/golden.mem"
+
+	if sudo test -f "$STATE_IMG"; then
+		if confirm 'Also remove the persistent state disk (host keys, kepler sessions)?'; then
+			sudo rm -f "$STATE_IMG"
+		else
+			note 'Kept state disk — the next create will reuse it'
+		fi
+	fi
+
+	# Saying yes to everything here is a true from-scratch reset: the next create
+	# re-downloads the current Fedora respin and rebuilds with nothing carried over.
+	if sudo test -f "$BASE_IMG"; then
+		if confirm 'Also remove the cached base image (next create re-downloads it)?'; then
+			sudo rm -f "$BASE_IMG"
+			rm -rf "${XDG_CACHE_HOME:-$HOME/.cache}/agent-vm"
+		fi
+	fi
+
+	# Host keys live on the state disk, so they normally survive — but if the state disk was
+	# just removed they'll regenerate, and a stale pin then blocks every reconnect (kepler
+	# uses accept-new, which errors on a CHANGED key rather than re-pinning).
+	ssh-keygen -R "$VM_IP" >/dev/null 2>&1 || true
+	ssh-keygen -R "$VM_NAME" >/dev/null 2>&1 || true
+
+	note 'Destroyed'
+	ls -la "$VM_IMAGE_DIR"
+}
+
+cmd_status() {
+	if ! domain_exists; then
+		echo "$VM_NAME: not defined"
+	else
+		printf '%-10s %s\n' 'domain:' "$(virsh domstate "$VM_NAME")"
+		printf '%-10s %s\n' 'ip:' "$(guest_ip || echo '-')"
+	fi
+	printf '%-10s %s\n' 'egress:' "$(systemctl is-active "$EGRESS_UNIT" 2>/dev/null || echo 'not installed')"
+	echo
+	test -d "$VM_IMAGE_DIR" && du -sh --apparent-size "$VM_IMAGE_DIR"/* 2>/dev/null
+	# `test && du` last: without this, a missing image dir makes status exit non-zero,
+	# which reads as a failure in scripts and shell prompts.
+	true
+}
+
+# --- dispatch -----------------------------------------------------------------
+
+cmd=${1:-help}
+[[ $# -gt 0 ]] && shift
+
+case $cmd in
+bootstrap) cmd_bootstrap "$@" ;;
+create) cmd_create "$@" ;;
+provision) cmd_provision "$@" ;;
+seed) cmd_seed "$@" ;;
+push) cmd_push "$@" ;;
+fetch) cmd_fetch "$@" ;;
+claude) cmd_claude "$@" ;;
+codex) cmd_codex "$@" ;;
+fixtures) cmd_fixtures "$@" ;;
+egress) install_egress ;;
+destroy) cmd_destroy "$@" ;;
+status) cmd_status "$@" ;;
+start) virsh start "$VM_NAME" >/dev/null && wait_for_ssh ;;
+stop) virsh shutdown "$VM_NAME" >/dev/null && note 'Shutting down' ;;
+ssh) if [[ $# -gt 0 ]]; then vm_ssh "$@"; else vm_ssh -t 'exec bash -l'; fi ;;
+help | -h | --help) awk 'NR>1 && /^#/ { sub(/^# ?/, ""); print; next } NR>1 { exit }' "$0" ;;
+*) die "unknown command: $cmd (try 'agent-vm help')" ;;
+esac

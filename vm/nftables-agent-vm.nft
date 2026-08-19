@@ -1,0 +1,34 @@
+# Egress restrictions for the agent-vm guest, enforced HOST-side so root-in-guest cannot
+# undo them. Loaded by agent-vm-egress.service; reapply after edits with `agent-vm egress`.
+#
+# Own table, coexisting with firewalld and libvirt: netfilter runs every table's hook
+# chains, so a drop here wins regardless of accepts in theirs, and firewalld reloads flush
+# only firewalld's own table. `policy accept` because this table only RESTRICTS — all
+# normal accept logic stays with firewalld/libvirt.
+#
+# The guest may reach the public internet only (Claude/OpenAI APIs, GitHub, npm, Fedora
+# mirrors, api.gitkraken.dev, Electron downloads — no allowlist to maintain). It may not
+# reach the LAN, the host, CGNAT space, or link-local. The only guest->host traffic is
+# DNS + DHCP to libvirt's dnsmasq. Everything host->guest (agent-vm ssh, kepler's tunnel,
+# seed pushes) is host-initiated and covered by the established/related rule.
+
+destroy table inet agent_vm_egress
+
+table inet agent_vm_egress {
+	chain forward {
+		type filter hook forward priority filter; policy accept;
+		iifname "virbr0" ip daddr { 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16,
+			169.254.0.0/16, 100.64.0.0/10 } drop
+		iifname "virbr0" ip6 daddr { fc00::/7, fe80::/10 } drop
+	}
+
+	chain input {
+		type filter hook input priority filter; policy accept;
+		# Replies to host-initiated connections — must precede the drop.
+		iifname "virbr0" ct state established,related accept
+		# Guest->host: DNS + DHCP to libvirt's dnsmasq, nothing else.
+		iifname "virbr0" udp dport { 53, 67 } accept
+		iifname "virbr0" tcp dport 53 accept
+		iifname "virbr0" drop
+	}
+}

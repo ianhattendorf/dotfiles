@@ -1,0 +1,15 @@
+# Loads the agent-vm guest egress restrictions at boot. Deliberately NOT Fedora's
+# nftables.service: its config flushes the entire ruleset, which would wipe firewalld's
+# and libvirt's tables. This unit only (re)loads our own table — the .nft file starts
+# with `destroy table`, so re-running it is idempotent.
+[Unit]
+Description=agent-vm guest egress restrictions (nftables)
+Wants=network-pre.target
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/sbin/nft -f /etc/nftables/agent-vm-egress.nft
+
+[Install]
+WantedBy=multi-user.target

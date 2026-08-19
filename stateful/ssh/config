@@ -25,3 +25,13 @@ Host router-query
 
 Host win-vm win-vm.internal.ianhattendorf.com
     Hostname win-vm.internal.ianhattendorf.com
+
+# Contained dev VM for coding agents (Claude Code, codex, kepler tasks). Must stay in this
+# file rather than an Include — kepler's remote-target parser reads ~/.ssh/config directly
+# and ignores Include/Match. It also takes only the FIRST pattern on a Host line, so
+# `agent-vm` is what shows up in its picker.
+# The address is a libvirt DHCP reservation (see dotfiles/vm/agent-vm.conf), not a lease.
+Host agent-vm
+    Hostname 192.168.122.50
+    User dev
+    IdentityFile ~/.ssh/agent-vm
