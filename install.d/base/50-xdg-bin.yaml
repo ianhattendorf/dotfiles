@@ -9,3 +9,4 @@
     ~/.local/bin/foot-ssh: xdg_bin/foot-ssh
     ~/.local/bin/pick-ssh-host: xdg_bin/pick-ssh-host
     ~/.local/bin/weechat.sh: xdg_bin/weechat.sh
+    ~/.local/bin/fuzzel-launch: xdg_bin/fuzzel-launch

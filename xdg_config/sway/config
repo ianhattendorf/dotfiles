@@ -19,7 +19,15 @@ set $term foot tmux
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
-set $menu fuzzel --launch-prefix="swaymsg exec --"
+# fuzzel-launch does that swaymsg hand-off itself. A bare `swaymsg exec --` prefix
+# cannot, because two separate bugs drop the quoting from a spec-correct Exec line
+# such as  Exec="/opt/Kepler (staging)/kepler-staging" %U  and feed the bare
+# parens to `sh -c`: fuzzel re-joins the parsed argv without re-quoting it, and
+# sway's own cmd_exec shortcuts single-token commands past its re-quoting path.
+# Either way the app dies with a syntax error before it ever starts.
+# The trailing '#' comments out fuzzel's mangled text; fuzzel-launch then rebuilds
+# the command from $DESKTOP_ENTRY_ID. See the script header for the details.
+set $menu fuzzel --launch-prefix="fuzzel-launch #"
 
 # Font
 font pango:sans-serif, Font Awesome 10

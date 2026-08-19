@@ -1,0 +1,166 @@
+#!/bin/sh
+# fuzzel-launch — launch a .desktop entry from fuzzel via sway, surviving shell
+# metacharacters in Exec, without giving up sway's workspace targeting.
+#
+# There are TWO separate quote-losing bugs in the way, both triggered by an
+# entry like Kepler's:
+#     Exec="/opt/Kepler (staging)/kepler-staging" %U
+# which is correctly quoted per the Desktop Entry spec (space and parens are
+# both reserved characters that must be quoted).
+#
+# BUG 1 -- fuzzel 1.14.0, --launch-prefix only. fuzzel parses Exec per the spec,
+# correctly stripping the quotes, then re-joins the argv into ONE string and
+# hands it to `sh -c` WITHOUT re-quoting. The parens reach sh bare:
+#     sh: -c: line 1: syntax error near unexpected token `staging'
+# Without a launch-prefix fuzzel execs argv directly and is unaffected, which is
+# why these entries launch fine from a terminal but not from the launcher.
+#
+# BUG 2 -- sway 1.11, `swaymsg exec` with a SINGLE-token command. sway tokenizes
+# the command (stripping quotes), then cmd_exec takes a shortcut for argc == 1
+# and passes that bare token to `sh -c`. Multi-token commands instead go through
+# join_args, which re-quotes tokens containing whitespace, so they survive.
+# Verified: `"<path with (parens)>"` fails; `"<path with (parens)>" --flag` works.
+# So `swaymsg exec` cannot launch a metacharacter path that takes no arguments,
+# no matter how it is quoted -- which is exactly Kepler once %U is stripped.
+#
+# THE APPROACH: never let a string that needs quoting cross a shell boundary.
+#
+#   Phase 1 (launch-prefix). The prefix ends with '#', so fuzzel's mangled text
+#   becomes a shell comment and is discarded -- sidestepping bug 1. We take the
+#   Desktop File ID from $DESKTOP_ENTRY_ID and re-invoke ourselves through
+#   `swaymsg exec`. Only the ID and our own path cross that boundary: no
+#   metacharacters, and 3 tokens, so bug 2 cannot fire either.
+#
+#   Phase 2 (--run ID, now a child of sway). We read Exec straight from the
+#   desktop file, quoting intact, and let our own shell tokenize it via eval.
+#   Desktop Entry quoting is deliberately POSIX-shell-compatible, so this is
+#   exactly the tokenization the spec asks for.
+#
+# `exec` all the way down means the app inherits the PID sway recorded, so
+# sway's PID-to-workspace tracking still maps the window onto the workspace that
+# was focused when the launcher ran -- the reason for the swaymsg hand-off.
+#
+# Deliberately NOT gtk-launch / gio launch / uwsm: all three reparent the app to
+# PID 1, which breaks sway's PID-chain walk and silently loses that targeting.
+# Verified: swaymsg exec -> ppid=sway; gtk-launch -> ppid=1.
+#
+# sway config:
+#     set $menu fuzzel --launch-prefix="fuzzel-launch #"
+#
+# Debug:  fuzzel-launch -n <ID>   prints the command instead of running it.
+# Config: $FUZZEL_LAUNCH_TERM     terminal for Terminal=true entries.
+
+set -eu
+
+die() { printf 'fuzzel-launch: %s\n' "$*" >&2; exit 1; }
+
+# Absolute path to this script, for re-invoking through sway. sway's environment
+# is not this shell's, so PATH cannot be relied on there.
+self_path() {
+	case $0 in
+	/*) printf '%s' "$0" ;;
+	*) command -v -- "$0" 2>/dev/null || printf '%s' "$0" ;;
+	esac
+}
+
+# Read one key from the [Desktop Entry] group, ignoring [Desktop Action ...].
+field() {
+	awk -v key="$1" '
+		/^[[:space:]]*\[/ {
+			in_entry = ($0 ~ /^[[:space:]]*\[Desktop Entry\][[:space:]]*$/)
+			next
+		}
+		in_entry {
+			line = $0
+			sub(/^[[:space:]]+/, "", line)
+			if (index(line, key "=") == 1) {
+				sub(/^[^=]*=[[:space:]]*/, "", line)
+				print line
+				exit
+			}
+		}
+	' "$2"
+}
+
+# The '#' in the launch-prefix means fuzzel passes us no arguments, so argv is
+# ours: --run is the post-sway phase, -n is a dry run.
+mode=prefix
+case "${1:-}" in
+--run)
+	mode=run
+	shift
+	if [ $# -gt 0 ]; then DESKTOP_ENTRY_ID=$1; fi
+	;;
+-n | --print)
+	mode=print
+	shift
+	if [ $# -gt 0 ]; then DESKTOP_ENTRY_ID=$1; fi
+	;;
+esac
+
+id="${DESKTOP_ENTRY_ID:-${FUZZEL_DESKTOP_FILE_ID:-}}"
+[ -n "$id" ] || die 'no Desktop File ID -- is this running as a fuzzel --launch-prefix?'
+case $id in
+*.desktop) ;;
+*) id="${id}.desktop" ;;
+esac
+
+# Phase 1: hand off to sway so that sway, not fuzzel, is the parent.
+if [ "$mode" = prefix ]; then
+	if [ -n "${SWAYSOCK:-}" ] && command -v swaymsg >/dev/null 2>&1; then
+		exec swaymsg -q exec -- "\"$(self_path)\" --run \"$id\""
+	fi
+	# No sway (another compositor, or fuzzel run bare): just launch it here.
+	mode=run
+fi
+
+# Resolve the Desktop File ID. XDG_DATA_HOME is searched first, so a user
+# override in ~/.local/share/applications shadows the packaged entry.
+file=''
+case $id in
+/*)
+	# Tolerate being handed an absolute path instead of an ID.
+	if [ -f "$id" ]; then file=$id; fi
+	;;
+*)
+	search="${XDG_DATA_HOME:-$HOME/.local/share}:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+	oifs=$IFS
+	IFS=:
+	for dir in $search; do
+		if [ -n "$dir" ] && [ -f "$dir/applications/$id" ]; then
+			file="$dir/applications/$id"
+			break
+		fi
+	done
+	IFS=$oifs
+	;;
+esac
+[ -n "$file" ] || die "no desktop file found for $id"
+
+cmd=$(field Exec "$file")
+[ -n "$cmd" ] || die "no Exec= in [Desktop Entry] of $file"
+
+# Drop field codes (%f %F %u %U %d %D %n %N %i %c %k %v %m). %% is a literal
+# percent, so park it on \001 while the rest are stripped.
+cmd=$(printf '%s' "$cmd" | sed 's/%%/\001/g; s/%[fFuUdDnNickvm]//g; s/\001/%/g')
+
+# fuzzel wraps Terminal=true entries itself; we bypassed it, so do it here.
+if [ "$(field Terminal "$file")" = 'true' ]; then
+	cmd="${FUZZEL_LAUNCH_TERM:-foot -e} $cmd"
+fi
+
+if [ "$mode" = print ]; then
+	printf '%s\n' "$cmd"
+	exit 0
+fi
+
+# Honour Path= (the entry's working directory) here rather than in the command
+# string, so the eval below stays a plain exec.
+workdir=$(field Path "$file")
+if [ -n "$workdir" ]; then
+	cd -- "$workdir" || die "cannot cd to Path=$workdir"
+fi
+
+# Exec straight from the desktop file's own quoting -- the only place it has not
+# been through someone else's tokenizer.
+eval "exec $cmd"
