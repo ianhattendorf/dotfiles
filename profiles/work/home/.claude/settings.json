@@ -406,5 +406,6 @@
   "effortLevel": "xhigh",
   "disableAutoMode": "disable",
   "theme": "auto",
-  "autoCompactEnabled": false
+  "autoCompactEnabled": false,
+  "tui": "fullscreen"
 }
