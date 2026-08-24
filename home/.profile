@@ -12,7 +12,7 @@ export WEECHAT_HOME="$XDG_CONFIG_HOME/weechat"
 
 # User specific environment and startup programs
 
-PATH=$PATH:$HOME/.local/bin:$HOME/go/bin:$HOME/.dotnet:${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin
+PATH=$HOME/.local/bin:$PATH:$HOME/go/bin:$HOME/.dotnet:${XDG_DATA_HOME:-$HOME/.local/share}/npm/bin
 export DOTNET_ROOT="$HOME/.dotnet"
 
 export NVM_DIR="$HOME/.config/nvm"
