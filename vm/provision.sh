@@ -64,6 +64,44 @@ grep -q '^apply_updates = yes' /etc/dnf/automatic.conf 2>/dev/null \
 	|| printf '[commands]\napply_updates = yes\n' | sudo tee -a /etc/dnf/automatic.conf >/dev/null
 sudo systemctl enable --now "$auto_timer"
 
+# --- ssh port forwarding (SELinux) --------------------------------------------
+# kepler reaches its guest daemon over `ssh -L <local>:127.0.0.1:<daemon port>`, and
+# selinux-policy 44.7 broke exactly that. 44.6 shipped sshd_session_t — the post-auth
+# domain of the OpenSSH 9.8+ sshd/sshd-session split — as a PERMISSIVE domain, so its
+# missing name_connect allows were logged and ignored; 44.7 enforces the domain without
+# granting them. sshd's connect() to the forward target then fails while plain ssh keeps
+# working (it opens no direct-tcpip channel), so the guest looks reachable right up until
+# kepler's health probe times out against a daemon that is listening and healthy.
+# It lives under the auto-updater because that is what delivers the flip.
+step 'Allowing ssh port forwarding under SELinux'
+# checkmodule only; semodule_package and semodule are in base policycoreutils.
+sudo dnf install -y -q checkpolicy
+mkdir -p "$HOME/.agent-vm/selinux"
+# Both port types: kepler's daemon takes an OS-assigned port (ephemeral_port_t,
+# 32768-60999), and a pinned one would land in unreserved_port_t.
+cat > "$HOME/.agent-vm/selinux/kepler-ssh-forward.te" <<'EOF'
+module kepler-ssh-forward 1.0;
+
+require {
+	type sshd_session_t;
+	type ephemeral_port_t;
+	type unreserved_port_t;
+	class tcp_socket name_connect;
+}
+
+allow sshd_session_t ephemeral_port_t:tcp_socket name_connect;
+allow sshd_session_t unreserved_port_t:tcp_socket name_connect;
+EOF
+# Rebuilt every run rather than skipped when already present: `semodule -i` is
+# install-or-upgrade, so an edit to the policy above always lands.
+(
+	cd "$HOME/.agent-vm/selinux"
+	checkmodule -M -m -o kepler-ssh-forward.mod kepler-ssh-forward.te
+	semodule_package -o kepler-ssh-forward.pp -m kepler-ssh-forward.mod
+	sudo semodule -i kepler-ssh-forward.pp
+)
+# Retire this step once Fedora ships the allows: sudo semodule -r kepler-ssh-forward
+
 # --- mise / node ----------------------------------------------------------------
 step 'Installing mise + Node (lts)'
 [[ -x $HOME/.local/bin/mise ]] || curl -fsSL https://mise.run | sh

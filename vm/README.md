@@ -159,6 +159,17 @@ The daemon downloads `gk` on first boot from the GitKraken release manifest
 (`api.gitkraken.dev`) — public internet, so the egress rules don't interfere; it lands on
 the state disk, so it's a one-time cost per state-disk lifetime.
 
+Forwarding into the guest also needs a local SELinux module, because kepler's transport is
+`ssh -L <local>:127.0.0.1:<daemon port>`. `selinux-policy` 44.6 shipped `sshd_session_t` —
+the post-auth domain of the OpenSSH 9.8+ `sshd`/`sshd-session` split — as a permissive
+domain; 44.7 enforces it without allowing `name_connect` to high ports, so every `ssh -L`
+fails at sshd's `connect()` while plain `ssh` keeps working. The symptom is kepler
+reporting `remote server at http://127.0.0.1:<port> not reachable within 15000ms` against
+a daemon that is listening and answering `/api/health` from inside the guest; the AVC is in
+the guest's `/var/log/audit/audit.log`. `provision.sh` builds and installs
+`kepler-ssh-forward` to grant it — retire that step once Fedora ships the allows
+(`sudo semodule -r kepler-ssh-forward`).
+
 ## Toolchain (all per-user, all current)
 
 - **Node via mise** (`node@lts` globally; repos with `.nvmrc`/`.tool-versions` get their
