@@ -170,6 +170,24 @@ the guest's `/var/log/audit/audit.log`. `provision.sh` builds and installs
 `kepler-ssh-forward` to grant it — retire that step once Fedora ships the allows
 (`sudo semodule -r kepler-ssh-forward`).
 
+The same module carries `name_bind` on `xserver_port_t` for the other direction, `ssh -X`:
+sshd-session listens on `6000 + X11DisplayOffset` for the forwarded display, and without
+the allow every display from `:10` up fails to bind, so the server answers `X11 forwarding
+request failed on channel 0`, `DISPLAY` stays unset in the session, and a guest GUI dies on
+`Missing X server or $DISPLAY`.
+
+## Running a guest GUI on the host
+
+`ssh -X agent-vm` then `pnpm dev` in `~/kepler/repositories/kepler` is enough — electron
+renders on the host X display (Xwayland, under GNOME) with no extra flags. `Warning: No
+xauth data; using fake authentication data` is expected and harmless: GNOME's Xwayland
+keeps no `~/.Xauthority`, and it admits the session user directly.
+
+X11 forwarding tunnels every draw over ssh, so it is fine for a smoke test and sluggish for
+real UI work. `waypipe ssh agent-vm` is the faster path if that starts to bite — it needs
+`waypipe` in the guest (host already has it) and electron started with
+`--ozone-platform=wayland`.
+
 ## Toolchain (all per-user, all current)
 
 - **Node via mise** (`node@lts` globally; repos with `.nvmrc`/`.tool-versions` get their
