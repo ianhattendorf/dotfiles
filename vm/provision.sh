@@ -175,12 +175,22 @@ if [[ -e /dev/tpmrm0 ]]; then
 	pin=$(<"$pin_file")
 
 	# usermod doesn't apply to this already-running session, so reach the TPM via sg.
-	# The pkcs11 store lives at ~/.tpm2_pkcs11.
-	if [[ ! -f $HOME/.tpm2_pkcs11/tpm2_pkcs11.sqlite3 ]]; then
-		sg tss -c 'tpm2_ptool init' >/dev/null
-		sg tss -c "tpm2_ptool addtoken --pid=1 --label=agent-vm --sopin='$pin' --userpin='$pin'" >/dev/null
-		sg tss -c "tpm2_ptool addkey --label=agent-vm --userpin='$pin' --algorithm=ecc256 --key-label=git-deploy" >/dev/null
-	fi
+	#
+	# Guard each step on its own postcondition, asked of ptool — NEVER on the store's path.
+	# tpm2-pkcs11 1.10 moved the store from ~/.tpm2_pkcs11 to $XDG_DATA_HOME/tpm2-pkcs11, so
+	# a file-existence guard silently stopped matching: every re-provision re-ran the whole
+	# sequence, leaking a duplicate primary object per run before dying on
+	# `sqlite3.IntegrityError: UNIQUE constraint failed: tokens.label`. Per-step guards also
+	# mean a failure partway leaves a repairable store — the old all-or-nothing guard would
+	# skip a token that never got its key, forever.
+	tpm_has() { sg tss -c "$1" 2>/dev/null | grep -q "$2"; }
+
+	tpm_has 'tpm2_ptool listprimaries' 'id: 1' \
+		|| sg tss -c 'tpm2_ptool init' >/dev/null
+	tpm_has 'tpm2_ptool listtokens --pid=1' 'label: agent-vm' \
+		|| sg tss -c "tpm2_ptool addtoken --pid=1 --label=agent-vm --sopin='$pin' --userpin='$pin'" >/dev/null
+	tpm_has 'tpm2_ptool listobjects --label=agent-vm' 'CKA_LABEL: git-deploy' \
+		|| sg tss -c "tpm2_ptool addkey --label=agent-vm --userpin='$pin' --algorithm=ecc256 --key-label=git-deploy" >/dev/null
 
 	# ssh asks for the PKCS#11 PIN interactively; agents have no TTY, so route the
 	# prompt through SSH_ASKPASS (force: OpenSSH >=8.4 uses it even without DISPLAY).
