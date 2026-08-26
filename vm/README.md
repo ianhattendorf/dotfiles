@@ -78,8 +78,9 @@ nc -zvw3 192.168.1.1 22              # must FAIL (LAN)
 
 ## Credential model
 
-The guest holds **no GitHub credentials** — no signing key, no push-capable SSH key, no
-`gh` token, no host filesystem mounts.
+The guest holds **no write-capable GitHub credentials** — no signing key, no push-capable
+SSH key, no host filesystem mounts. Its two read paths are the TPM deploy key (git) and a
+read-only `gh` token (API).
 
 - **Public repos** (vscode-gitlens) are cloned anonymously by `provision.sh` into
   `~/kepler/repositories/` — kepler's own layout, so kepler tasks reuse the same checkout.
@@ -95,6 +96,22 @@ The guest holds **no GitHub credentials** — no signing key, no push-capable SS
   register it as an account signing key — a guest-usable signing key means forged
   "Verified" commits. The swtpm state dies with the domain (`destroy` removes it), so a
   rebuild means registering a fresh key — deregister the old one.
+- **Read-only `gh` token** so agents can read issues, PRs, CI runs, and repo metadata.
+  `provision.sh` **prompts** for it (early in the run, before the slow steps) when there
+  is no valid token or the current one expires within 30 days; paste-and-forget, nothing
+  stored on the host. Use a **fine-grained** PAT — classic tokens have no read-only mode,
+  their `repo` scope is read+write — at **90 days**, restricted to the repos the guest may
+  read, with every permission set to Read: Metadata, Contents, Issues, Pull requests,
+  Actions, Checks, Commit statuses, Discussions, Deployments.
+
+  Unlike the TPM key this **is** exfiltratable — a compromised guest can steal it and use
+  it from anywhere — which is why it must stay read-only and repo-scoped; the 90-day
+  expiry bounds the damage. It is stored by `gh auth login --with-token` in
+  `~/.config/gh/hosts.yml` (plaintext; the guest is the boundary), which `gh` reads however
+  it was launched, so non-interactive agents get it without `GH_TOKEN` in any environment.
+  Provisioning deliberately skips `gh auth setup-git`, which would make `gh` git's HTTPS
+  credential helper and turn the token into a git path — git stays on the TPM key. Revoke
+  by deleting the PAT on GitHub; `gh auth logout` clears the guest's copy.
 - Work leaves via the host: `agent-vm fetch [--repo name] <branch>` → `vm/<branch>` on the
   host. Review and push from the host, which has the credentials.
 
@@ -199,6 +216,8 @@ real UI work. `waypipe ssh agent-vm` is the faster path if that starts to bite �
   presence: the old npm-global root-owned install once failed mid-update and left `claude`
   resolving to a bare bun runtime that a presence check would have skipped.
 - **codex** binary from GitHub releases, refreshed to latest on every provision.
+- **`gh`** from Fedora's repos, so dnf-automatic keeps it current like everything else.
+  Provisioning prompts for its read-only token when one is missing or near expiry.
 - **OS**: `dnf upgrade` at provision + dnf-automatic timer with `apply_updates = yes`.
 
 ## Fixtures
@@ -228,7 +247,7 @@ Kepler's full e2e suite is not part of provisioning — agents run it in worktre
 
 ## Not in the guest, deliberately
 
-Signing key · push-capable SSH keys · `gh` token · any host filesystem mount · the host's
+Signing key · push-capable SSH keys · any write-capable GitHub token · any host filesystem mount · the host's
 `~/.claude/settings.json` (its sandbox allowlist is full of host paths that mean nothing
 here, and the VM is already the boundary).
 

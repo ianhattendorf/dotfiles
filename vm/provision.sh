@@ -4,7 +4,9 @@
 #
 # The guest is a continuously-updated dev box, not a frozen image: the OS auto-updates,
 # Claude Code self-updates in place, and re-running this script refreshes everything else.
-# Keep it credential-free: public clones only — private repos arrive via `agent-vm seed`.
+# Keep credentials OUT of this file and out of the repo: public clones only, private repos
+# arrive via `agent-vm seed`, and the one secret it handles (the read-only gh token) is
+# prompted for on the TTY, never passed in or stored host-side.
 set -euo pipefail
 
 GITLENS_REMOTE=${GITLENS_REMOTE:-https://github.com/gitkraken/vscode-gitlens.git}
@@ -38,12 +40,93 @@ sudo dnf install -y -q \
 	libxkbcommon libxkbcommon-x11 libXcomposite libXdamage libXfixes libXrandr \
 	libXtst libXScrnSaver pango cairo cairo-gobject gdk-pixbuf2 libsecret \
 	xorg-x11-server-Xvfb \
-	git tmux jq ripgrep tar xz gcc-c++ make python3 \
+	git gh tmux jq ripgrep tar xz gcc-c++ make python3 \
 	tpm2-pkcs11 tpm2-pkcs11-tools tpm2-tools
 
 # Resolve by file path, not package name — xdpyinfo has moved between packages across
 # Fedora releases and dnf will find whatever currently provides it.
 sudo dnf install -y -q /usr/bin/xdpyinfo
+
+# --- gh CLI auth ----------------------------------------------------------------
+# READ-ONLY, repo-scoped, fine-grained PAT so agents can read issues/PRs/CI/repo metadata.
+# Prompted for here rather than shipped from the host: nothing lands in this repo, in argv,
+# or in a file the host has to keep rotated. Runs THIS early (before the slow dnf upgrade and
+# the smoke tests) so the prompt lands seconds into a provision, not ten minutes in.
+#
+# Stored via `gh auth login --with-token` -> ~/.config/gh/hosts.yml, which gh reads however
+# it was launched. Deliberately NOT exported as GH_TOKEN in ~/.bashrc.d: that would only
+# reach things spawned through bash, and would put the token in /proc/<pid>/environ.
+# Deliberately NOT `gh auth setup-git`: that makes gh git's HTTPS credential helper and turns
+# the token into a git path. Git stays on the TPM deploy key. See README.md's credential model.
+step 'Configuring gh'
+GH_TOKEN_MIN_DAYS=${GH_TOKEN_MIN_DAYS:-30}
+
+# GitHub reports PAT expiry on every authenticated response, so there is no local expiry
+# metadata to store or keep in sync. Absent header = a token type that doesn't expire.
+gh_token_expiry() {
+	local hdr
+	hdr=$(gh api -i /rate_limit 2>/dev/null \
+		| grep -i '^github-authentication-token-expiration:' | cut -d: -f2- | tr -d '\r') || true
+	[[ -n ${hdr// /} ]] || return 1
+	date -d "$hdr" +%s 2>/dev/null
+}
+
+gh_needs_token() {
+	local exp days
+	gh auth status >/dev/null 2>&1 || { echo 'no valid token'; return 0; }
+	exp=$(gh_token_expiry) || { echo ''; return 1; } # authenticated, non-expiring
+	days=$(((exp - $(date +%s)) / 86400))
+	((days < GH_TOKEN_MIN_DAYS)) && { echo "expires in ${days}d"; return 0; }
+	echo "valid for ${days}d"
+	return 1
+}
+
+gh_reason=$(gh_needs_token) && gh_prompt=1 || gh_prompt=0
+if ((gh_prompt)); then
+	if [[ -t 0 ]]; then
+		cat >&2 <<EOF
+
+  gh token: ${gh_reason}.
+
+  Create a FINE-GRAINED PAT — classic tokens have no read-only mode, their 'repo'
+  scope is read+write:
+
+    https://github.com/settings/personal-access-tokens/new
+
+    Expiration:         90 days
+    Repository access:  only the repos this guest may read
+    Permissions, all READ-ONLY:
+      Metadata, Contents, Issues, Pull requests, Actions,
+      Checks, Commit statuses, Discussions, Deployments
+
+  Grant nothing write-capable: a guest can exfiltrate this token, unlike the TPM
+  deploy key. Fine-grained PATs against an org may need org approval.
+
+EOF
+		printf '  Paste token (empty to skip): ' >&2
+		read -rs gh_new </dev/tty
+		printf '\n\n' >&2
+		if [[ -n ${gh_new:-} ]]; then
+			# Not a pipe into `if`: pipefail would carry gh's status, but the intent is
+			# clearer captured, and gh's rejection message is worth showing verbatim.
+			if gh_out=$(printf '%s' "$gh_new" | gh auth login --with-token 2>&1); then
+				gh_reason=$(gh_needs_token) || true
+				echo "  gh: authenticated as $(gh api --jq .login user 2>/dev/null), ${gh_reason}"
+			else
+				echo "${gh_out}" | sed 's/^/  /' >&2
+				echo 'warning: gh rejected the token — agents will have no GitHub read access' >&2
+			fi
+		else
+			echo 'note: skipped — agents will have no GitHub read access until the next provision' >&2
+		fi
+		unset gh_new
+	else
+		echo "warning: gh ${gh_reason} and no TTY to prompt — re-run 'agent-vm provision' interactively" >&2
+	fi
+else
+	echo "gh: ${gh_reason:-authenticated, non-expiring token}"
+fi
+# Revoke by deleting the PAT on GitHub; `gh auth logout` clears the guest's copy.
 
 step 'Upgrading OS packages'
 sudo dnf upgrade -y -q
