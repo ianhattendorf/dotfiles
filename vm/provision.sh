@@ -40,6 +40,7 @@ sudo dnf install -y -q \
 	libxkbcommon libxkbcommon-x11 libXcomposite libXdamage libXfixes libXrandr \
 	libXtst libXScrnSaver pango cairo cairo-gobject gdk-pixbuf2 libsecret \
 	xorg-x11-server-Xvfb \
+	waypipe \
 	git gh tmux jq ripgrep tar xz gcc-c++ make python3 \
 	tpm2-pkcs11 tpm2-pkcs11-tools tpm2-tools
 
@@ -151,37 +152,52 @@ sudo systemctl enable --now "$auto_timer"
 # kepler reaches its guest daemon over `ssh -L <local>:127.0.0.1:<daemon port>`, and
 # selinux-policy 44.7 broke exactly that. 44.6 shipped sshd_session_t — the post-auth
 # domain of the OpenSSH 9.8+ sshd/sshd-session split — as a PERMISSIVE domain, so its
-# missing name_connect allows were logged and ignored; 44.7 enforces the domain without
-# granting them. sshd's connect() to the forward target then fails while plain ssh keeps
-# working (it opens no direct-tcpip channel), so the guest looks reachable right up until
-# kepler's health probe times out against a daemon that is listening and healthy.
+# missing allows were logged and ignored; 44.7 enforces the domain without granting them
+# (upstream "Remove 14 permissive domains", 2026-06-30). sshd's connect() to the forward
+# target then fails while plain ssh keeps working (it opens no direct-tcpip channel), so
+# the guest looks reachable right up until kepler's health probe times out against a
+# daemon that is listening and healthy.
 # It lives under the auto-updater because that is what delivers the flip.
+#
+# Every ssh forwarding mode is affected, each reported separately and all still open:
+#   ssh -L / ProxyJump   RHBZ 2523732
+#   ssh -X               RHBZ 2524485
+#   internal-sftp        fedora-selinux/selinux-policy#3382
+#   waypipe ssh          fedora-selinux/selinux-policy#3383
+#   ssh -A agent fwd     fedora-selinux/selinux-policy#3384
 step 'Allowing ssh forwarding under SELinux'
 # checkmodule only; semodule_package and semodule are in base policycoreutils.
 sudo dnf install -y -q checkpolicy
 mkdir -p "$HOME/.agent-vm/selinux"
-# Both port types for name_connect: kepler's daemon takes an OS-assigned port
-# (ephemeral_port_t, 32768-60999), and a pinned one would land in unreserved_port_t.
+# Deliberately the whole port_type attribute rather than the handful of port types we
+# happen to use today. Enumerating them was the first cut and it kept coming up short:
+# kepler's daemon lands on ephemeral_port_t, a pinned port on unreserved_port_t, `ssh -X`
+# binds xserver_port_t (6000-6020), `ssh -R` binds whatever the caller picked, and `ssh -D`
+# connects to http_port_t and friends. This grants what the permissive domain effectively
+# granted, still scoped to one domain and to tcp_socket.
 #
-# name_bind on xserver_port_t (6000-6020) is the same regression in the other direction:
-# `ssh -X` has sshd-session LISTEN on 6000+X11DisplayOffset for the forwarded display, so
-# without it every display from :10 up fails to bind and the server answers "X11
-# forwarding request failed on channel 0" — leaving DISPLAY unset in the session and any
-# GUI (electron under `pnpm dev`) dying on "Missing X server or $DISPLAY".
+# The sock_file rules are the unix-socket forwards, which fail on `create` rather than a
+# port permission: waypipe's endpoint under /tmp (tmp_t), a forwarded gpg-agent or
+# waypipe socket under /run/user/$UID (user_tmp_t), and ssh -A's listener in ~/.ssh/agent
+# (ssh_home_t). `create` is the denial actually observed; unlink/getattr and the dir
+# permissions cover teardown.
 cat > "$HOME/.agent-vm/selinux/kepler-ssh-forward.te" <<'EOF'
-module kepler-ssh-forward 1.0;
+module kepler-ssh-forward 2.0;
 
 require {
 	type sshd_session_t;
-	type ephemeral_port_t;
-	type unreserved_port_t;
-	type xserver_port_t;
+	type tmp_t;
+	type user_tmp_t;
+	type ssh_home_t;
+	attribute port_type;
 	class tcp_socket { name_bind name_connect };
+	class sock_file { create unlink getattr };
+	class dir { search write add_name remove_name };
 }
 
-allow sshd_session_t ephemeral_port_t:tcp_socket name_connect;
-allow sshd_session_t unreserved_port_t:tcp_socket name_connect;
-allow sshd_session_t xserver_port_t:tcp_socket name_bind;
+allow sshd_session_t port_type:tcp_socket { name_bind name_connect };
+allow sshd_session_t { tmp_t user_tmp_t ssh_home_t }:sock_file { create unlink getattr };
+allow sshd_session_t { tmp_t user_tmp_t ssh_home_t }:dir { search write add_name remove_name };
 EOF
 # Rebuilt every run rather than skipped when already present: `semodule -i` is
 # install-or-upgrade, so an edit to the policy above always lands.
@@ -191,7 +207,10 @@ EOF
 	semodule_package -o kepler-ssh-forward.pp -m kepler-ssh-forward.mod
 	sudo semodule -i kepler-ssh-forward.pp
 )
-# Retire this step once Fedora ships the allows: sudo semodule -r kepler-ssh-forward
+# Retire this step once Fedora ships the allows: sudo semodule -r kepler-ssh-forward.
+# Removing the permissive domains was intentional, so expect upstream to grant specific
+# permissions rather than restore permissiveness — re-test each mode after removing this
+# rather than assuming a fix restores all of them.
 
 # --- mise / node ----------------------------------------------------------------
 step 'Installing mise + Node (lts)'

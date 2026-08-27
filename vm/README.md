@@ -187,11 +187,30 @@ the guest's `/var/log/audit/audit.log`. `provision.sh` builds and installs
 `kepler-ssh-forward` to grant it — retire that step once Fedora ships the allows
 (`sudo semodule -r kepler-ssh-forward`).
 
-The same module carries `name_bind` on `xserver_port_t` for the other direction, `ssh -X`:
-sshd-session listens on `6000 + X11DisplayOffset` for the forwarded display, and without
-the allow every display from `:10` up fails to bind, so the server answers `X11 forwarding
-request failed on channel 0`, `DISPLAY` stays unset in the session, and a guest GUI dies on
-`Missing X server or $DISPLAY`.
+**Every forwarding mode is affected, not just `-L`.** The removal was a deliberate
+hardening sweep (upstream `Remove 14 permissive domains`, 2026-06-30), so the missing
+allows are the bug; each mode was reported separately and all are still open:
+
+| Mode | Fails as | Denial | Report |
+| --- | --- | --- | --- |
+| `ssh -L`, ProxyJump | kepler health probe times out | `name_connect` | [RHBZ 2523732](https://bugzilla.redhat.com/show_bug.cgi?id=2523732) |
+| `ssh -X` | `X11 forwarding request failed on channel 0`, then `Missing X server or $DISPLAY` | `name_bind` | [RHBZ 2524485](https://bugzilla.redhat.com/show_bug.cgi?id=2524485) |
+| `ssh -R` (tcp) | `remote port forwarding failed for listen port` | `name_bind` | RHBZ 2523732 |
+| `ssh -R` (unix) | `remote port forwarding failed for listen path` | `create` on `sock_file` | [#3383](https://github.com/fedora-selinux/selinux-policy/issues/3383) |
+| `ssh -D` | SOCKS connects hang | `name_connect` | RHBZ 2523732 |
+| `ssh -A` | `Agent forwarding disabled: couldn't create listener socket` | `create` on `sock_file` | [#3384](https://github.com/fedora-selinux/selinux-policy/issues/3384) |
+| `internal-sftp` | — | — | [#3382](https://github.com/fedora-selinux/selinux-policy/issues/3382) |
+
+The module grants the whole `port_type` attribute rather than an enumeration, because
+enumerating kept coming up one port type short — `ssh -X` needs `xserver_port_t`, `ssh -R`
+needs whatever the caller picked, `ssh -D` needs `http_port_t`. It also grants `sock_file`
+create/unlink/getattr under `tmp_t`, `user_tmp_t`, and `ssh_home_t` for the unix-socket
+forwards, which fail on file creation rather than on a port permission.
+
+Because the permissive removal was intentional, expect upstream to grant specific
+permissions rather than restore permissiveness — so when a fix lands, re-test each mode
+after `semodule -r` rather than assuming all of them came back. The host picks the same
+regression up whenever it takes 44.6+; it was still on 44.5 as of 2026-08-26.
 
 ## Running a guest GUI on the host
 
@@ -201,9 +220,19 @@ xauth data; using fake authentication data` is expected and harmless: GNOME's Xw
 keeps no `~/.Xauthority`, and it admits the session user directly.
 
 X11 forwarding tunnels every draw over ssh, so it is fine for a smoke test and sluggish for
-real UI work. `waypipe ssh agent-vm` is the faster path if that starts to bite — it needs
-`waypipe` in the guest (host already has it) and electron started with
-`--ozone-platform=wayland`.
+real UI work. `waypipe` is the faster path when that bites — it is installed in the guest by
+`provision.sh`, and electron needs `--ozone-platform=wayland`:
+
+```sh
+waypipe ssh agent-vm                       # then run the app from that shell
+waypipe ssh agent-vm ~/bin/some-script     # or hand it ONE program
+```
+
+`waypipe ssh` parses its remote argv itself instead of handing the line to a shell, so a
+compound command silently misfires — `waypipe ssh agent-vm 'cd x && ./app'` reports
+`Failed to run program cd`, and `bash -c '…'` fares no better. Use an interactive shell or
+a script. Electron logs `drmGetDevices2() has not found any devices` there; that is the
+guest having no render node, and it software-renders past it.
 
 ## Toolchain (all per-user, all current)
 
