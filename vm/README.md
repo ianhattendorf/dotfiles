@@ -243,8 +243,14 @@ guest having no render node, and it software-renders past it.
 - **Claude Code** via the native installer — user-owned, self-updates in place. Provisioning
   health-checks it (`claude --version` must say "Claude Code") rather than just checking
   presence: the old npm-global root-owned install once failed mid-update and left `claude`
-  resolving to a bare bun runtime that a presence check would have skipped.
-- **codex** binary from GitHub releases, refreshed to latest on every provision.
+  resolving to a bare bun runtime that a presence check would have skipped. The install is
+  pinned to the `latest` channel explicitly — a bare `install.sh` installs *stable* and pins
+  self-updates there, so the repair path would quietly downgrade a guest on `latest`.
+  (Anything kepler launches runs the Claude CLI pinned by its `claude-agent-sdk`, not this
+  one, so `claude update` does not move it.)
+- **codex** binary from GitHub releases, refreshed on every provision — but only when the
+  release tag is ahead of the installed `codex --version`, so an unchanged release costs a
+  redirect instead of a download.
 - **`gh`** from Fedora's repos, so dnf-automatic keeps it current like everything else.
   Provisioning prompts for its read-only token when one is missing or near expiry.
 - **OS**: `dnf upgrade` at provision + dnf-automatic timer with `apply_updates = yes`.

@@ -240,19 +240,38 @@ step 'Installing Claude Code'
 # a root-owned tree plus a user-run auto-updater is exactly how the previous VM broke
 # (update failed with no_permissions and left `claude` resolving to a bare bun runtime).
 # Health check rather than presence check: that breakage still had `claude` on PATH.
+#
+# The channel argument is REQUIRED, not cosmetic: install.sh ends in `claude install
+# [TARGET]`, and with no TARGET that installs the DEFAULT channel (stable) and pins the
+# guest's self-updates to it. A guest running `latest` would silently drop to stable —
+# a real downgrade — the first time this repair path fired. `latest` matches the rest of
+# the box: continuously updated, no rollback.
 claude_healthy() { claude --version 2>/dev/null | grep -q 'Claude Code'; }
-claude_healthy || curl -fsSL https://claude.ai/install.sh | bash
+claude_healthy || curl -fsSL https://claude.ai/install.sh | bash -s -- latest
 claude_healthy || { echo 'error: claude failed its health check after install' >&2; exit 1; }
 
 # --- codex ----------------------------------------------------------------------
 step 'Installing codex'
-# No self-updater, so refresh to the latest release on every provision. The binary inside
-# the tarball is named after the asset stem.
-codex_tmp=$(mktemp -d)
-curl -fsSL https://github.com/openai/codex/releases/latest/download/codex-x86_64-unknown-linux-musl.tar.gz \
-	| tar -xz -C "$codex_tmp"
-install -m 0755 "$codex_tmp/codex-x86_64-unknown-linux-musl" "$HOME/.local/bin/codex"
-rm -rf "$codex_tmp"
+# No self-updater, so provisioning is what keeps codex current — but most runs have nothing
+# to fetch, and the tarball is tens of MB. GitHub redirects /releases/latest to the tag, so
+# one redirect-only request decides. `codex --version` prints "codex-cli X.Y.Z"; the tag is
+# "rust-vX.Y.Z". The binary inside the tarball is named after the asset stem.
+codex_have=$(codex --version 2>/dev/null | awk '{ print $2 }') || true
+codex_want=$(curl -fsS --max-time 20 -o /dev/null -w '%{url_effective}' \
+	-L https://github.com/openai/codex/releases/latest 2>/dev/null | sed 's#.*/rust-v##') || true
+# Only an exact match skips the download. Anything unexpected — no network, a renamed tag
+# scheme leaving the whole URL in codex_want — falls through and installs, because a stale
+# codex pinned in place by a failed check is the worse outcome.
+if [[ -n $codex_have && $codex_have == "$codex_want" ]]; then
+	echo "codex: $codex_have is current"
+else
+	codex_tmp=$(mktemp -d)
+	curl -fsSL https://github.com/openai/codex/releases/latest/download/codex-x86_64-unknown-linux-musl.tar.gz \
+		| tar -xz -C "$codex_tmp"
+	install -m 0755 "$codex_tmp/codex-x86_64-unknown-linux-musl" "$HOME/.local/bin/codex"
+	rm -rf "$codex_tmp"
+	echo "codex: installed ${codex_want:-latest} (was ${codex_have:-none})"
+fi
 codex --version >/dev/null || { echo 'error: codex failed to run after install' >&2; exit 1; }
 
 # --- TPM-resident git deploy key ----------------------------------------------
