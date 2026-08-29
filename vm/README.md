@@ -118,6 +118,35 @@ read-only `gh` token (API).
 Its only real credentials are the agents' own logins (Claude, codex, GitKraken), which the
 agents need to reach their APIs anyway.
 
+### Commit identity
+
+The guest has no `~/.gitconfig` of its own. Provisioning writes a **global** one from the
+host's identity, passed in by `agent-vm` — never hardcoded, since this repo is public and
+the right address differs per machine (the dotfiles `work` profile resolves a work email,
+`personal` a personal one). Override with `VM_GIT_NAME` / `VM_GIT_EMAIL` in
+`~/.config/agent-vm.conf`.
+
+`agent-vm` resolves that identity from an empty temp dir, not from its cwd and not with
+`--global`. Both obvious spellings are wrong: plain `git config --get` reads the cwd's
+repo-local config, and the dotfiles checkout has its own `user.email`, so provisioning
+from there would seed a personal address into a work guest; `--global` does not expand
+`[include]` and returns an **empty** email, because the address lives in
+`~/.gitconfig-local` — the file the profiles swap.
+
+Global, not per-repo, because kepler and `gh` create clones `provision.sh` never sees;
+an earlier per-clone version reached only vscode-gitlens and left the rest either
+identity-less (commits fail outright) or carrying whatever a tool wrote into
+`.git/config`. Each provision also strips `user.*`, `commit.gpgsign`, and `tag.gpgsign`
+overrides from every repo under `~/kepler/repositories/`, since local config beats global.
+
+It is deliberately your **real, routable** address rather than a placeholder: guest
+commits come back via `agent-vm fetch` and are pushed from the host, so anything else
+lands on a real remote as a dead address that links to no account. Provenance comes from
+the `wip/*` branch namespace `agent-vm push` uses, not from a fake email. Signing is
+disabled globally (`commit.gpgsign`, `tag.gpgsign`, `tag.forceSignAnnotated`) because the
+guest holds no signing key by design — tags included, since the host gitconfig sets
+`tag.forceSignAnnotated`.
+
 ## Disks
 
 | File | Survives `destroy`? |

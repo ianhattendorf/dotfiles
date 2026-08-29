@@ -48,6 +48,46 @@ sudo dnf install -y -q \
 # Fedora releases and dnf will find whatever currently provides it.
 sudo dnf install -y -q /usr/bin/xdpyinfo
 
+# --- git identity ---------------------------------------------------------------
+# ONE global identity for every repo in the guest. This used to be three repo-local
+# `git config` calls in the GitLens block, which reached exactly the repo this script
+# clones: kepler and gh create clones it never sees, and those ended up with no identity
+# at all (a commit in them fails outright) while others carried whatever a tool happened
+# to write into .git/config. Global is what every future clone inherits for free.
+#
+# Name and email come from the HOST (agent-vm's run_provision), never hardcoded here:
+# this repo is public, and the correct address is per-machine — the dotfiles work profile
+# resolves a work email, personal a personal one. It has to be a REAL, routable address:
+# guest commits come back with `agent-vm fetch` and are pushed from the host, so a
+# placeholder like agent-vm@localhost links to no account and lands on a real remote as a
+# dead address. Provenance is already legible from the wip/* branch namespace.
+step 'Configuring git identity'
+if [[ -n ${GUEST_GIT_NAME:-} && -n ${GUEST_GIT_EMAIL:-} ]]; then
+	git config --global user.name "$GUEST_GIT_NAME"
+	git config --global user.email "$GUEST_GIT_EMAIL"
+	echo "identity: $GUEST_GIT_NAME <$GUEST_GIT_EMAIL>"
+else
+	echo 'warning: no identity passed from the host — guest commits will fail' >&2
+fi
+
+# The guest holds no signing key, by design — the host has the only one. Cover tags too,
+# not just commits: the host gitconfig sets tag.forceSignAnnotated, so if that ever
+# reaches the guest an annotated tag would fail the same way a commit would.
+git config --global commit.gpgsign false
+git config --global tag.gpgsign false
+git config --global tag.forceSignAnnotated false
+
+# Local config beats global, so clones provisioned before this step keep their stale
+# override until it is removed. Sweeping every run also catches identities that tools
+# write into .git/config after the fact.
+for repo in "$REPOS_DIR"/*/; do
+	[[ -d $repo/.git ]] || continue
+	for key in user.name user.email user.signingkey commit.gpgsign tag.gpgsign; do
+		# --unset-all exits 5 when the key is absent, which is the normal case here.
+		git -C "$repo" config --unset-all "$key" 2>/dev/null || true
+	done
+done
+
 # --- gh CLI auth ----------------------------------------------------------------
 # READ-ONLY, repo-scoped, fine-grained PAT so agents can read issues/PRs/CI/repo metadata.
 # Prompted for here rather than shipped from the host: nothing lands in this repo, in argv,
@@ -432,9 +472,8 @@ else
 fi
 
 cd "$GITLENS_DIR"
-git config commit.gpgsign false # no signing key in the guest, by design
-git config user.name 'Agent VM'
-git config user.email 'agent-vm@localhost'
+# No repo-local identity or gpgsign here — both are global now, set in the git identity
+# step above so every clone in the guest gets them, not just this one.
 
 # Point the inspector's named-session dir at the persistent disk so `sign_in` survives
 # a rebuild. .vscode-test is already gitignored.

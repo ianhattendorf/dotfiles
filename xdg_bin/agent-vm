@@ -56,6 +56,10 @@ EGRESS_UNIT=agent-vm-egress.service
 die() { printf '\033[1;31merror:\033[0m %s\n' "$1" >&2; exit 1; }
 note() { printf '\033[1;34m==>\033[0m %s\n' "$1"; }
 
+# Single-quote a value for interpolation into a remote shell command. The replacement has
+# to go through a variable: written inline in the ${//} the escaping is read differently.
+shq() { local q="'\\''"; printf "'%s'" "${1//\'/$q}"; }
+
 confirm() {
 	local reply
 	read -rp "$1 [y/N] " reply
@@ -225,8 +229,32 @@ sync_assets() {
 	vm_ssh 'chmod +x ~/.agent-vm/provision.sh ~/.agent-vm/fixtures/*.sh'
 }
 
+# The guest has no ~/.gitconfig of its own, so provisioning seeds one from the host's
+# identity rather than hardcoding an address in the (public) dotfiles repo.
+#
+# Resolved from an empty temp dir, which is neither of the two obvious spellings because
+# both are wrong here. Plain `git config --get` reads the cwd's repo-local config, and
+# this dotfiles checkout carries its own user.email — provisioning from it would seed the
+# personal address into a work guest. `git config --global --get` does NOT expand
+# `[include]`, so it returns an EMPTY email: the address lives in ~/.gitconfig-local,
+# which is exactly the file the dotfiles work and personal profiles swap.
+host_git_config() {
+	local d out
+	d=$(mktemp -d)
+	out=$(git -C "$d" config --get "$1" 2>/dev/null) || true
+	rmdir "$d"
+	printf '%s' "$out"
+}
+
 run_provision() {
-	vm_ssh -t "GITLENS_REMOTE='$GITLENS_REMOTE' bash ~/.agent-vm/provision.sh"
+	local git_name git_email
+	git_name=${VM_GIT_NAME:-$(host_git_config user.name)}
+	git_email=${VM_GIT_EMAIL:-$(host_git_config user.email)}
+	[[ -n $git_name && -n $git_email ]] \
+		|| note 'warning: no host git identity — guest commits will have none (set VM_GIT_NAME/VM_GIT_EMAIL)'
+	vm_ssh -t "GITLENS_REMOTE=$(shq "$GITLENS_REMOTE") \
+		GUEST_GIT_NAME=$(shq "$git_name") GUEST_GIT_EMAIL=$(shq "$git_email") \
+		bash ~/.agent-vm/provision.sh"
 }
 
 # virt-install attaches the NoCloud seed ISO from /var/lib/libvirt/boot for the first boot
