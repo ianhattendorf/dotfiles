@@ -33,6 +33,7 @@
     ~/.config/sway/scripts: xdg_config/sway/scripts
     ~/.config/swaylock: xdg_config/swaylock
     ~/.config/systemd/user/onedrive.service: xdg_config/systemd/user/onedrive.service
+    ~/.config/systemd/user/waybar.service.d: xdg_config/systemd/user/waybar.service.d
     ~/.config/tmux: xdg_config/tmux
     ~/.config/tmuxinator: xdg_config/tmuxinator
     ~/.config/waybar: xdg_config/waybar

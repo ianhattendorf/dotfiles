@@ -12,4 +12,14 @@ fi
 
 systemctl --user daemon-reload
 systemctl --user enable --now ssh-agent.socket
+
+# Run waybar as a session service instead of letting sway spawn it, so a
+# segfault on monitor removal restarts rather than leaving no bar. See
+# xdg_config/sway/config.d/90-bar.conf. `enable` would wire it to
+# graphical-session.target, which systemd refuses to start directly; sway's
+# session.sh starts sway-session.target after importing WAYLAND_DISPLAY.
+if [ -f /usr/lib/systemd/user/waybar.service ]; then
+  systemctl --user add-wants sway-session.target waybar.service
+fi
+
 update-desktop-database "$HOME/.local/share/applications"
