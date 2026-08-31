@@ -66,10 +66,14 @@ one commit per PR with `(#NNNN)`; (4) changelog convention (per-version files, s
 Org-wide constants (hold in every GK repo, no profile needed):
 
 - Issue/PR **writes** go through the GitKraken MCP (`issues_create`,
-  `pull_request_create`) — the `gh` token is read-only. It covers: kepler,
+  `pull_request_create`), never `gh`. In the agent-vm guest that is the only path — its
+  `gh` token is deliberately read-only — and on the host, where `gh` *could* write, stay
+  on the MCP anyway so the loop behaves identically in both. The MCP covers: kepler,
   vscode-gitlens, gkcli, core-tools, gitkraken-client, api-service, drafts-service,
   gitkraken.dev.
-- Pushes go over SSH with a TPM-backed key; the `gh` token plays no part.
+- Pushes go over SSH; the `gh` token plays no part. A push always needs explicit human
+  confirmation — that is a permission rule, not a capability limit, so never treat a
+  successful `git push` as evidence it was pre-approved.
 - Issues are assigned to `ianhattendorf`; PRs are never assigned. Project-board status
   cannot be set by tooling (no MCP surface; the token lacks Projects scope) — ask the
   human to set it.
@@ -83,8 +87,8 @@ Org-wide constants (hold in every GK repo, no profile needed):
 - Verify the problem is real before anything else: reproduce it, or trace the code path
   to the root cause. If it cannot be verified, report that and stop — do not proceed on
   an unverified premise.
-- If no GitHub issue exists, create one via the GitKraken MCP `issues_create` (the
-  `gh` token is read-only). Print the exact title and body to chat first so the human
+- If no GitHub issue exists, create one via the GitKraken MCP `issues_create`, per the
+  write path above. Print the exact title and body to chat first so the human
   can see what will be created, and pass `assignees: ["ianhattendorf"]`. The issue
   body must include **acceptance criteria** — later review rounds are judged against
   these, and scope disputes are settled by them. Ask the human to set project-board
@@ -291,8 +295,8 @@ feedback on the implementation pass, not as a reason to skip the gate next time.
   `git branch -m <issue#>-<slug>` (the MCP `git_branch` cannot rename; a local rename
   before any push is safe, though the task metadata keeps the old name, so a later
   `discard_worktree` may leave the renamed branch behind — delete it by hand then).
-- Open the PR via the GitKraken MCP `pull_request_create` (the `gh` token is
-  read-only). Do not assign the PR — only the issue gets assigned. Print the exact
+- Open the PR via the GitKraken MCP `pull_request_create`, per the write path above.
+  Do not assign the PR — only the issue gets assigned. Print the exact
   title and body to chat first so the human can see what will be created. The body
   covers: the problem (link the issue), the approach and why, invariants touched, how
   it was verified (gates + live verification + human run), and any noted out-of-scope

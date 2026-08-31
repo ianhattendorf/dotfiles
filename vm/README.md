@@ -244,6 +244,17 @@ credential model — the read-only `gh` token and the MCP-only path for GitHub w
 not true of the host. There is deliberately no `install.d/profiles/agent-vm.yaml`: it
 would look dotbot-installable, and installing it would drag in the base links above.
 
+### Skills
+
+`~/.claude/skills` is linked wholesale into the profile directory, so a skill written
+inside the guest is captured by `dotfiles pull` with no extra step.
+
+Skills meant for **both** machines live in `home/.claude/skills/` and appear in that
+directory as a relative symlink — `ship-issue` is one. The host installs the same tree
+per-skill through dotbot (`install.d/base/20-home.yaml`), so both sides share one copy
+and an edit from either lands in the same file. Anything genuinely guest-only can just be
+a real directory under `profiles/agent-vm/home/.claude/skills/` instead.
+
 ## Disks
 
 | File | Survives `destroy`? |

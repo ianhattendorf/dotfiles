@@ -3,6 +3,10 @@
     ~/.bashrc: home/.bashrc
     ~/.claude/CLAUDE.md: home/.claude/CLAUDE.md
     ~/.claude/settings.json: home/.claude/settings.json
+    # Per-skill, not the whole ~/.claude/skills directory, so skills installed by other
+    # means stay put. The agent-vm guest reaches the same tree through a symlink in
+    # profiles/agent-vm (it links ~/.claude/skills wholesale — see vm/provision.sh).
+    ~/.claude/skills/ship-issue: home/.claude/skills/ship-issue
     ~/.emacs.d/early-init.el: home/emacs.d/early-init.el
     ~/.emacs.d/init.el: home/emacs.d/init.el
     ~/.emacs.d/straight/versions/default.el: home/emacs.d/straight/versions/default.el
