@@ -1,0 +1,56 @@
+{
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "ask": [
+      "Bash(git push*)",
+      "Bash(gh pr create*)",
+      "Bash(gh pr comment*)",
+      "Bash(gh pr review*)",
+      "Bash(gh pr merge*)",
+      "Bash(gh pr close*)",
+      "Bash(gh issue create*)",
+      "Bash(gh issue comment*)",
+      "Bash(gh issue close*)",
+      "Bash(gh issue reopen*)",
+      "Bash(gh release create*)",
+      "Bash(gh workflow run*)",
+      "mcp__GitKraken__git_push",
+      "mcp__GitKraken__pull_request_create",
+      "mcp__GitKraken__pull_request_create_review",
+      "mcp__GitKraken__issues_add_comment",
+      "mcp__GitKraken__issues_create",
+      "mcp__GitKraken__app_tool_box",
+      "mcp__GitKraken__gitlens_start_work",
+      "mcp__GitKraken__gitlens_start_review"
+    ],
+    "defaultMode": "auto"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cmd=$(jq -r '.tool_input.command // empty')\nm=$(echo \"$cmd\" | grep -oE 'gh[[:space:]]+[a-zA-Z-]+([[:space:]]+[a-zA-Z-]+)?' | head -1)\n[ -z \"$m\" ] && exit 0\ngroup=$(echo \"$m\" | awk '{print $2}')\naction=$(echo \"$m\" | awk '{print $3}')\nif [ \"$group\" = \"api\" ]; then\n  if echo \"$cmd\" | grep -qiE -- '(-X[[:space:]]*|--method([[:space:]]+|=))GET([[:space:]]|$)' && ! echo \"$cmd\" | grep -qE -- '--input'; then\n    exit 0\n  fi\n  if echo \"$cmd\" | grep -qiE -- '(-X|--method)[[:space:]]*[A-Za-z]*(POST|PUT|PATCH|DELETE)|[[:space:]](-f|-F|--field|--raw-field|--input)([[:space:]=])'; then\n    echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"gh api call looks like a write - confirm before mutating GitHub\"}}'\n  fi\nelif echo \"$action\" | grep -qE '^(view|list|diff|checks|status|download|watch|search)$'; then\n  exit 0\nelif [ \"$group\" = \"auth\" ] && [ \"$action\" = \"status\" ]; then\n  exit 0\nelif [ \"$group\" = \"repo\" ] && [ \"$action\" = \"clone\" ]; then\n  exit 0\nelif [ \"$group\" = \"browse\" ]; then\n  exit 0\nelif [ \"$group\" = \"config\" ] && { [ \"$action\" = \"get\" ] || [ \"$action\" = \"list\" ]; }; then\n  exit 0\nelse\n  echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"gh command may write to GitHub - confirm before proceeding\"}}'\nfi\n",
+            "if": "Bash(gh *)",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "slack@claude-plugins-official": true,
+    "sentry@claude-plugins-official": true
+  },
+  "tui": "fullscreen",
+  "theme": "auto",
+  "autoMode": {
+    "soft_deny": [
+      "$defaults",
+      "Any git command that pushes to a remote (git push, force-push, push --tags, push --delete, or equivalent) - always require explicit confirmation, never auto-approve even if user intent seems clear",
+      "Any GitHub API write action - creating, editing, commenting on, merging, closing, reopening, deleting, locking, transferring, or otherwise mutating a pull request, issue, review, release, repo, workflow, run, gist, label, project, secret, variable, or key - whether via gh CLI or an MCP tool - always require explicit confirmation, never auto-approve even if user intent seems clear"
+    ]
+  }
+}
