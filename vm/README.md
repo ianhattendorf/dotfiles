@@ -22,9 +22,11 @@ which is kept fully reproducible for exactly that reason.
 | `claude [args…]` | Claude Code in tmux inside the guest (`--permission-mode auto`) |
 | `codex [args…]` | codex in tmux inside the guest (pass its own flags as args) |
 | `fixtures` | Rebuild the scenario repos under `~/dev/test` |
-| `egress` | Reapply the host-side nftables rules after editing them |
+| `egress` | Reapply the host-side nftables rules **and** the firewalld zone binding |
 | `ssh [cmd…]` | Shell in (or run a one-off command) |
-| `start` / `stop` / `status` | Lifecycle; `status` includes egress state |
+| `logs` | Read the guest journal straight off the disk — works with no network |
+| `rescue` | Root shell on the guest's disk (guest must be stopped) |
+| `start` / `stop` / `status` | Lifecycle; `status` includes egress and firewall state |
 | `destroy` | Delete domain + system disk; state disk only with a second confirmation |
 
 First run: `bootstrap` → `create` → log into the agents (`agent-vm claude`,
@@ -34,7 +36,7 @@ First run: `bootstrap` → `create` → log into the agents (`agent-vm claude`,
 ## One-time host setup
 
 ```sh
-sudo dnf install -y @virtualization
+sudo dnf install -y @virtualization guestfs-tools
 sudo usermod -aG libvirt "$USER"        # re-login afterwards
 
 # Fedora presets the MODULAR daemons. Do NOT `enable --now libvirtd` — it's preset-disabled
@@ -67,6 +69,52 @@ stopped when not in use" no longer protects the LAN.
 The table coexists with firewalld and libvirt (own nft table; a drop anywhere wins;
 firewalld reloads only flush firewalld's table). Do **not** enable Fedora's
 `nftables.service` — its config flushes the whole ruleset.
+
+### virbr0 must be in firewalld's `libvirt` zone
+
+Separate from our table, and the one piece of host firewall state that silently kills the
+guest. The `libvirt` zone is `target: ACCEPT` and allows `dhcp`/`dns`; if `virbr0` is bound
+to **no zone**, guest traffic falls to the **default** zone (`public`), which allows
+neither, and every DHCPDISCOVER is dropped *before dnsmasq sees it*.
+
+The symptom is a healthy-looking VM that cannot be reached: `virsh domstate` says running,
+the guest has only an IPv6 link-local on `enp1s0`, `virsh net-dhcp-leases default` is
+empty, the host's ARP entry for `VM_IP` is `INCOMPLETE`/`FAILED`, `agent-vm ssh` says **`No
+route to host`**, and dnsmasq's journal shows *no DHCP lines at all* — not even a DISCOVER.
+Rebooting the guest changes nothing, because the block is host-side.
+
+libvirt binds the bridge when the network starts, but firewalld re-applies its permanent
+config on every start and `--reload`, dropping a runtime-only binding — at boot that's a
+race either daemon can win. So `agent-vm` asserts the binding itself, runtime **and**
+`--permanent`, from `agent-vm-egress.service` (`ExecStartPost`, so every host boot) and from
+`install_egress` (so `bootstrap` and `egress` do it too).
+
+```sh
+firewall-cmd --get-zone-of-interface=virbr0   # want: libvirt
+agent-vm status                               # 'firewall:' line says the same
+agent-vm egress                               # reasserts rules + binding
+```
+
+## Break-glass: when the guest has no network
+
+There is no second way in, by design — so reach for `agent-vm logs` early rather than
+hunting for a login:
+
+- **The console can't help.** cloud-init is key-only (`ssh_pwauth: false`, no password on
+  `dev`, `disable_root: true`), so `virsh console` reaches a login prompt with no
+  credentials that exist.
+- **The guest agent can't help.** It runs confined as `virt_qemu_ga_t`; through
+  `virsh qemu-agent-command … guest-exec`, `systemctl`, `journalctl`, `nmcli`, `ip`, `rpm`,
+  and `/var/log/journal` all return Access/Permission denied. It *can* still answer
+  `virsh domifaddr --source agent`, which is how `status` sees the guest's real addresses.
+  Note that a confined `nmcli` reports "NetworkManager is not running" when it merely
+  can't reach it — check `busctl --system list` for `org.freedesktop.NetworkManager`
+  before believing it.
+- **libguestfs can.** `agent-vm logs` (`virt-log`) reads the journal off the disk image,
+  read-only and safe on a live guest, though entries still buffered in the guest won't be
+  there. `agent-vm rescue` (`virt-rescue`) gives a root shell on the disk to actually fix
+  something — read-write, so it refuses unless the guest is stopped. Both need
+  `guestfs-tools`.
 
 Verify from the guest:
 

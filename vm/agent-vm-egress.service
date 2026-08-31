@@ -5,11 +5,25 @@
 [Unit]
 Description=agent-vm guest egress restrictions (nftables)
 Wants=network-pre.target
+# For the ExecStartPost zone binding below, not for the nft table: firewalld re-applies its
+# permanent config when it starts, so a binding written before it came up would be dropped.
+After=firewalld.service
 
 [Service]
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=/usr/sbin/nft -f /etc/nftables/agent-vm-egress.nft
+
+# virbr0 must sit in firewalld's `libvirt` zone (target ACCEPT, services dhcp+dns). Left in
+# no zone it falls to the default zone — `public`, which allows neither — and every guest
+# DHCPDISCOVER is dropped before dnsmasq sees it: the guest boots with no IPv4 address and
+# `agent-vm ssh` fails with "No route to host", with nothing in dnsmasq's log because the
+# request never arrived. libvirt binds the bridge when the network starts, but loses that
+# binding to any later firewalld start or reload, which at boot is a race either daemon can
+# win — so assert it here on every boot. Both spellings: runtime fixes this boot, --permanent
+# survives the next `firewall-cmd --reload`. `-` because a host without firewalld is fine.
+ExecStartPost=-/usr/bin/firewall-cmd -q --zone=libvirt --change-interface=virbr0
+ExecStartPost=-/usr/bin/firewall-cmd -q --permanent --zone=libvirt --change-interface=virbr0
 
 [Install]
 WantedBy=multi-user.target

@@ -31,7 +31,7 @@ Host win-vm win-vm.internal.ianhattendorf.com
 # and ignores Include/Match. It also takes only the FIRST pattern on a Host line, so
 # `agent-vm` is what shows up in its picker.
 # The address is a libvirt DHCP reservation (see dotfiles/vm/agent-vm.conf), not a lease.
-Host agent-vm
+Host agent-vm 192.168.122.50
     Hostname 192.168.122.50
     User dev
     IdentityFile ~/.ssh/agent-vm

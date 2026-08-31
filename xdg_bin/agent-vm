@@ -16,8 +16,10 @@
 #   claude [args...]             run Claude Code in tmux inside the guest (auto mode)
 #   codex [args...]              run codex in tmux inside the guest
 #   fixtures                     rebuild the scenario repos
-#   egress                       reapply the host-side nftables egress rules
+#   egress                       reapply the host-side egress rules + firewalld zone binding
 #   ssh [cmd...]                 shell in
+#   logs                         read the guest journal off the disk (no network needed)
+#   rescue                       root shell on the guest's disk (guest must be stopped)
 #   start | stop | status | destroy
 set -euo pipefail
 
@@ -30,6 +32,9 @@ VM_ASSETS=${AGENT_VM_ASSETS:-$HOME/dotfiles/vm}
 [[ -f $CONF_DIR/agent-vm.conf ]] && . "$CONF_DIR/agent-vm.conf"
 
 : "${VM_LIBVIRT_URI:=qemu:///system}"
+# Defaulted here too, not just in agent-vm.conf, so an older ~/.config/agent-vm.conf that
+# predates the setting doesn't leave the firewall checks below comparing against an empty name.
+: "${VM_BRIDGE:=virbr0}"
 
 # Every libvirt call goes through here so the URI is never left to the ambient default,
 # which for a non-root user is qemu:///session — a different hypervisor with no networks,
@@ -69,16 +74,67 @@ confirm() {
 domain_exists() { virsh dominfo "$VM_NAME" >/dev/null 2>&1; }
 domain_running() { [[ $(virsh domstate "$VM_NAME" 2>/dev/null) == running ]]; }
 
-# Prefer the live lease, but fall back to the reserved address: domifaddr can come back
-# empty for a moment after a restart even though the guest is answering.
+# The address the guest ACTUALLY holds, empty when it holds none. `virsh domifaddr` reads
+# libvirt's lease file by default; fall back to the guest agent, which reports what the guest
+# itself has configured and so stays right when the lease file and reality disagree.
 # The `|| true` on every capture below is load-bearing: with `set -e` + `pipefail`, a grep
 # that legitimately matches nothing fails its pipeline and aborts the whole script, so the
 # explicit emptiness checks that follow would never get to report anything useful.
-guest_ip() {
+guest_ip_live() {
 	local ip
 	ip=$(virsh -q domifaddr "$VM_NAME" 2>/dev/null \
 		| awk '/ipv4/ { split($4, a, "/"); print a[1]; exit }') || true
+	# $3/$4 rather than a bare /ipv4/ match: the agent lists loopback too, and 127.0.0.1 as
+	# the guest's address would send every ssh and git push back at the host.
+	[[ -n $ip ]] || ip=$(virsh -q domifaddr "$VM_NAME" --source agent 2>/dev/null \
+		| awk '$3 == "ipv4" && $4 !~ /^127\./ { split($4, a, "/"); print a[1]; exit }') || true
+	printf '%s' "$ip"
+}
+
+# Prefer the live address, but fall back to the reserved one: domifaddr can come back empty
+# for a moment after a restart even though the guest is answering. That fallback is right for
+# connecting and wrong for reporting — `status` uses guest_ip_live directly, because printing
+# the reservation made a guest with no IPv4 at all look perfectly healthy.
+guest_ip() {
+	local ip
+	ip=$(guest_ip_live)
 	echo "${ip:-$VM_IP}"
+}
+
+FIREWALL_ZONE=libvirt
+
+# firewalld's zone for the guest bridge, or a reason there isn't one. Both non-zone answers
+# are spelled out rather than collapsed to empty so callers can tell "no firewalld on this
+# host" (fine) from "bound to the wrong zone" (broken).
+firewall_zone_of_bridge() {
+	command -v firewall-cmd >/dev/null 2>&1 || { echo 'no firewalld'; return; }
+	firewall-cmd --state >/dev/null 2>&1 || { echo 'firewalld stopped'; return; }
+	firewall-cmd --get-zone-of-interface="$VM_BRIDGE" 2>/dev/null || true
+}
+
+# $VM_BRIDGE has to sit in firewalld's `libvirt` zone (target ACCEPT, services dhcp+dns).
+# Unbound, it falls to the DEFAULT zone — `public`, which allows neither — and every guest
+# DHCPDISCOVER is dropped before dnsmasq sees it: the guest boots with no IPv4 address, and
+# `agent-vm ssh` fails with "No route to host" against an otherwise healthy VM, with nothing
+# in dnsmasq's log because the request never arrived. libvirt binds the bridge when the
+# network starts, but any later firewalld start or reload re-applies firewalld's permanent
+# config and drops a runtime-only binding — at boot that's a race both daemons can win.
+ensure_firewall_zone() {
+	local zone
+	zone=$(firewall_zone_of_bridge)
+	case $zone in
+	'no firewalld' | 'firewalld stopped')
+		note "firewalld is not running — skipping the $VM_BRIDGE zone binding"
+		return 0
+		;;
+	"$FIREWALL_ZONE") ;;
+	*) note "Binding $VM_BRIDGE to firewalld's $FIREWALL_ZONE zone (was: ${zone:-unset})" ;;
+	esac
+	# Both spellings every time, even when the runtime binding already looks right: the
+	# runtime call fixes the host now, and --permanent is what survives the next firewalld
+	# restart or `--reload`. Asserting only the half that's missing is how this broke.
+	sudo firewall-cmd -q --zone="$FIREWALL_ZONE" --change-interface="$VM_BRIDGE"
+	sudo firewall-cmd -q --permanent --zone="$FIREWALL_ZONE" --change-interface="$VM_BRIDGE"
 }
 
 # Must run BEFORE virt-install: the guest DHCPs on its first boot, so a reservation added
@@ -135,6 +191,14 @@ libvirt group (re-login after usermod) and that virtqemud.socket or libvirtd.soc
 	# No sudo needed: the image dir is traversable, and prompting for a password just to
 	# stat a directory means an extra prompt for every command.
 	test -d "$VM_IMAGE_DIR" || die "missing $VM_IMAGE_DIR — run: agent-vm bootstrap"
+	# Warn rather than die: a wrong zone only breaks the guest's DHCP, and saying so here
+	# beats watching `create` spend ten minutes timing out in wait_for_ssh.
+	local zone
+	zone=$(firewall_zone_of_bridge)
+	case $zone in
+	"$FIREWALL_ZONE" | 'no firewalld' | 'firewalld stopped') ;;
+	*) note "warning: $VM_BRIDGE is in firewalld zone '${zone:-none}', not '$FIREWALL_ZONE' — the guest's DHCP will be dropped; fix with: agent-vm egress" ;;
+	esac
 }
 
 wait_for_ssh() {
@@ -146,7 +210,13 @@ wait_for_ssh() {
 		fi
 		sleep 3
 	done
-	die 'guest did not come up on SSH'
+	# The overwhelmingly likely cause of a guest that boots but never appears on the network,
+	# so name it here instead of leaving a bare timeout to be debugged from scratch.
+	local zone
+	zone=$(firewall_zone_of_bridge)
+	[[ $zone == "$FIREWALL_ZONE" || $zone == 'no firewalld' || $zone == 'firewalld stopped' ]] \
+		|| die "guest did not come up on SSH — $VM_BRIDGE is in firewalld zone '${zone:-none}', not '$FIREWALL_ZONE', so the guest's DHCP is being dropped; fix with: agent-vm egress"
+	die "guest did not come up on SSH (inspect it with: agent-vm logs)"
 }
 
 # --- image handling -----------------------------------------------------------
@@ -282,6 +352,9 @@ install_egress() {
 	sudo systemctl restart "$EGRESS_UNIT"
 	sudo nft list table inet agent_vm_egress >/dev/null || die 'egress table failed to load'
 	note 'Egress rules active (guest: public internet only; no LAN, no host)'
+	# The unit asserts this too (ExecStartPost, so it also lands on every host boot); doing it
+	# here as well keeps `agent-vm egress` a complete repair for the host's guest networking.
+	ensure_firewall_zone
 }
 
 # --- subcommands ----------------------------------------------------------------
@@ -518,18 +591,61 @@ cmd_destroy() {
 }
 
 cmd_status() {
+	local ip zone
 	if ! domain_exists; then
 		echo "$VM_NAME: not defined"
 	else
 		printf '%-10s %s\n' 'domain:' "$(virsh domstate "$VM_NAME")"
-		printf '%-10s %s\n' 'ip:' "$(guest_ip || echo '-')"
+		# guest_ip_live, NOT guest_ip: the reserved-address fallback is right for connecting
+		# and a lie here — it reported 192.168.122.50 for a guest that had no IPv4 at all.
+		ip=$(guest_ip_live)
+		printf '%-10s %s\n' 'ip:' "${ip:-none — no lease (reserved: $VM_IP)}"
 	fi
 	printf '%-10s %s\n' 'egress:' "$(systemctl is-active "$EGRESS_UNIT" 2>/dev/null || echo 'not installed')"
+	# Worth a line of its own: a wrong zone here is silent everywhere else, and it presents
+	# as a guest that boots fine and simply cannot be reached.
+	zone=$(firewall_zone_of_bridge)
+	case $zone in
+	"$FIREWALL_ZONE") zone="$VM_BRIDGE in the $FIREWALL_ZONE zone" ;;
+	'no firewalld' | 'firewalld stopped') ;;
+	*) zone="$VM_BRIDGE in '${zone:-none}', not '$FIREWALL_ZONE' — guest DHCP is being dropped (fix: agent-vm egress)" ;;
+	esac
+	printf '%-10s %s\n' 'firewall:' "$zone"
 	echo
 	test -d "$VM_IMAGE_DIR" && du -sh --apparent-size "$VM_IMAGE_DIR"/* 2>/dev/null
 	# `test && du` last: without this, a missing image dir makes status exit non-zero,
 	# which reads as a failure in scripts and shell prompts.
 	true
+}
+
+# --- break-glass --------------------------------------------------------------
+#
+# When the guest loses the network there is otherwise NO way in. cloud-init builds it
+# key-only (`ssh_pwauth: false`, no password on $VM_USER, `disable_root: true`), so the
+# serial console has nothing to log in with, and the qemu guest agent runs confined as
+# virt_qemu_ga_t — through it `systemctl`, `journalctl`, `nmcli`, `ip`, and /var/log/journal
+# all come back Access denied. libguestfs sidesteps all of it by reading the disk directly.
+require_guestfs() {
+	command -v "$1" >/dev/null || die "$1 not found — run: sudo dnf install guestfs-tools"
+}
+
+cmd_logs() {
+	require_guestfs virt-log
+	# No sudo: the images are world-readable and libguestfs runs its appliance unprivileged.
+	# virt-log only ever opens the disk read-only, so this is safe against a live guest — but
+	# journald buffers, so the newest entries may not be on disk yet.
+	domain_running && note 'guest is running — entries still buffered in the guest may be missing'
+	virt-log -c "$VM_LIBVIRT_URI" -d "$VM_NAME"
+}
+
+cmd_rescue() {
+	require_guestfs virt-rescue
+	# Read-WRITE, unlike logs: virt-rescue mounts the real filesystem, so running it against a
+	# live guest means two kernels writing one disk — that corrupts it rather than risking it.
+	domain_running \
+		&& die "guest is running — 'agent-vm stop' first (a read-write rescue on a live image corrupts it)"
+	note "Rescue shell; nothing is mounted yet — 'virt-rescue --suggest -d $VM_NAME' prints this guest's mount commands"
+	sudo virt-rescue -c "$VM_LIBVIRT_URI" -d "$VM_NAME"
 }
 
 # --- dispatch -----------------------------------------------------------------
@@ -548,6 +664,8 @@ claude) cmd_claude "$@" ;;
 codex) cmd_codex "$@" ;;
 fixtures) cmd_fixtures "$@" ;;
 egress) install_egress ;;
+logs) cmd_logs "$@" ;;
+rescue) cmd_rescue "$@" ;;
 destroy) cmd_destroy "$@" ;;
 status) cmd_status "$@" ;;
 start) virsh start "$VM_NAME" >/dev/null && wait_for_ssh ;;
