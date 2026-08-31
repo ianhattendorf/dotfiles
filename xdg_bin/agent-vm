@@ -3,9 +3,9 @@
 #
 # The VM is the containment boundary: damage from an agent stays in the guest, never the
 # host. The guest is continuously updated (OS, agents, toolchain) — there is no rollback;
-# recovery is destroy + recreate from the provisioning script. The guest holds no GitHub
-# credentials: public repos clone directly, private repos are seeded from the host, and
-# work comes back via host-initiated fetch.
+# recovery is destroy + recreate from the provisioning script. Its only GitHub credentials
+# are a non-exportable TPM SSH key and a read-only gh token; private repos can also be
+# seeded from the host, and work can come back via host-initiated fetch.
 #
 #   bootstrap                    one-time host setup: image dir, SSH key, egress rules
 #   create                       build a guest from nothing, seed kepler, provision
@@ -395,7 +395,7 @@ cmd_create() {
 	ud=$(mktemp)
 	render_cloud_init "$ud"
 
-	# Emulated TPM for the non-exportable deploy key (see provision.sh). Attached at
+	# Emulated TPM for the non-exportable git key (see provision.sh). Attached at
 	# define time because TPMs can't be hot-plugged.
 	local tpm_args=()
 	[[ ${VM_TPM:-1} -eq 1 ]] && tpm_args=(--tpm 'model=tpm-crb,backend.type=emulator,backend.version=2.0')

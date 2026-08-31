@@ -126,9 +126,9 @@ nc -zvw3 192.168.1.1 22              # must FAIL (LAN)
 
 ## Credential model
 
-The guest holds **no write-capable GitHub credentials** — no signing key, no push-capable
-SSH key, no host filesystem mounts. Its two read paths are the TPM deploy key (git) and a
-read-only `gh` token (API).
+The guest holds **no signing key and no host filesystem mounts**. Its GitHub access is a
+TPM-resident SSH key registered on the account (git, read and write) and a read-only `gh`
+token (API). Pushes are gated by agent permission rules, not by the key.
 
 - **Public repos** (vscode-gitlens) are cloned anonymously by `provision.sh` into
   `~/kepler/repositories/` — kepler's own layout, so kepler tasks reuse the same checkout.
@@ -136,14 +136,19 @@ read-only `gh` token (API).
   ~/dev/repos/kepler` pushes over host-initiated SSH into
   `~/kepler/repositories/kepler`. The clone carries the real `origin` URL (kepler
   resolves repos by remote URL); re-running `seed` updates it from the host.
-- **In-guest fetch via TPM deploy key**: the guest has an emulated TPM (swtpm), and
+- **In-guest git via the TPM key**: the guest has an emulated TPM (swtpm), and
   provisioning creates a **non-exportable** key in it — a compromised guest can use the
-  key while running but never steal it. Provision prints the public half; add it on
-  GitHub as a **read-only, per-repo deploy key** and `git fetch origin` works from
-  inside for those repos. Keep it read-only (pushes stay host-side) and **never**
-  register it as an account signing key — a guest-usable signing key means forged
-  "Verified" commits. The swtpm state dies with the domain (`destroy` removes it), so a
-  rebuild means registering a fresh key — deregister the old one.
+  key while running but never steal it. Provision prints the public half; register it on
+  GitHub as an **account SSH (authentication) key** and both `git fetch` and `git push`
+  work from inside, for every repo the account can reach. **Never** add it as a signing
+  key — a guest-usable signing key means forged "Verified" commits — and note that the
+  guest disables signing globally anyway. The swtpm state dies with the domain (`destroy`
+  removes it), so a rebuild means registering a fresh key — deregister the old one.
+
+  The key places no limit on what the guest may push, so that job belongs to the agent's
+  permission layer: `permissions.ask` entries plus `autoMode.soft_deny` rules in
+  `profiles/agent-vm/home/.claude/settings.json` force an explicit human confirmation for
+  any push or GitHub-mutating command. Those rules are the control — keep them in place.
 - **Read-only `gh` token** so agents can read issues, PRs, CI runs, and repo metadata.
   `provision.sh` **prompts** for it (early in the run, before the slow steps) when there
   is no valid token or the current one expires within 30 days; paste-and-forget, nothing
@@ -160,8 +165,9 @@ read-only `gh` token (API).
   Provisioning deliberately skips `gh auth setup-git`, which would make `gh` git's HTTPS
   credential helper and turn the token into a git path — git stays on the TPM key. Revoke
   by deleting the PAT on GitHub; `gh auth logout` clears the guest's copy.
-- Work leaves via the host: `agent-vm fetch [--repo name] <branch>` → `vm/<branch>` on the
-  host. Review and push from the host, which has the credentials.
+- Work can leave via the host rather than being pushed from the guest:
+  `agent-vm fetch [--repo name] <branch>` → `vm/<branch>` on the host, to review and push
+  there. Still the right route when you want the diff in front of you first.
 
 Its only real credentials are the agents' own logins (Claude, codex, GitKraken), which the
 agents need to reach their APIs anyway.
@@ -205,7 +211,7 @@ The guest never runs `./install`. That repo's dotbot base is desktop-shaped (swa
 waybar, weechat, plasma) and cannot be subsetted — a profile can override a base link but
 never remove one — and three base links actively break this guest: `~/.bashrc` does not
 source `~/.bashrc.d/*`, so mise's shims and `SSH_ASKPASS` would disappear; `~/.ssh/config`
-would drop the `PKCS11Provider` block the TPM deploy key needs, and the next provision
+would drop the `PKCS11Provider` block the TPM key needs, and the next provision
 would append into the checkout through the symlink; `~/.claude/settings.json` would import
 a host sandbox allowlist of paths that mean nothing here.
 
@@ -419,9 +425,12 @@ Kepler's full e2e suite is not part of provisioning — agents run it in worktre
 
 ## Not in the guest, deliberately
 
-Signing key · push-capable SSH keys · any write-capable GitHub token · any host filesystem mount · the host's
+Signing key · any write-capable GitHub API token · any host filesystem mount · the host's
 `~/.claude/settings.json` (its sandbox allowlist is full of host paths that mean nothing
 here, and the VM is already the boundary).
+
+The SSH key *can* push — see the credential model — so pushes are held back by the agent's
+permission rules rather than by the credential.
 
 ## Known gaps
 

@@ -49,17 +49,16 @@ sudo dnf install -y -q \
 sudo dnf install -y -q /usr/bin/xdpyinfo
 
 # --- git identity ---------------------------------------------------------------
-# ONE global identity for every repo in the guest. This used to be three repo-local
-# `git config` calls in the GitLens block, which reached exactly the repo this script
-# clones: kepler and gh create clones it never sees, and those ended up with no identity
-# at all (a commit in them fails outright) while others carried whatever a tool happened
-# to write into .git/config. Global is what every future clone inherits for free.
+# ONE global identity for every repo in the guest. Repo-local `git config` calls cannot
+# do this job: kepler and gh create clones this script never sees, which would be left
+# with no identity at all (a commit in them fails outright) or with whatever a tool
+# happened to write into .git/config. Global is what every future clone inherits for free.
 #
 # Name and email come from the HOST (agent-vm's run_provision), never hardcoded here:
 # this repo is public, and the correct address is per-machine — the dotfiles work profile
 # resolves a work email, personal a personal one. It has to be a REAL, routable address:
-# guest commits come back with `agent-vm fetch` and are pushed from the host, so a
-# placeholder like agent-vm@localhost links to no account and lands on a real remote as a
+# guest commits reach real remotes — pushed from here, or via `agent-vm fetch` and the
+# host — so a placeholder like agent-vm@localhost would link to no account and land as a
 # dead address. Provenance is already legible from the wip/* branch namespace.
 step 'Configuring git identity'
 if [[ -n ${GUEST_GIT_NAME:-} && -n ${GUEST_GIT_EMAIL:-} ]]; then
@@ -98,7 +97,7 @@ done
 # it was launched. Deliberately NOT exported as GH_TOKEN in ~/.bashrc.d: that would only
 # reach things spawned through bash, and would put the token in /proc/<pid>/environ.
 # Deliberately NOT `gh auth setup-git`: that makes gh git's HTTPS credential helper and turns
-# the token into a git path. Git stays on the TPM deploy key. See README.md's credential model.
+# the token into a git path. Git stays on the TPM key. See README.md's credential model.
 step 'Configuring gh'
 GH_TOKEN_MIN_DAYS=${GH_TOKEN_MIN_DAYS:-30}
 
@@ -141,7 +140,7 @@ if ((gh_prompt)); then
       Checks, Commit statuses, Discussions, Deployments
 
   Grant nothing write-capable: a guest can exfiltrate this token, unlike the TPM
-  deploy key. Fine-grained PATs against an org may need org approval.
+  key. Fine-grained PATs against an org may need org approval.
 
 EOF
 		printf '  Paste token (empty to skip): ' >&2
@@ -314,13 +313,17 @@ else
 fi
 codex --version >/dev/null || { echo 'error: codex failed to run after install' >&2; exit 1; }
 
-# --- TPM-resident git deploy key ----------------------------------------------
+# --- TPM-resident git key -------------------------------------------------------
 # The guest has an emulated TPM (swtpm on the host). A key created in it is
 # NON-EXPORTABLE: a compromised guest can use it while running but never steal it.
-# The public half is printed at the end — register it on GitHub as a READ-ONLY
-# per-repo deploy key so the guest can `git fetch` private repos itself. Pushes
-# stay host-side (`agent-vm fetch`), and it must never be an account signing key.
-step 'TPM-resident git deploy key'
+# The public half is printed at the end — register it on GitHub as an account SSH
+# AUTHENTICATION key, which lets the guest fetch and push for itself. Never add it as a
+# signing key: a guest-usable signing key means forged "Verified" commits.
+#
+# The key grants whatever the account can reach, so what holds a push back is the
+# permission layer: the ask rules and autoMode soft-denies in
+# profiles/agent-vm/home/.claude/settings.json require a human to confirm one.
+step 'TPM-resident git key'
 PKCS11_LIB=/usr/lib64/pkcs11/libtpm2_pkcs11.so
 TPM_PUBKEY=''
 if [[ -e /dev/tpmrm0 ]]; then
@@ -376,7 +379,7 @@ EOF
 	mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
 	if ! grep -q 'PKCS11Provider' "$HOME/.ssh/config" 2>/dev/null; then
 		cat >> "$HOME/.ssh/config" <<EOF
-# TPM-resident deploy key — read-only fetch of registered private repos.
+# TPM-resident account key — fetch and push, non-exportable.
 Host github.com
 	User git
 	PKCS11Provider $PKCS11_LIB
@@ -387,7 +390,7 @@ EOF
 	TPM_PUBKEY=$(sg tss -c "ssh-keygen -D $PKCS11_LIB" 2>/dev/null | head -1) || true
 	[[ -n $TPM_PUBKEY ]] || echo 'warning: TPM key exists but public key could not be read' >&2
 else
-	echo 'note: no TPM device — recreate the VM with VM_TPM=1 to enable the in-guest deploy key' >&2
+	echo 'note: no TPM device — recreate the VM with VM_TPM=1 to enable the in-guest git key' >&2
 fi
 
 # --- persistent state disk ------------------------------------------------------
@@ -492,7 +495,7 @@ pnpm install --frozen-lockfile
 # dotbot base is desktop-shaped (sway, i3, waybar, weechat, plasma) and three of its base
 # links actively break this guest — ~/.bashrc does not source ~/.bashrc.d/*, so mise's
 # shims and SSH_ASKPASS would vanish; ~/.ssh/config would drop the PKCS11Provider block
-# the TPM deploy key needs; ~/.claude/settings.json would import a host sandbox allowlist.
+# the TPM key needs; ~/.claude/settings.json would import a host sandbox allowlist.
 #
 # Symlinks rather than copies so an edit made in the guest lands in the checkout and can
 # be brought home with `agent-vm dotfiles pull`.
@@ -659,8 +662,8 @@ echo "repos:  $REPOS_DIR"
 echo "state:  $STATE_MNT (survives rebuild)"
 if [[ -n $TPM_PUBKEY ]]; then
 	echo
-	echo 'TPM deploy key — add as a READ-ONLY deploy key on each private repo the guest'
-	echo 'may fetch (github repo -> Settings -> Deploy keys). Never as a signing key.'
+	echo 'TPM key — add as an account SSH authentication key (github -> Settings -> SSH'
+	echo 'and GPG keys -> New SSH key, type Authentication). Never as a signing key.'
 	echo
 	echo "  $TPM_PUBKEY"
 fi
