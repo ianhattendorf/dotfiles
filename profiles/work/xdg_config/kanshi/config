@@ -1,0 +1,39 @@
+# Output arrangements for the Framework Laptop 16 (work profile).
+#
+# kanshi owns geometry only — enable/mode/position/scale/adaptive_sync. Wallpaper,
+# render_bit_depth, subpixel and workspace assignment stay in sway's profile.conf,
+# because they do not vary by desk.
+#
+# A profile matches when exactly the outputs it lists are connected, so each desk
+# gets its own arrangement and kanshi reapplies on hotplug — no file swapping and
+# no `swaymsg reload`.
+#
+# External monitors are matched by identifier ("make model serial") rather than by
+# connector name, because the connector moves with the port: the office QHD showed
+# up on DP-3 (port 4) after previously being configured as DP-1 (graphics module),
+# which silently dropped its config. The internal panel is matched as eDP-2, which
+# does not move.
+#
+# To capture a new desk:
+#   swaymsg -t get_outputs | grep -E '"(name|make|model|serial)"|"(x|y|scale|width|height|refresh)"'
+
+# Home desk. Ported from the connector-name config that used to live in
+# profile.conf; the monitors' identifiers are not known yet, so this still matches
+# on DP-4/DP-1. Re-key it to "make model serial" next time this is set up at home.
+profile home {
+	output eDP-2 mode 2560x1600@165Hz position 0,607 scale 1.5
+	output DP-4 mode 3840x2160@160Hz position 1706,0 scale 1.5 adaptive_sync off
+	output DP-1 mode 3840x2160@120Hz position 4266,0 scale 1.5 adaptive_sync off
+}
+
+# Office desk: LG UHD on the left, LG QHD in the middle, laptop on the right.
+profile office-lg-uhd-qhd {
+	output "LG Electronics LG Ultra HD 0x0005CDAD" mode 3840x2160@60Hz position 0,0 scale 1.5 adaptive_sync off
+	output "LG Electronics LG HDR QHD 102NTDVA2554" mode 2560x1440@60Hz position 2560,0 scale 1 adaptive_sync off
+	output eDP-2 mode 2560x1600@165Hz position 5120,248 scale 1.5
+}
+
+# Undocked.
+profile laptop {
+	output eDP-2 mode 2560x1600@165Hz position 0,0 scale 1.5
+}

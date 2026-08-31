@@ -1,0 +1,29 @@
+#!/bin/sh
+
+set -eu
+
+if [ "${DOTFILES_DRY_RUN:-0}" = "1" ]; then
+  exit 0
+fi
+
+if [ "$(uname)" = "Darwin" ]; then
+  exit 0
+fi
+
+if [ ! -e "$HOME/.config/kanshi/config" ]; then
+  printf 'no kanshi config linked; skipping\n' >&2
+  exit 0
+fi
+
+if [ ! -f /usr/lib/systemd/user/kanshi.service ]; then
+  printf 'kanshi is not installed\n' >&2
+  exit 1
+fi
+
+# kanshi applies the output arrangement for whichever desk's monitors are
+# connected, and reapplies on hotplug. sway-systemd's session.sh imports
+# WAYLAND_DISPLAY and SWAYSOCK before starting sway-session.target, so the
+# service finds the compositor. `enable` is wrong here: the shipped unit is
+# WantedBy=graphical-session.target, which systemd refuses to start directly.
+systemctl --user daemon-reload
+systemctl --user add-wants sway-session.target kanshi.service
