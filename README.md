@@ -34,6 +34,8 @@ Supported profiles are `personal`, `work`, `work-mac`, `fedora`, `simba`, `nala`
 
 There is no hostname-based install or runtime selection. If you need machine- or context-specific behavior, add it under `profiles/<name>/...` and install it explicitly with `DOTFILES_PROFILE=<name>`.
 
+`profiles/agent-vm/` is the exception: it holds the agent-vm guest's Claude config but has no `install.d/profiles/agent-vm.yaml` and is not installable with `DOTFILES_PROFILE`. The guest never runs `./install` — it symlinks a curated subset of this repo from `vm/provision.sh`, because the dotbot base is desktop-shaped and several of its base links break that guest. See `vm/README.md`.
+
 ## Profile Inheritance
 
 A profile YAML may declare a parent on its first line as a YAML comment:

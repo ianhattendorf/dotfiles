@@ -486,17 +486,76 @@ fi
 step 'Installing GitLens dependencies'
 pnpm install --frozen-lockfile
 
-# --- guest Claude config --------------------------------------------------------------
-# Deliberately NOT the host's settings.json: that carries a sandbox allowlist full of
-# host paths that mean nothing here. The VM is the boundary.
-step 'Writing guest Claude config'
-mkdir -p "$HOME/.claude"
-if [[ ! -f $HOME/.claude/settings.json ]]; then
-	cat > "$HOME/.claude/settings.json" <<'EOF'
+# --- dotfiles -------------------------------------------------------------------------
+# A CURATED subset of the host's dotfiles, symlinked out of the checkout that
+# `agent-vm dotfiles push` seeds to ~/dotfiles. Never `./install` from that repo: its
+# dotbot base is desktop-shaped (sway, i3, waybar, weechat, plasma) and three of its base
+# links actively break this guest — ~/.bashrc does not source ~/.bashrc.d/*, so mise's
+# shims and SSH_ASKPASS would vanish; ~/.ssh/config would drop the PKCS11Provider block
+# the TPM deploy key needs; ~/.claude/settings.json would import a host sandbox allowlist.
+#
+# Symlinks rather than copies so an edit made in the guest lands in the checkout and can
+# be brought home with `agent-vm dotfiles pull`.
+step 'Linking dotfiles'
+DOTFILES_DIR=$HOME/dotfiles
+if [[ -d $DOTFILES_DIR/.git ]]; then
+	# Anything a hand-built guest already has at a target path is MOVED here, never
+	# deleted: the guest accumulated a real ~/.claude before it was repo-managed, and a
+	# provision run before `agent-vm dotfiles adopt` would otherwise destroy it.
+	preadopt=$HOME/.dotfiles-preadopt/$(date -u +%Y%m%dT%H%M%SZ)
+
+	link_dotfile() {
+		local target=$HOME/$1 src=$DOTFILES_DIR/$2
+		[[ -e $src ]] || { echo "warning: $2 missing from the checkout — skipped" >&2; return; }
+		# Already ours: relink unconditionally so a moved source is picked up.
+		if [[ -L $target ]]; then
+			ln -sfn "$src" "$target"
+			return
+		fi
+		if [[ -e $target ]]; then
+			mkdir -p "$preadopt/$(dirname "$1")"
+			mv "$target" "$preadopt/$1"
+			echo "warning: moved pre-existing ~/$1 to ${preadopt/#$HOME/\~}/$1" >&2
+			echo "         run 'agent-vm dotfiles adopt' from the host to keep it" >&2
+		fi
+		mkdir -p "$(dirname "$target")"
+		ln -sfn "$src" "$target"
+	}
+
+	# Editor + git ignores: no dependencies, useful the moment an agent opens a file.
+	link_dotfile .vimrc home/.vimrc
+	link_dotfile .vim home/vim
+	link_dotfile .gitignore home/.gitignore
+
+	# tmux: `agent-vm claude` runs the agents inside tmux here, and this config is what
+	# makes OSC 52 copy reach the host clipboard over ssh. Its status line and key
+	# bindings shell out to these scripts, so they come along; tmux-resurrect and
+	# tmux-continuum deliberately do not, and tmux.conf guards their run-shell lines.
+	link_dotfile .config/tmux/tmux.conf xdg_config/tmux/tmux.conf
+	for t in tmux-yank tmux-agent-next tmux-agent-prev tmux-agent-refresh; do
+		link_dotfile ".local/bin/$t" "xdg_bin/$t"
+	done
+
+	# Claude config, from the agent-vm profile — guest-specific by nature: it encodes the
+	# read-only gh token and the MCP-only path for GitHub writes, neither true of the host.
+	link_dotfile .claude/CLAUDE.md profiles/agent-vm/home/.claude/CLAUDE.md
+	link_dotfile .claude/settings.json profiles/agent-vm/home/.claude/settings.json
+	link_dotfile .claude/skills profiles/agent-vm/home/.claude/skills
+
+	[[ -d $preadopt ]] && echo "note: pre-existing files preserved under $preadopt" >&2
+	echo "linked from $DOTFILES_DIR"
+else
+	# Fallback so this script stays runnable standalone against a guest that has never
+	# been seeded. Only the Claude settings matter enough to synthesize.
+	echo "note: no checkout at $DOTFILES_DIR — run 'agent-vm dotfiles push' from the host" >&2
+	mkdir -p "$HOME/.claude"
+	if [[ ! -f $HOME/.claude/settings.json ]]; then
+		cat > "$HOME/.claude/settings.json" <<'EOF'
 {
 	"includeCoAuthoredBy": false
 }
 EOF
+	fi
 fi
 
 # --- smoke tests ------------------------------------------------------------------

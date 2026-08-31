@@ -13,6 +13,7 @@
 #   seed <path> [name]           push a host repo into the guest (for private repos)
 #   push [--repo name] [branch]  send the current HEAD to the guest
 #   fetch [--repo name] <branch> bring a guest branch back as vm/<branch>
+#   dotfiles <adopt|push|pull>   sync this dotfiles repo with the guest's checkout
 #   claude [args...]             run Claude Code in tmux inside the guest (auto mode)
 #   codex [args...]              run codex in tmux inside the guest
 #   fixtures                     rebuild the scenario repos
@@ -427,6 +428,7 @@ cmd_create() {
 	else
 		note "warning: KEPLER_HOST_REPO (${KEPLER_HOST_REPO:-unset}) not found — skipping kepler seed"
 	fi
+	dotfiles_push || note 'warning: dotfiles seed failed — provision will skip the linking step'
 
 	run_provision
 	eject_cloudinit_media
@@ -440,6 +442,10 @@ cmd_create() {
 cmd_provision() {
 	domain_running || die 'guest is not running'
 	sync_assets
+	# Refresh the guest's dotfiles checkout before provisioning links out of it, so a
+	# provision always installs the host's current state. Non-fatal: provision.sh skips
+	# its linking step when the checkout is absent.
+	dotfiles_push || note 'warning: dotfiles seed failed — provision will skip the linking step'
 	run_provision
 }
 
@@ -447,11 +453,15 @@ cmd_provision() {
 # credentials, so anything it can't clone anonymously gets pushed in from the host.
 # Re-running seed updates the guest to the host's current state.
 cmd_seed() {
-	local src=${1:?usage: agent-vm seed <host-repo-path> [name]}
+	# --dest puts the checkout somewhere other than kepler's repo dir. The dotfiles seed
+	# needs it: anything under $GUEST_REPOS is picked up by kepler as a workable repo.
+	local dest_override=''
+	[[ ${1:-} == --dest ]] && { dest_override=${2:?--dest needs a guest path}; shift 2; }
+	local src=${1:?usage: agent-vm seed [--dest path] <host-repo-path> [name]}
 	src=$(cd "$src" 2>/dev/null && pwd) || die "no such directory: $1"
 	git -C "$src" rev-parse --git-dir >/dev/null 2>&1 || die "$src is not a git repository"
 	local name=${2:-$(basename "$src")}
-	local dest=$GUEST_REPOS/$name
+	local dest=${dest_override:-$GUEST_REPOS/$name}
 	local ip origin_url def_branch cur_branch
 	ip=$(guest_ip) || die 'guest not reachable'
 
@@ -510,6 +520,92 @@ cmd_push() {
 
 	# Only reinstall when the lockfile actually moved — pnpm install isn't free.
 	vm_ssh "cd $dest && git diff --quiet HEAD@{1} HEAD -- pnpm-lock.yaml 2>/dev/null || pnpm install --frozen-lockfile"
+}
+
+# --- dotfiles round trip ----------------------------------------------------------
+# The guest gets a curated subset of these dotfiles (see vm/provision.sh's linking step).
+# It is a real checkout, seeded from the HOST rather than cloned from the public remote:
+# the host is the source of truth and is routinely ahead of it, and seeding gives the
+# return path below for free without the guest needing any credential.
+#
+# It lives at ~/dotfiles, NOT under ~/.agent-vm — sync_assets wipes that directory on
+# every provision, which would eat uncommitted guest edits.
+DOTFILES_HOST_REPO=${DOTFILES_HOST_REPO:-$HOME/dotfiles}
+DOTFILES_GUEST_DIR=/home/$VM_USER/dotfiles
+# Guest-side work lands here so it can never fast-forward onto the host's branch by
+# accident; the host fetches it to vm/dotfiles for review.
+DOTFILES_GUEST_BRANCH=vm/guest
+
+cmd_dotfiles() {
+	local action=${1:?usage: agent-vm dotfiles <adopt|push|pull>}
+	shift
+	case $action in
+	adopt) dotfiles_adopt "$@" ;;
+	push) dotfiles_push "$@" ;;
+	pull) dotfiles_pull "$@" ;;
+	*) die "unknown dotfiles action: $action (adopt|push|pull)" ;;
+	esac
+}
+
+# One-time capture of config that was created by hand INSIDE the guest, before the
+# linking step replaces those paths with symlinks. Copies host-ward only — the guest is
+# untouched — so the diff can be reviewed and committed before anything is overwritten.
+dotfiles_adopt() {
+	local ip dest=$DOTFILES_HOST_REPO/profiles/agent-vm/home/.claude
+	ip=$(guest_ip) || die 'guest not reachable'
+	mkdir -p "$dest"
+	note "Adopting guest ~/.claude -> ${dest#"$DOTFILES_HOST_REPO"/}"
+	# Explicit list, not the whole directory: ~/.claude also holds credentials, session
+	# transcripts, plugin caches and history that must never reach the repo.
+	scp -i "$VM_SSH_KEY" "${SSH_OPTS[@]}" -q -r \
+		"$VM_USER@$ip:.claude/CLAUDE.md" \
+		"$VM_USER@$ip:.claude/settings.json" \
+		"$VM_USER@$ip:.claude/skills" \
+		"$dest/"
+	note 'Adopted. Review and commit before running provision:'
+	printf '    git -C %s status --short profiles/agent-vm\n' "$DOTFILES_HOST_REPO"
+}
+
+dotfiles_push() {
+	[[ -d $DOTFILES_HOST_REPO/.git ]] || die "no dotfiles repo at $DOTFILES_HOST_REPO"
+	# cmd_seed ends in `checkout -qf`, which would discard uncommitted guest edits — and
+	# editing a linked file in the guest is exactly how those appear. Refuse with a useful
+	# message instead of letting the force-checkout eat them. (The push itself would also
+	# fail on a dirty worktree, since receive.denyCurrentBranch=updateInstead requires a
+	# clean one, but the git error does not say what to do about it.)
+	if vm_ssh "test -d '$DOTFILES_GUEST_DIR/.git'" 2>/dev/null; then
+		vm_ssh "test -z \"\$(git -C '$DOTFILES_GUEST_DIR' status --porcelain)\"" \
+			|| die "guest dotfiles checkout has uncommitted changes — run 'agent-vm dotfiles pull' first"
+	fi
+	cmd_seed --dest "$DOTFILES_GUEST_DIR" "$DOTFILES_HOST_REPO"
+}
+
+# Bring guest-side edits home. Commits whatever is dirty in the guest checkout onto
+# DOTFILES_GUEST_BRANCH first — editing a linked file in the guest writes straight into
+# the checkout, so uncommitted changes are the normal case, not an error.
+dotfiles_pull() {
+	local ip
+	ip=$(guest_ip) || die 'guest not reachable'
+	vm_ssh "test -d '$DOTFILES_GUEST_DIR/.git'" \
+		|| die "no dotfiles checkout in the guest — run 'agent-vm dotfiles push' first"
+
+	# Commit only if something changed; an empty commit would churn the branch on every
+	# pull. The guest's global git identity is set by provisioning.
+	vm_ssh "cd '$DOTFILES_GUEST_DIR' \
+		&& git checkout -q -B '$DOTFILES_GUEST_BRANCH' \
+		&& if ! git diff --quiet HEAD || [ -n \"\$(git status --porcelain)\" ]; then \
+			git add -A && git commit -q -m \"agent-vm: guest changes \$(date -u +%Y-%m-%dT%H:%MZ)\"; \
+		fi"
+
+	note "Fetching $DOTFILES_GUEST_BRANCH -> vm/dotfiles"
+	git_over_ssh -C "$DOTFILES_HOST_REPO" fetch \
+		"ssh://$VM_USER@$ip$DOTFILES_GUEST_DIR" \
+		"+refs/heads/$DOTFILES_GUEST_BRANCH:refs/heads/vm/dotfiles"
+	git -C "$DOTFILES_HOST_REPO" --no-pager log --oneline -5 vm/dotfiles
+	local base
+	base=$(git -C "$DOTFILES_HOST_REPO" symbolic-ref --short HEAD)
+	git -C "$DOTFILES_HOST_REPO" --no-pager diff --stat "$base"..vm/dotfiles || true
+	note "Review with: git diff $base..vm/dotfiles"
 }
 
 cmd_fetch() {
@@ -660,6 +756,7 @@ provision) cmd_provision "$@" ;;
 seed) cmd_seed "$@" ;;
 push) cmd_push "$@" ;;
 fetch) cmd_fetch "$@" ;;
+dotfiles) cmd_dotfiles "$@" ;;
 claude) cmd_claude "$@" ;;
 codex) cmd_codex "$@" ;;
 fixtures) cmd_fixtures "$@" ;;

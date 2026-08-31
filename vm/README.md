@@ -195,6 +195,55 @@ disabled globally (`commit.gpgsign`, `tag.gpgsign`, `tag.forceSignAnnotated`) be
 guest holds no signing key by design — tags included, since the host gitconfig sets
 `tag.forceSignAnnotated`.
 
+## Dotfiles in the guest
+
+A **curated subset** of the host dotfiles is symlinked into the guest by provisioning:
+`~/.vimrc`, `~/.vim`, `~/.gitignore`, the tmux config plus the four `tmux-*` scripts its
+status line and bindings call, and the Claude config from `profiles/agent-vm/`.
+
+The guest never runs `./install`. That repo's dotbot base is desktop-shaped (sway, i3,
+waybar, weechat, plasma) and cannot be subsetted — a profile can override a base link but
+never remove one — and three base links actively break this guest: `~/.bashrc` does not
+source `~/.bashrc.d/*`, so mise's shims and `SSH_ASKPASS` would disappear; `~/.ssh/config`
+would drop the `PKCS11Provider` block the TPM deploy key needs, and the next provision
+would append into the checkout through the symlink; `~/.claude/settings.json` would import
+a host sandbox allowlist of paths that mean nothing here.
+
+tmux-resurrect and tmux-continuum are deliberately absent — session persistence in a
+disposable guest is not wanted — so `tmux.conf` guards their `run-shell` lines.
+
+### Round trip
+
+The guest holds a real checkout at `~/dotfiles`, **seeded from the host** rather than
+cloned from the public remote: the host is the source of truth and is routinely ahead of
+it, and seeding gives the return path below for free without the guest holding any
+credential. It is at `~/dotfiles` and not under `~/.agent-vm` because `sync_assets` wipes
+that directory on every provision.
+
+| Direction | Command |
+|---|---|
+| host → guest | `agent-vm dotfiles push` (also run by `create` and `provision`) |
+| guest → host | `agent-vm dotfiles pull` |
+| capture hand-built guest config | `agent-vm dotfiles adopt` |
+
+`pull` commits whatever is dirty in the guest checkout onto `vm/guest` — editing a linked
+file in the guest writes straight into it, so uncommitted changes are the normal case —
+then fetches that branch home as `vm/dotfiles` for review. This works because provisioning
+gives the guest a global git identity with signing off; without it the in-guest commit
+would fail. `push` refuses while the guest checkout is dirty, since it ends in a force
+checkout.
+
+`adopt` is the one-time capture that precedes the first link: it copies an explicit list
+(`CLAUDE.md`, `settings.json`, `skills/`) out of the guest's `~/.claude` into
+`profiles/agent-vm/`, never the whole directory — that also holds credentials, session
+transcripts and plugin caches. Provisioning independently refuses to clobber: a real file
+sitting at a link target is moved to `~/.dotfiles-preadopt/<timestamp>/`, not deleted.
+
+Guest Claude config lives in `profiles/agent-vm/` because it encodes the guest's
+credential model — the read-only `gh` token and the MCP-only path for GitHub writes are
+not true of the host. There is deliberately no `install.d/profiles/agent-vm.yaml`: it
+would look dotbot-installable, and installing it would drag in the base links above.
+
 ## Disks
 
 | File | Survives `destroy`? |
