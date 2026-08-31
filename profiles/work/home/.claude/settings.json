@@ -404,8 +404,13 @@
     ]
   },
   "effortLevel": "xhigh",
+  "tui": "fullscreen",
   "disableAutoMode": "disable",
   "theme": "auto",
   "autoCompactEnabled": false,
-  "tui": "fullscreen"
+  "modelSettings": {
+    "claude-opus-5": {
+      "effortLevel": "medium"
+    }
+  }
 }
