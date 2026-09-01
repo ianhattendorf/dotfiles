@@ -82,6 +82,10 @@ Org-wide constants (hold in every GK repo, no profile needed):
 
 ## 1. Intake & verify
 
+- If the task already carries an investigation note (from `/investigate`), intake and
+  verification are done — do not re-derive them. Run the freshness check above against
+  the note's recorded baseline sha first, then start at issue creation below (the note
+  carries a draft title).
 - Pull the source material into context directly: GitKraken MCP tools for issue detail,
   Slack tools for threads. Do not work from a paraphrase.
 - Verify the problem is real before anything else: reproduce it, or trace the code path
@@ -308,21 +312,14 @@ feedback on the implementation pass, not as a reason to skip the gate next time.
   plus a suggested reply if one is useful. Do not post to the thread yourself (same
   rule as human PR comments: the human speaks to humans).
 
-**After the PR is open:** review feedback — human or bot (Copilot, CI annotations) —
-re-enters the loop at step 5's fix-or-reject rules. A PR comment is a finding, not an
-order: fix it if it names a concrete failure scenario, otherwise decline it with a
-rationale. Fixes go through gates (step 4) and the comment audit bar before pushing.
+**After the PR is open:** feedback rounds — reviewer comments (human or bot), CI
+failures, requested changes — run `/address-feedback`
+(`~/.claude/skills/address-feedback/SKILL.md`). It applies step 5's fix-or-reject
+rules to each thread, holds fixes to the gates and the comment-audit bar, and owns
+the reply etiquette (bot comments answered directly; replies to humans handed off,
+never posted). A ship-issue task's notes are its "own PR, task notes live" entry
+case.
 
-Who replies depends on who commented. **Bot/agent comments**: the agent may reply
-directly, or simply decline. **Human comments**: the agent NEVER posts the reply.
-For each human comment that warrants a response, hand it to the human in chat:
-
-- TL;DR of the human's comment + a link to it.
-- A suggested response, written to be postable as-is — plain and direct, no
-  AI-sounding voice (no "Great point!", no hedging boilerplate, no bullet-pointed
-  essay for a one-line question).
-- TL;DR of that suggested response.
-
-The human posts it (or doesn't) themselves. Do not request bot reviewers as part of
-opening the PR — the pre-PR loop already outperforms them, and requesting reviewers
-is a GitHub write the tooling cannot perform anyway.
+Do not request bot reviewers as part of opening the PR — the pre-PR loop already
+outperforms them, and requesting reviewers is a GitHub write the tooling cannot
+perform anyway.
