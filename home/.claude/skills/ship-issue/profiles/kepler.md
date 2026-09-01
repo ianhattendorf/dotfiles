@@ -1,6 +1,10 @@
 # ship-issue profile: kepler
 
-- **Gates**: `pnpm typecheck`; `pnpm exec vitest run <the tests covering the change>`
+- **Gates**: `pnpm typecheck`; `pnpm lint` (`oxlint --type-aware --type-check`;
+  `.oxlintrc.json`'s `no-unused-vars` only ignores underscore-prefixed function
+  args, not destructured vars — a `const { x: _x, ...rest } = y` strip needs
+  `// oxlint-disable-next-line typescript/no-unused-vars` above it, precedented
+  in `adapter-spawn.ts`); `pnpm exec vitest run <the tests covering the change>`
   (existing tests over edited code, not just test files you edited — NEVER
   `pnpm test -- <file>`; the filter is dropped and the whole suite runs);
   `pnpm design` if any UI was touched; `pnpm format:check`.

@@ -304,7 +304,11 @@ feedback on the implementation pass, not as a reason to skip the gate next time.
   title and body to chat first so the human can see what will be created. The body
   covers: the problem (link the issue), the approach and why, invariants touched, how
   it was verified (gates + live verification + human run), and any noted out-of-scope
-  findings.
+  findings. Describe the shipped end state, not the review process that produced it —
+  an in-scope bug a review round caught and fixed is just part of the approach, not a
+  callout; that narrative already lives in the task notes (step 5's rejection
+  rationale, this step's final state note). Only out-of-scope findings get named in
+  the body, because those are the ones asking the human for a scope decision.
 - Attach the PR to the task (`attach_link`) and close out the task notes with a final
   state note.
 - If the task originated from a Slack thread: remind the human, in chat, to reply to
