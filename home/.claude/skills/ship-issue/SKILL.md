@@ -1,6 +1,6 @@
 ---
 name: ship-issue
-description: End-to-end loop for shipping a change in a GitKraken-owned repo (Kepler, vscode-gitlens, gkcli, core-tools, …) — intake/verify, plan with human approval, implement, gates, converging code review, simplify pass, live verification, human live run, PR. Use when picking up a GitHub issue, a Slack thread, or a self-noticed problem in a GK repo and carrying it to an open PR. Also use when resuming a task already mid-loop (start at the step the task notes say is next).
+description: End-to-end loop for shipping a change in a GitKraken-owned repo (Kepler, vscode-gitlens, gkcli, core-tools, …) — intake/verify, approach decision when the how is open, plan with human approval, implement, gates, converging code review, simplify pass, live verification, human live run, PR. Use when picking up a GitHub issue, a Slack thread, or a self-noticed problem in a GK repo and carrying it to an open PR. Also use when resuming a task already mid-loop (start at the step the task notes say is next).
 ---
 
 # Ship an issue (GitKraken repos)
@@ -28,9 +28,11 @@ this (it costs one fetch and two logs — do not skip it because the pause "felt
    linked issue's current state (closed? new comments? linked PRs?).
 2. **Nothing relevant landed** → proceed from the recorded step.
 3. **Relevant commits landed** → read them and classify:
-   - **Premise gone** (the bug was fixed, the feature shipped another way): stop and
-     report to the human with the evidence — propose closing the issue and abandoning
-     the branch. Do not keep implementing to salvage sunk work.
+   - **Premise gone** (the bug was fixed, the feature shipped another way): stop,
+     report the evidence to the human, and use `AskUserQuestion` to confirm before
+     acting — e.g. "Close the issue and abandon the branch" (recommended) / "Keep
+     the branch, I want to look closer" / "Something else". Do not keep implementing
+     to salvage sunk work while waiting on the answer.
    - **Plan invalidated** (the seams the plan names were refactored, an invariant
      changed): back to step 2 for a plan revision with human approval.
    - **Mechanical overlap only**: rebase onto `origin/main` NOW, not at PR time —
@@ -71,6 +73,18 @@ Org-wide constants (hold in every GK repo, no profile needed):
   on the MCP anyway so the loop behaves identically in both. The MCP covers: kepler,
   vscode-gitlens, gkcli, core-tools, gitkraken-client, api-service, drafts-service,
   gitkraken.dev.
+- Every issue/PR write is confirmed in **two turns, in this order**. First, a plain
+  chat message carrying the draft: the title on its own line, then the body, the whole
+  thing inside one fenced code block (a longer fence than any fence inside the body) so
+  the human can copy the raw markdown to edit it. Second, `AskUserQuestion` with a
+  one-sentence question that points back at the draft — "File the issue drafted
+  above?" / "Open the PR drafted above?" — and two options, e.g. "File it as drafted"
+  (recommended) / "Let me edit it first". The question field and the option
+  descriptions never contain the title or body: that field renders as plain text, so
+  a body pasted into it comes out as raw markdown symbols, cannot be copied for
+  editing, and is gone from the screen once the question resolves. If the draft is
+  not already in chat when you are about to ask, print it first; do not fold the two
+  turns into one.
 - Pushes go over SSH; the `gh` token plays no part. A push always needs explicit human
   confirmation — that is a permission rule, not a capability limit, so never treat a
   successful `git push` as evidence it was pre-approved.
@@ -86,17 +100,20 @@ Org-wide constants (hold in every GK repo, no profile needed):
   verification are done — do not re-derive them. Run the freshness check above against
   the note's recorded baseline sha first, then start at issue creation below (the note
   carries a draft title).
+- If the task carries an approach decision note (from `/approach`) but no issue yet, the
+  issue's problem statement and acceptance criteria come from that note's context —
+  file the issue from them, then step 2 plans against the same note.
 - Pull the source material into context directly: GitKraken MCP tools for issue detail,
   Slack tools for threads. Do not work from a paraphrase.
 - Verify the problem is real before anything else: reproduce it, or trace the code path
   to the root cause. If it cannot be verified, report that and stop — do not proceed on
   an unverified premise.
 - If no GitHub issue exists, create one via the GitKraken MCP `issues_create`, per the
-  write path above. Print the exact title and body to chat first so the human
-  can see what will be created, and pass `assignees: ["ianhattendorf"]`. The issue
-  body must include **acceptance criteria** — later review rounds are judged against
-  these, and scope disputes are settled by them. Ask the human to set project-board
-  status ("In Progress"), once, alongside the creation announcement.
+  write path above — draft printed to chat, then the one-sentence `AskUserQuestion` —
+  and pass `assignees: ["ianhattendorf"]`. The issue body must include **acceptance
+  criteria** — later review rounds are judged against these, and scope disputes are
+  settled by them. Ask the human to set project-board status ("In Progress"), once,
+  alongside the creation announcement.
 - Attach the issue to the task (`attach_link`).
 - Record the verdict as a task note: repro steps, root cause, and explicitly the scope
   you decided NOT to touch. If the task originated from a Slack thread, include the
@@ -107,15 +124,36 @@ Org-wide constants (hold in every GK repo, no profile needed):
 **Skip when** the change is mechanical, single-file, and touches none of the invariants
 in the profile's invariants source. When skipping, say so and why in one line.
 
-Otherwise, plan in **plan mode** so the human approves before implementation:
+### Decide the approach before planning it
 
-- Start from the verification note — plan the *how*, do not re-investigate the *what*.
+A plan bakes in an approach — by the time it names files and seams, the how has been
+chosen, implicitly, by whichever seam was found first — and plan-mode approval is a
+yes/no on one plan, the wrong shape for a choice between approaches. So, before plan
+mode, check the task for an **approach decision note** (from `/approach`,
+`~/.claude/skills/approach/SKILL.md`):
+
+- **A note exists** → plan against it. Do not reopen the choice; its rejected options
+  are settled.
+- **No note, and any of these hold** → run `/approach` first and come back here with
+  its note: more than one credible seam could host the change; the change touches an
+  invariant in the profile's invariants source; it introduces a new concept (an event,
+  a table or migration, a setting, a flag, a wire route); the intake verdict was
+  "needs a human decision"; or the human asked to settle direction first.
+- **Otherwise** → say in one line that the approach is uncontested and what it is,
+  then plan.
+
+Then plan in **plan mode** so the human approves before implementation:
+
+- Start from the verification note (and the approach note, when one exists) — plan
+  the *how*, do not re-investigate the *what* or re-decide the approach.
 - The plan must name: the files/seams to change, **which repo invariants the change
   touches** (check the profile's invariants source), which gates apply, and the
   intended test surface (which test files, which extra gates, what live verification
   will cover).
-- Refinement happens in the plan-approval loop. Do not begin implementation without
-  approval.
+- Refinement happens in the plan-approval loop, *within* the decided approach. If
+  approval feedback questions the approach itself rather than the plan, that is a
+  return to `/approach` with the feedback as evidence, not a plan revision. Do not
+  begin implementation without approval.
 
 ### Feature scale
 
@@ -125,7 +163,8 @@ folder, record a pointer + approval status as a task note, and have the human re
 the file itself. A feature-scale plan must contain:
 
 - **Settled decisions** with the reason each was settled (so later sessions don't
-  re-litigate them).
+  re-litigate them). The approach decision note seeds this list — its chosen option
+  and every rejected one, with their reasons, are the first settled decisions.
 - **Phases with sizing**, each independently gateable, and the **demo-able milestone**
   named explicitly.
 - **An out-of-scope backlog** (ordered, with known traps documented per item). This is
@@ -211,9 +250,11 @@ For each finding, decide **fix or reject** by these rules:
 After fixing, return to step 4, then review again. **Convergence** is a round with no
 findings, or one whose findings are all rejected under the rules above — cap at ~3
 rounds total. If rounds oscillate (a round re-raises what the previous round's fix
-introduced), stop patching — the fix shape is wrong; reconsider the approach,
-escalating to `/code-review high` with fresh eyes (optionally a different model — this
-is the one place model diversity earns its cost) before writing more code.
+introduced), stop patching — the fix shape is wrong. Escalate to `/code-review high`
+with fresh eyes (optionally a different model — this is the one place model diversity
+earns its cost) to characterise what the shape cannot accommodate, then take it to
+`/approach` with the failed shape recorded as a rejected option and the findings as
+evidence, and re-plan (step 2) before writing more code.
 
 ## 6. Simplify — once
 
@@ -299,12 +340,12 @@ feedback on the implementation pass, not as a reason to skip the gate next time.
   `git branch -m <issue#>-<slug>` (the MCP `git_branch` cannot rename; a local rename
   before any push is safe, though the task metadata keeps the old name, so a later
   `discard_worktree` may leave the renamed branch behind — delete it by hand then).
-- Open the PR via the GitKraken MCP `pull_request_create`, per the write path above.
-  Do not assign the PR — only the issue gets assigned. Print the exact
-  title and body to chat first so the human can see what will be created. The body
-  covers: the problem (link the issue), the approach and why, invariants touched, how
-  it was verified (gates + live verification + human run), and any noted out-of-scope
-  findings. Describe the shipped end state, not the review process that produced it —
+- Open the PR via the GitKraken MCP `pull_request_create`, per the write path above —
+  draft printed to chat, then the one-sentence `AskUserQuestion`. Do not assign the PR
+  — only the issue gets assigned. The body covers: the problem (link the issue), the approach and why — lifted from the approach
+  decision note when one exists, with one line per rejected option, since those are
+  what a reviewer would otherwise propose — invariants touched, how it was verified
+  (gates + live verification + human run), and any noted out-of-scope findings. Describe the shipped end state, not the review process that produced it —
   an in-scope bug a review round caught and fixed is just part of the approach, not a
   callout; that narrative already lives in the task notes (step 5's rejection
   rationale, this step's final state note). Only out-of-scope findings get named in

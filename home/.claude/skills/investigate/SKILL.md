@@ -16,7 +16,8 @@ Hard limits (the point of this skill vs. ship-issue):
 - **No fix, however small.** A one-line fix discovered during investigation goes in
   the note as the proposed fix, not into the tree. Read-only on the repo, except
   throwaway repro scaffolding that is reverted before the session ends.
-- **No plan.** Naming the root-cause seam is in scope; designing the change is
+- **No plan, and no approach.** Naming the root-cause seam is in scope; choosing
+  between ways to build the fix is `/approach`, and designing the chosen one is
   step 2 of ship-issue.
 
 ## 1. Intake
@@ -63,7 +64,8 @@ record it as a task note (`add_task_note`). The note's shape is the interface
 6. **Baseline**: repo, commit sha investigated at, and the date — ship-issue's
    freshness check re-validates against this before an issue is filed on it.
 7. **Next step**: usually "invoke /ship-issue; intake note exists — start at issue
-   creation", or "reply to the reporter asking for X", or "no action".
+   creation", or "invoke /approach first — more than one credible way to build this"
+   (say what the fork is), or "reply to the reporter asking for X", or "no action".
 
 If the verdict is `real — worth an issue` and the human says to proceed, that is
 `/ship-issue` from here on — this skill does not continue into it.

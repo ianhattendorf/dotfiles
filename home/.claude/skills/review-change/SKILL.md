@@ -28,8 +28,10 @@ confidence level than a full one, and the human must know which they got.
   forming opinions, not after. Spec = the linked issue's acceptance criteria.
 - **Branch or commit/range**: diff is `merge-base(target-branch)..head` (or the
   given range). No discussion to dedup. Spec: a linked issue if one is referenced;
-  otherwise ask the human what the change is meant to do — or, if they want a cold
-  read, review against correctness + invariants only and say so in the verdict.
+  otherwise use `AskUserQuestion` to ask what the change is meant to do — offer
+  "Cold read only (correctness + invariants, no stated intent)" as an option
+  alongside "Other" for the human to describe it — and say which you got in the
+  verdict.
 - **Raw diff/patch**: no checkout of the change → no gates, no live verification
   (steps 3, 5, 6 don't apply — static review only, named in the verdict).
   Uncommitted working-tree changes are NOT this case: the dirty tree is a checkout;
@@ -91,7 +93,9 @@ claims to do and the one or two places a regression would show, not a full audit
 
 Offer this when the change touches anything on the profile's never-skip list (UI,
 event-flow, terminal/agent paths) and look-and-feel judgment matters to the verdict
-— a reviewer approving UI they never saw is signing someone else's work. High level:
+— a reviewer approving UI they never saw is signing someone else's work. Use
+`AskUserQuestion` to offer it ("Do a live UI pass" / "Skip, static review is
+enough") rather than assuming either way. High level:
 
 1. Launch the change live (Kepler: `pnpm serve:isolate` in this worktree) and
    print the Remote access URL to chat.
