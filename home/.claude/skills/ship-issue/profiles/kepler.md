@@ -21,9 +21,17 @@
   `main` before kepler#2312 — that is a freshness-check finding (rebase onto
   `origin/main` per the resume check), NOT a reason to fall back to shared-dir
   serve.
-- **Human live run handoff**: run `pnpm serve:isolate` in the task worktree and
-  print the **Remote access URL** it emits to chat — the human opens it in their
-  local browser (tunnel; no ssh -X needed). `serve:isolate` gives this task worktree
+- **Human live run handoff**: run `pnpm serve:isolate -- --json-ready` in the task
+  worktree and print the **owner-token URL** built from its `KEPLER_READY` line to
+  chat: the `pairingUrl` host and port (serve picked the machine's LAN address, so
+  the human's browser on another machine can reach it) with `?token=<token>` in
+  place of the bootstrap — the `/live-inspect` skill has the one-line `jq`. NOT the
+  `Remote access URL` a plain launch prints: that carries a
+  `?bootstrap=` pairing token that is consumed by its first page load and expires
+  after 5 minutes, so a URL the agent's own sweep opened, or captured minutes
+  earlier, fails for the human with a bare "pair again". The owner token is
+  reusable, so the same URL serves the agent's sweep and the human's run. The human
+  opens it in their local browser (tunnel; no ssh -X needed). `serve:isolate` gives this task worktree
   its own branch-keyed data dir, seeded once from the VM's local data dir so login +
   repos carry over, and runs with `--isolated` so it never touches the shared `gk`
   auth session. This is what makes **concurrent live instances across task
