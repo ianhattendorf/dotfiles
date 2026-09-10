@@ -314,6 +314,7 @@ Three things make this survive a rebuild:
 | DHCP lease moves on rebuild | Reserved `VM_IP` keyed to the pinned `VM_MAC` |
 | Host key changes on rebuild | `/etc/ssh/ssh_host_*` persisted on the state disk |
 | Rebuild wipes `~/.kepler-server` | Symlinked onto the state disk, so `data/app.db` survives |
+| `kepler-server` and its children see no `DISPLAY` | An sshd `SetEnv` drop-in, since kepler's spawn is a bare non-interactive `ssh <host> <cmd>` that sources no shell rc — see [the display](#the-guests-display) |
 
 The daemon downloads `gk` on first boot from the GitKraken release manifest
 (`api.gitkraken.dev`) — public internet, so the egress rules don't interfere; it lands on
@@ -355,16 +356,62 @@ permissions rather than restore permissiveness — so when a fix lands, re-test 
 after `semodule -r` rather than assuming all of them came back. The host picks the same
 regression up whenever it takes 44.6+; it was still on 44.5 as of 2026-08-26.
 
+## The guest's display
+
+`provision.sh` runs a permanent headless X server: `Xvfb :20`, a `systemd --user` unit
+(`xvfb.service`) with linger enabled, so it is up from boot with no session attached. The
+provisioning smoke tests run on it, and so does anything an agent launches.
+
+Getting `DISPLAY` to the agents needed a second, separate fix. Kepler ships and starts
+`kepler-server` with a bare `ssh <host> <cmd>` — no PTY, no login shell — which sources
+**neither** `~/.bashrc` (interactive only) **nor** `~/.profile` (login only). So the daemon
+and every process under it, including the `playwright-electron` MCP server that kepler's
+live-UI verification drives, saw no `DISPLAY` at all and failed with `missing X server or
+$DISPLAY` on a guest that had one running the whole time. `~/.ssh/rc` cannot fix it either:
+it runs as its own process before the command execs, so nothing it exports survives.
+
+Only sshd can put env on a session it execs a bare command in, so the fix is a one-line
+drop-in — `SetEnv DISPLAY=:20` in `/etc/ssh/sshd_config.d/10-display-env.conf`. Two things
+about that file are easy to get wrong:
+
+- **`10-`, not a higher number.** sshd takes the *first* value obtained for a keyword and
+  `Include` expands lexically, so a low number wins over Fedora's `50-*.conf`. This is the
+  opposite of the last-one-wins convention most config directories use.
+- **No `Match` block.** Drop-ins are `Include`d at the *top* of `sshd_config`, so a
+  trailing `Match` would scope everything parsed after it, main config included.
+
+`PermitUserEnvironment DISPLAY` + `~/.ssh/environment` does the same job; both were tested
+on the guest and behave identically, so `SetEnv` wins on cost — one root-owned file rather
+than a per-user file whose mode sshd silently rejects, and no need to enable environment
+processing (an `LD_PRELOAD` bypass vector per `sshd_config(5)`).
+
+**The cost: `ssh -X` loses.** A forwarded `localhost:10.0` really is created and works, but
+`:20` wins over it, so an X-forwarded GUI renders into the invisible display instead of the
+host's — and a session can't recover its own forwarded display number (`ss` can't attribute
+sshd's listeners, and `xauth list` accumulates stale entries from earlier sessions). Use
+`waypipe` for host GUI work; it is untouched, since it carries `WAYLAND_DISPLAY`. Under
+`ssh -X`, pass the display by hand (`DISPLAY=localhost:10.0 …`) if there is only one
+forwarded session.
+
+An already-running `kepler-server` keeps the environment it started with, so after a
+provision that changes this, kill it (`pkill -f kepler-server`) and let kepler reconnect.
+
 ## Running a guest GUI on the host
 
-`ssh -X agent-vm` then `pnpm dev` in `~/kepler/repositories/kepler` is enough — electron
-renders on the host X display (Xwayland, under GNOME) with no extra flags. `Warning: No
-xauth data; using fake authentication data` is expected and harmless: GNOME's Xwayland
-keeps no `~/.Xauthority`, and it admits the session user directly.
+**`waypipe` is the path now, not `ssh -X`** — the guest's `SetEnv DISPLAY=:20` (above)
+overrides the forwarded display, so `ssh -X agent-vm` + `pnpm dev` renders into the
+headless display instead of the host's unless you pass `DISPLAY=localhost:10.0` yourself.
+The forwarding still works; only the default value changed.
+
+With the display passed by hand, electron renders on the host X display (Xwayland, under
+GNOME) with no extra flags. `Warning: No xauth data; using fake authentication data` is
+expected and harmless: GNOME's Xwayland keeps no `~/.Xauthority`, and it admits the session
+user directly.
 
 X11 forwarding tunnels every draw over ssh, so it is fine for a smoke test and sluggish for
-real UI work. `waypipe` is the faster path when that bites — it is installed in the guest by
-`provision.sh`, and electron needs `--ozone-platform=wayland`:
+real UI work. `waypipe` avoids both problems — it carries `WAYLAND_DISPLAY`, which nothing
+here overrides. It is installed in the guest by `provision.sh`, and electron needs
+`--ozone-platform=wayland`:
 
 ```sh
 waypipe ssh agent-vm                       # then run the app from that shell
@@ -415,11 +462,15 @@ Each generator asserts its own output, including a real rebase in a throwaway wo
 Both run during `provision` and gate the hand-maintained Electron dep list — trust a test
 failing, not the list:
 
-- **VS Code** (in the GitLens repo): downloads current stable, opens the workbench under
-  Xvfb, screenshots. Superseded cached versions are pruned.
+- **VS Code** (in the GitLens repo): downloads current stable, opens the workbench,
+  screenshots. Superseded cached versions are pruned.
 - **kepler** (when the seeded repo is present): `pnpm install`, then launches **kepler's own
-  Electron** with a trivial window under Xvfb — VS Code's Electron doesn't prove kepler's.
-  The script lives under `node_modules/` so the seeded worktree stays clean.
+  Electron** with a trivial window — VS Code's Electron doesn't prove kepler's. The script
+  lives under `node_modules/` so the seeded worktree stays clean.
+
+Both run on the guest's persistent `:20` rather than a throwaway display of their own, so
+they gate that display too — if the `xvfb.service` unit is broken, provisioning says so
+instead of an agent discovering it later.
 
 Kepler's full e2e suite is not part of provisioning — agents run it in worktrees on demand.
 
@@ -440,9 +491,17 @@ permission rules rather than by the credential.
 - **Worktree debris accumulates.** Each kepler worktree gets its own `node_modules` (pnpm's
   store dedupes the heavy part) and any `.vscode-test` it creates (~1G per VS Code
   download). Prune when deleting worktrees; `df -h /` in the guest when in doubt.
-- **No visible display.** Everything works headless (the inspector screenshots over CDP, so
-  pixels are identical), but watching the UI live would need `waypipe` plus a VS Code RPM in
-  the guest.
+- **No *visible* display, and no window manager.** A display is always running (`:20`) and
+  everything works headless — the inspector screenshots over CDP, so pixels are identical —
+  but watching the UI live would need `waypipe` plus a VS Code RPM in the guest, and nothing
+  manages window stacking or decoration on `:20`.
+- **One display for every concurrent agent.** The `SetEnv` drop-in hands every session the
+  same static `DISPLAY` — there is no per-worktree display. Clicks and keystrokes don't
+  cross-talk (Playwright drives Electron over CDP, not X11 input synthesis); the costs are a
+  shared fault domain — one agent wedging the X server takes down everyone's live
+  verification — and the missing WM above. Per-agent displays would need per-agent SSH
+  identities or an env-injection point in kepler's remote-spawn code, which has none today.
+  Not worth it until it actually bites.
 - **Don't debug rendering-timing bugs here.** A virtualized display can mask flaky
   rendering, hover/focus, and animation glitches — or invent new ones. Guest for logic, DOM,
   a11y, and screenshot-diffable layout; host for "does this feel right".

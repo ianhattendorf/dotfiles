@@ -17,6 +17,10 @@ GITLENS_DIR=$REPOS_DIR/vscode-gitlens
 KEPLER_DIR=$REPOS_DIR/kepler # seeded from the host — never cloned or pulled from here
 STATE_MNT=${STATE_MNT:-/mnt/state}
 STATE_DEV=${STATE_DEV:-/dev/vdb}
+# The guest's one persistent virtual display. A number provisioning OWNS: :99 is what a
+# hand-started Xvfb has historically squatted on, and Xvfb refuses to start against an
+# existing /tmp/.X<n>-lock, so taking it over would mean killing a foreign server first.
+XVFB_DISPLAY=${XVFB_DISPLAY:-:20}
 
 step() { printf '\n\033[1;34m==> %s\033[0m\n' "$1"; }
 
@@ -561,26 +565,119 @@ EOF
 	fi
 fi
 
+# --- persistent virtual display ---------------------------------------------------
+# Everything graphical in here runs headless, so the guest needs a display that is simply
+# always up — not one conjured per command. Two halves, and only having both fixes
+# anything: the X server itself, and DISPLAY reaching the processes kepler starts.
+step 'Starting the persistent virtual display'
+
+mkdir -p "$HOME/.config/systemd/user"
+cat > "$HOME/.config/systemd/user/xvfb.service" <<EOF
+[Unit]
+Description=Xvfb on $XVFB_DISPLAY — the guest's persistent virtual display
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/Xvfb $XVFB_DISPLAY -screen 0 1920x1080x24 -nolisten tcp
+Restart=always
+
+[Install]
+WantedBy=default.target
+EOF
+# -nolisten tcp: nothing here connects over TCP, and a listener would need the
+# xserver_port_t allows the SELinux step above is already fighting for ssh -X.
+#
+# linger is set HERE and not left to the TPM step that also sets it: this display must be
+# up on boot, ahead of any session, and a guest built with VM_TPM=0 never reaches that
+# step at all. Both calls are idempotent.
+#
+# Non-fatal like the ssh-agent unit above: a user manager that will not take this unit
+# must not kill the rest of provisioning. The readiness check below is what reports it.
+sudo loginctl enable-linger "$(id -un)" || true
+systemctl --user daemon-reload || true
+systemctl --user enable xvfb.service >/dev/null 2>&1 || true
+# restart, not start: re-running provisioning after an edit to the unit above has to
+# replace the running server, and nothing holds state on a display.
+systemctl --user restart xvfb.service || true
+
+# Xvfb binds its socket asynchronously after exec, so poll rather than race it. Nothing
+# guards against a SECOND display beyond Xvfb itself: it refuses to start against an
+# existing /tmp/.X<n>-lock, which is why this owns a number nothing else touches.
+for _ in $(seq 1 50); do
+	DISPLAY=$XVFB_DISPLAY xdpyinfo >/dev/null 2>&1 && break
+	sleep 0.1
+done
+if DISPLAY=$XVFB_DISPLAY xdpyinfo >/dev/null 2>&1; then
+	echo "display: $XVFB_DISPLAY up"
+else
+	# Hard failure, not a warning: provisioning fully owns this display and the smoke
+	# tests below run on it, so letting it through only turns a clear error into an
+	# inscrutable Electron crash later.
+	echo "error: no X server on $XVFB_DISPLAY — journalctl --user -u xvfb.service" >&2
+	exit 1
+fi
+
+# --- DISPLAY in non-interactive SSH sessions --------------------------------------
+# kepler spawns kepler-server over a bare `ssh <host> <cmd>`: no PTY, no login shell. That
+# sources NEITHER ~/.bashrc (interactive only) nor ~/.profile (login only), so the daemon
+# and everything it starts — including the playwright-electron MCP server kepler's live-UI
+# verification drives — would see no DISPLAY at all and fail with "missing X server or
+# $DISPLAY" on a guest that has one running. ~/.ssh/rc is no help either: it runs as a
+# separate process before the command execs, so its exports never reach the command. Only
+# sshd itself can put env on a session it execs a bare command in.
+step 'Exporting DISPLAY to every SSH session'
+
+# 10-, not a higher number: sshd takes the FIRST value obtained for a keyword and Include
+# expands in lexical order, so a LOW number wins over Fedora's shipped 50-*.conf. (The
+# intuition runs backwards here — this is not "last one wins" like many config dirs.)
+#
+# SetEnv rather than PermitUserEnvironment + ~/.ssh/environment, which does the same job:
+# both were tested on the guest and behave IDENTICALLY, including the ssh -X caveat below,
+# so this is the cheaper of the two — one root-owned file instead of a per-user file whose
+# mode sshd silently rejects, and no need to switch on environment processing at all
+# (sshd_config(5) warns it "may enable users to bypass access restrictions … using
+# mechanisms such as LD_PRELOAD").
+#
+# Unconditional, NOT inside a `Match User` block: drop-ins are Included at the TOP of
+# sshd_config, so a trailing Match here would scope everything parsed after it — the whole
+# main config included. Only one human user exists in this guest anyway.
+sshd_dropin=/etc/ssh/sshd_config.d/10-display-env.conf
+printf 'SetEnv DISPLAY=%s\n' "$XVFB_DISPLAY" | sudo tee "$sshd_dropin" >/dev/null
+sudo chmod 644 "$sshd_dropin"
+# Validate BEFORE reloading, and remove the file if it does not parse: sshd keeps running
+# its old config either way, but a bad drop-in left on disk breaks the next reboot.
+if ! sudo sshd -t; then
+	sudo rm -f "$sshd_dropin"
+	echo "error: sshd rejected $sshd_dropin — removed it, sshd config unchanged" >&2
+	exit 1
+fi
+sudo systemctl reload sshd
+echo "ssh sessions export DISPLAY=$XVFB_DISPLAY"
+
+# Two consequences, both measured on the guest rather than assumed:
+#
+# 1. `ssh -X` loses. The forwarded localhost:10.0 IS created and works, but this value
+#    wins over it, so an X-forwarded GUI renders into this invisible display instead of
+#    the host's. ~/.ssh/environment was no better — same clobber. A session cannot recover
+#    its own forwarded display number either (ss cannot attribute sshd's listeners, and
+#    `xauth list` keeps stale entries), so for host GUI work use waypipe, which is
+#    untouched by this — it carries WAYLAND_DISPLAY, not DISPLAY. See vm/README.md.
+# 2. DISPLAY is now set in EVERY session, which flips tools that probe it to choose GUI
+#    over terminal (pinentry, xdg-open, clipboard helpers, ssh-add's askpass). The TPM
+#    path above is already immune — it forces SSH_ASKPASS_REQUIRE — but this is the first
+#    thing to suspect if something starts prompting into the void.
+#
+# An ALREADY RUNNING kepler-server keeps the environment it was started with, so a guest
+# mid-session needs it killed (kepler re-ships it on the next connect) before this takes
+# effect for kepler.
+
 # --- smoke tests ------------------------------------------------------------------
-# Both launch a real Electron under Xvfb through Playwright. They are the gate on the
-# hand-maintained package list above: VS Code covers the Electron the GitLens inspector
-# runs, the kepler test covers the (different) Electron kepler ships.
+# Both launch a real Electron through Playwright on the persistent display above. They are
+# the gate on the hand-maintained package list — and now on that display too: VS Code
+# covers the Electron the GitLens inspector runs, the kepler test covers the (different)
+# Electron kepler ships.
 
-run_under_xvfb() {
-	# xvfb-run ships with Fedora's Xvfb package, but fall back to driving Xvfb directly
-	# rather than failing the whole provision if that ever stops being true.
-	if command -v xvfb-run >/dev/null; then
-		xvfb-run -a -s '-screen 0 1920x1080x24' "$@"
-	else
-		Xvfb :99 -screen 0 1920x1080x24 >/dev/null 2>&1 &
-		local xvfb_pid=$!
-		# shellcheck disable=SC2064
-		trap "kill $xvfb_pid 2>/dev/null || true" RETURN
-		DISPLAY=:99 "$@"
-	fi
-}
-
-step 'Smoke testing VS Code Electron under Xvfb'
+step 'Smoke testing VS Code Electron'
 # Must live inside the repo: bare specifiers resolve relative to the importing FILE, not
 # the cwd, so a script in /tmp cannot see the repo's node_modules. .vscode-test is ignored.
 mkdir -p "$GITLENS_DIR/.vscode-test"
@@ -613,7 +710,7 @@ await Promise.race([app.close(), new Promise((r) => setTimeout(r, 15_000))]);
 console.log('smoke: workbench rendered');
 process.exit(0);
 EOF
-(cd "$GITLENS_DIR" && run_under_xvfb node "$smoke")
+(cd "$GITLENS_DIR" && DISPLAY=$XVFB_DISPLAY node "$smoke")
 [[ -s /tmp/smoke.png ]] || { echo 'smoke: no screenshot produced' >&2; exit 1; }
 
 # downloadAndUnzipVSCode('stable') resolves the CURRENT stable each run, so the cache
@@ -625,7 +722,7 @@ if [[ -d $KEPLER_DIR/.git ]]; then
 	cd "$KEPLER_DIR"
 	pnpm install --frozen-lockfile
 
-	step 'Smoke testing kepler Electron under Xvfb'
+	step 'Smoke testing kepler Electron'
 	# Lives under node_modules/ (gitignored) so the seeded worktree stays clean —
 	# `agent-vm seed` pushes refuse a dirty checked-out branch.
 	smoke_dir=$KEPLER_DIR/node_modules/.agent-vm-smoke
@@ -651,7 +748,7 @@ await Promise.race([app.close(), new Promise((r) => setTimeout(r, 15_000))]);
 console.log('kepler smoke: window rendered');
 process.exit(0);
 EOF
-	run_under_xvfb node "$smoke_dir/smoke.mjs"
+	DISPLAY=$XVFB_DISPLAY node "$smoke_dir/smoke.mjs"
 	[[ -s /tmp/kepler-smoke.png ]] || { echo 'kepler smoke: no screenshot produced' >&2; exit 1; }
 else
 	echo "note: kepler repo not present — seed it (agent-vm seed ~/dev/repos/kepler) and re-run provision" >&2
