@@ -624,8 +624,28 @@ fi
 # verification drives — would see no DISPLAY at all and fail with "missing X server or
 # $DISPLAY" on a guest that has one running. ~/.ssh/rc is no help either: it runs as a
 # separate process before the command execs, so its exports never reach the command. Only
-# sshd itself can put env on a session it execs a bare command in.
+# sshd can put env on a session it execs a bare command in — but see below for why it hands
+# over a hook rather than the value itself.
 step 'Exporting DISPLAY to every SSH session'
+
+# The value must be a FALLBACK, not an assignment. `SetEnv DISPLAY=…` (and the equivalent
+# PermitUserEnvironment + ~/.ssh/environment; both were tested here) set it unconditionally
+# and therefore also overwrite the localhost:1x.0 that sshd hands an X11-FORWARDED session,
+# which silently redirects `ssh -X agent-vm` + `pnpm dev` into this invisible display. That
+# is unrecoverable in-band: nothing tells a session its own forwarded display number, since
+# the listener FDs belong to a root-owned sshd-session process (so neither `ss -p` nor
+# /proc/<pid>/fd attributes them) and `xauth list` keeps entries from earlier sessions.
+#
+# So hand sshd a HOOK instead of a value. bash sources $BASH_ENV when it is NON-INTERACTIVE
+# — exactly the `ssh host cmd` shape kepler uses, and never the interactive shell — which
+# makes the default conditional: set DISPLAY only when the session does not already have
+# one. The file must stay silent: scp and rsync also run `bash -c`, and anything printed
+# here corrupts their protocol.
+sudo tee /etc/ssh/session-display-env.sh >/dev/null <<EOF
+# Sourced by bash in non-interactive sessions (BASH_ENV, set by sshd). Silent by design.
+[ -n "\${DISPLAY:-}" ] || export DISPLAY=$XVFB_DISPLAY
+EOF
+sudo chmod 644 /etc/ssh/session-display-env.sh
 
 # 10-, not a higher number: sshd takes the FIRST value obtained for a keyword and Include
 # expands in lexical order, so a LOW number wins over Fedora's shipped 50-*.conf. (The
@@ -642,7 +662,7 @@ step 'Exporting DISPLAY to every SSH session'
 # sshd_config, so a trailing Match here would scope everything parsed after it — the whole
 # main config included. Only one human user exists in this guest anyway.
 sshd_dropin=/etc/ssh/sshd_config.d/10-display-env.conf
-printf 'SetEnv DISPLAY=%s\n' "$XVFB_DISPLAY" | sudo tee "$sshd_dropin" >/dev/null
+printf 'SetEnv BASH_ENV=/etc/ssh/session-display-env.sh\n' | sudo tee "$sshd_dropin" >/dev/null
 sudo chmod 644 "$sshd_dropin"
 # Validate BEFORE reloading, and remove the file if it does not parse: sshd keeps running
 # its old config either way, but a bad drop-in left on disk breaks the next reboot.
@@ -652,20 +672,28 @@ if ! sudo sshd -t; then
 	exit 1
 fi
 sudo systemctl reload sshd
-echo "ssh sessions export DISPLAY=$XVFB_DISPLAY"
 
-# Two consequences, both measured on the guest rather than assumed:
-#
-# 1. `ssh -X` loses. The forwarded localhost:10.0 IS created and works, but this value
-#    wins over it, so an X-forwarded GUI renders into this invisible display instead of
-#    the host's. ~/.ssh/environment was no better — same clobber. A session cannot recover
-#    its own forwarded display number either (ss cannot attribute sshd's listeners, and
-#    `xauth list` keeps stale entries), so for host GUI work use waypipe, which is
-#    untouched by this — it carries WAYLAND_DISPLAY, not DISPLAY. See vm/README.md.
-# 2. DISPLAY is now set in EVERY session, which flips tools that probe it to choose GUI
-#    over terminal (pinentry, xdg-open, clipboard helpers, ssh-add's askpass). The TPM
-#    path above is already immune — it forces SSH_ASKPASS_REQUIRE — but this is the first
-#    thing to suspect if something starts prompting into the void.
+# BASH_ENV covers non-interactive shells only, which leaves the agents: `agent-vm claude`
+# runs them in tmux, and an interactive shell reads ~/.bashrc.d instead. Same conditional,
+# so a forwarded display still wins here too.
+cat > "$HOME/.bashrc.d/display.sh" <<EOF
+# Interactive shells do not read BASH_ENV; this is the same conditional default.
+[ -n "\${DISPLAY:-}" ] || export DISPLAY=$XVFB_DISPLAY
+EOF
+
+# BASH_ENV is a bash feature: a login shell that is not bash would take the hook and
+# silently ignore it, leaving kepler's spawn with no display again.
+login_shell=$(getent passwd "$(id -un)" | cut -d: -f7)
+case $login_shell in
+*/bash) echo "ssh sessions default DISPLAY to $XVFB_DISPLAY (forwarded displays win)" ;;
+*) echo "warning: login shell is $login_shell, not bash — BASH_ENV is ignored, so" >&2
+	echo "         kepler-spawned processes will see no DISPLAY" >&2 ;;
+esac
+
+# Side effect: DISPLAY is now set in nearly every session, which flips tools that probe it
+# to choose GUI over terminal (pinentry, xdg-open, clipboard helpers, ssh-add's askpass).
+# The TPM path above is already immune — it forces SSH_ASKPASS_REQUIRE — but this is the
+# first thing to suspect if something starts prompting into the void.
 #
 # An ALREADY RUNNING kepler-server keeps the environment it was started with, so a guest
 # mid-session needs it killed (kepler re-ships it on the next connect) before this takes
