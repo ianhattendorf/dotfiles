@@ -126,9 +126,10 @@ nc -zvw3 192.168.1.1 22              # must FAIL (LAN)
 
 ## Credential model
 
-The guest holds **no signing key and no host filesystem mounts**. Its GitHub access is a
-TPM-resident SSH key registered on the account (git, read and write) and a read-only `gh`
-token (API). Pushes are gated by agent permission rules, not by the key.
+The guest holds **no host filesystem mounts and no copy of the host's keys**. Its GitHub
+access is a TPM-resident SSH key registered on the account (git, read and write, and commit
+signing) and a read-only `gh` token (API). Pushes are gated by agent permission rules, not
+by the key.
 
 - **Public repos** (vscode-gitlens) are cloned anonymously by `provision.sh` into
   `~/kepler/repositories/` — kepler's own layout, so kepler tasks reuse the same checkout.
@@ -139,11 +140,17 @@ token (API). Pushes are gated by agent permission rules, not by the key.
 - **In-guest git via the TPM key**: the guest has an emulated TPM (swtpm), and
   provisioning creates a **non-exportable** key in it — a compromised guest can use the
   key while running but never steal it. Provision prints the public half; register it on
-  GitHub as an **account SSH (authentication) key** and both `git fetch` and `git push`
-  work from inside, for every repo the account can reach. **Never** add it as a signing
-  key — a guest-usable signing key means forged "Verified" commits — and note that the
-  guest disables signing globally anyway. The swtpm state dies with the domain (`destroy`
-  removes it), so a rebuild means registering a fresh key — deregister the old one.
+  GitHub **twice, as both an Authentication key and a Signing key** (same key, two
+  entries). Authentication makes `git fetch` and `git push` work from inside for every
+  repo the account can reach; Signing makes commits made in here verify. The whole flow —
+  commit, push, PR, merge — runs in the guest, so both halves have to work. The swtpm
+  state dies with the domain (`destroy` removes it), so a rebuild means registering a
+  fresh key — deregister both old entries.
+
+  The cost of the signing half: a compromised guest can produce Verified commits under the
+  real identity for as long as it runs. It signs with its own key, not the host's, so
+  `allowed_signers` still identifies which machine signed a given commit — but the GitHub
+  badge alone does not.
 
   The key places no limit on what the guest may push, so that job belongs to the agent's
   permission layer: `permissions.ask` entries plus `autoMode.soft_deny` rules in
@@ -190,16 +197,34 @@ from there would seed a personal address into a work guest; `--global` does not 
 Global, not per-repo, because kepler and `gh` create clones `provision.sh` never sees;
 an earlier per-clone version reached only vscode-gitlens and left the rest either
 identity-less (commits fail outright) or carrying whatever a tool wrote into
-`.git/config`. Each provision also strips `user.*`, `commit.gpgsign`, and `tag.gpgsign`
-overrides from every repo under `~/kepler/repositories/`, since local config beats global.
+`.git/config`. Each provision also strips `user.*`, `gpg.format`, `commit.gpgsign`, and
+`tag.gpgsign` overrides from every repo under `~/kepler/repositories/`, since local config
+beats global.
 
 It is deliberately your **real, routable** address rather than a placeholder: guest
 commits come back via `agent-vm fetch` and are pushed from the host, so anything else
 lands on a real remote as a dead address that links to no account. Provenance comes from
-the `wip/*` branch namespace `agent-vm push` uses, not from a fake email. Signing is
-disabled globally (`commit.gpgsign`, `tag.gpgsign`, `tag.forceSignAnnotated`) because the
-guest holds no signing key by design — tags included, since the host gitconfig sets
-`tag.forceSignAnnotated`.
+the `wip/*` branch namespace `agent-vm push` uses, not from a fake email.
+
+Commits and annotated tags are signed with the TPM key (`gpg.format=ssh`, `user.signingkey`
+set to the `key::` literal of its public half). `ssh-keygen -Y sign` has no PKCS#11 option
+and reads keys only out of **ssh-agent**, so where fetch and push get by with
+`PKCS11Provider` in `~/.ssh/config`, signing needs an agent: a `ssh-agent.service` user unit
+on `$XDG_RUNTIME_DIR/ssh-agent.socket`, `ssh-add -s`-ing the module at start, with linger on
+so it is up on boot and `SSH_AUTH_SOCK` exported from `~/.bashrc.d/tpm-ssh.sh` so every
+shell finds that one agent.
+
+Signing is configured whenever the TPM key exists, **not** gated on the agent answering at
+provision time. If the agent is not holding the key, commits fail loudly until it is fixed;
+a silent fallback to unsigned would surface as a wall of unverified history on GitHub long
+after the run that made it. The usual cause on a guest's first provision is the `tss` group:
+`usermod -aG tss` does not reach the already-running user manager that spawns the agent, so
+it can only open `/dev/tpmrm0` after the next boot — `agent-vm restart`, then re-provision.
+Provision reports the agent's state either way rather than leaving it to the first commit.
+
+Guests with no TPM at all have nothing to sign with, so there `commit.gpgsign`,
+`tag.gpgsign`, and `tag.forceSignAnnotated` stay off — tags included, since the host
+gitconfig sets `tag.forceSignAnnotated`.
 
 ## Dotfiles in the guest
 
@@ -235,9 +260,9 @@ that directory on every provision.
 `pull` commits whatever is dirty in the guest checkout onto `vm/guest` — editing a linked
 file in the guest writes straight into it, so uncommitted changes are the normal case —
 then fetches that branch home as `vm/dotfiles` for review. This works because provisioning
-gives the guest a global git identity with signing off; without it the in-guest commit
-would fail. `push` refuses while the guest checkout is dirty, since it ends in a force
-checkout.
+gives the guest a global git identity and a reachable signing key; without both, the
+in-guest commit would fail. `push` refuses while the guest checkout is dirty, since it ends
+in a force checkout.
 
 `adopt` is the one-time capture that precedes the first link: it copies an explicit list
 (`CLAUDE.md`, `settings.json`, `skills/`) out of the guest's `~/.claude` into
@@ -483,12 +508,13 @@ Kepler's full e2e suite is not part of provisioning — agents run it in worktre
 
 ## Not in the guest, deliberately
 
-Signing key · any write-capable GitHub API token · any host filesystem mount · the host's
-`~/.claude/settings.json` (its sandbox allowlist is full of host paths that mean nothing
-here, and the VM is already the boundary).
+The host's signing key · any write-capable GitHub API token · any host filesystem mount ·
+the host's `~/.claude/settings.json` (its sandbox allowlist is full of host paths that mean
+nothing here, and the VM is already the boundary).
 
-The SSH key *can* push — see the credential model — so pushes are held back by the agent's
-permission rules rather than by the credential.
+The guest has a signing key, but it is *its own* — the TPM key, never the host's, and never
+reachable from the host. The SSH key *can* push and *can* sign — see the credential model —
+so both are held back by the agent's permission rules rather than by the credential.
 
 ## Known gaps
 

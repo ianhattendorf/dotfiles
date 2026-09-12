@@ -73,9 +73,10 @@ else
 	echo 'warning: no identity passed from the host — guest commits will fail' >&2
 fi
 
-# The guest holds no signing key, by design — the host has the only one. Cover tags too,
-# not just commits: the host gitconfig sets tag.forceSignAnnotated, so if that ever
-# reaches the guest an annotated tag would fail the same way a commit would.
+# Signing off is only the fallback for a guest with no TPM at all, and so no key to sign
+# with; the TPM step below turns it on whenever there is one. Cover tags too, not just
+# commits: the host gitconfig sets tag.forceSignAnnotated, so if that ever reaches the
+# guest an annotated tag would fail the same way a commit would.
 git config --global commit.gpgsign false
 git config --global tag.gpgsign false
 git config --global tag.forceSignAnnotated false
@@ -85,7 +86,7 @@ git config --global tag.forceSignAnnotated false
 # write into .git/config after the fact.
 for repo in "$REPOS_DIR"/*/; do
 	[[ -d $repo/.git ]] || continue
-	for key in user.name user.email user.signingkey commit.gpgsign tag.gpgsign; do
+	for key in user.name user.email user.signingkey gpg.format commit.gpgsign tag.gpgsign; do
 		# --unset-all exits 5 when the key is absent, which is the normal case here.
 		git -C "$repo" config --unset-all "$key" 2>/dev/null || true
 	done
@@ -320,9 +321,13 @@ codex --version >/dev/null || { echo 'error: codex failed to run after install' 
 # --- TPM-resident git key -------------------------------------------------------
 # The guest has an emulated TPM (swtpm on the host). A key created in it is
 # NON-EXPORTABLE: a compromised guest can use it while running but never steal it.
-# The public half is printed at the end — register it on GitHub as an account SSH
-# AUTHENTICATION key, which lets the guest fetch and push for itself. Never add it as a
-# signing key: a guest-usable signing key means forged "Verified" commits.
+# The public half is printed at the end — register it on GitHub as an account SSH key BOTH
+# ways, Authentication (fetch and push from inside) and Signing (Verified commits from
+# inside). The whole development flow runs in here, so both halves have to work.
+#
+# The cost of the signing half: a compromised guest can produce Verified commits under the
+# real identity while it runs. ~/.ssh/allowed_signers below still identifies which machine
+# signed what, since this key is distinct from the host's.
 #
 # The key grants whatever the account can reach, so what holds a push back is the
 # permission layer: the ask rules and autoMode soft-denies in
@@ -393,6 +398,91 @@ EOF
 
 	TPM_PUBKEY=$(sg tss -c "ssh-keygen -D $PKCS11_LIB" 2>/dev/null | head -1) || true
 	[[ -n $TPM_PUBKEY ]] || echo 'warning: TPM key exists but public key could not be read' >&2
+
+	# --- signing path: the same key, reached through an agent ---------------------
+	# Fetch and push get by with PKCS11Provider above and no agent at all, but signing
+	# cannot: `ssh-keygen -Y sign` has no PKCS#11 option and reads a key only out of
+	# ssh-agent. So the guest runs one, holding the module.
+	#
+	# ssh-agent binds its socket asynchronously after ExecStart, so the load step waits
+	# for the socket instead of racing it — and lives in its own script rather than an
+	# inline ExecStartPost, where the shell quoting fights systemd's % expansion.
+	cat > "$HOME/.local/bin/tpm-ssh-add" <<EOF
+#!/bin/sh
+export SSH_AUTH_SOCK="\${XDG_RUNTIME_DIR:-/run/user/\$(id -u)}/ssh-agent.socket"
+export SSH_ASKPASS="\$HOME/.local/bin/tpm-pin-askpass"
+export SSH_ASKPASS_REQUIRE=force
+i=0
+while [ ! -S "\$SSH_AUTH_SOCK" ] && [ \$i -lt 50 ]; do i=\$((i + 1)); sleep 0.1; done
+ssh-add -l >/dev/null 2>&1 && exit 0
+exec ssh-add -s $PKCS11_LIB
+EOF
+	chmod 0700 "$HOME/.local/bin/tpm-ssh-add"
+
+	# A user unit on a fixed socket path, with linger so it is up on boot ahead of any
+	# agent rather than only inside a login session. SSH_AUTH_SOCK is exported from
+	# ~/.bashrc.d (below) to the same path, so every shell finds this one agent.
+	mkdir -p "$HOME/.config/systemd/user"
+	cat > "$HOME/.config/systemd/user/ssh-agent.service" <<EOF
+[Unit]
+Description=ssh-agent holding the TPM-resident git key
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh-agent -D -a %t/ssh-agent.socket
+ExecStartPost=%h/.local/bin/tpm-ssh-add
+Restart=on-failure
+
+[Install]
+WantedBy=default.target
+EOF
+	# Non-fatal under `set -e`: a user manager that will not start this unit must not take
+	# the rest of provisioning down with it. The signing config below is written either
+	# way, and the check at the end of this step is what reports the breakage.
+	sudo loginctl enable-linger "$(id -un)" || true
+	systemctl --user daemon-reload || true
+	systemctl --user enable ssh-agent.service >/dev/null 2>&1 || true
+	systemctl --user restart ssh-agent.service || true
+
+	cat >> "$HOME/.bashrc.d/tpm-ssh.sh" <<'EOF'
+export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/ssh-agent.socket"
+EOF
+
+	# Signing is configured unconditionally, NOT gated on the agent answering right now.
+	# If the agent is not holding the key, every commit fails loudly until that is fixed —
+	# which is the wanted outcome: this guest is the whole development flow, so a silent
+	# fallback to unsigned commits would be discovered as a wall of unverified history on
+	# GitHub, long after the run that produced it.
+	if [[ -n $TPM_PUBKEY ]]; then
+		git config --global gpg.format ssh
+		git config --global user.signingkey "key::$TPM_PUBKEY"
+		git config --global commit.gpgsign true
+		git config --global tag.gpgsign true
+
+		# Lets `git log --show-signature` verify in here, and is the record of WHICH key
+		# this is: host and guest sign as the same email with different keys.
+		if [[ -n ${GUEST_GIT_EMAIL:-} ]]; then
+			printf '%s %s\n' "$GUEST_GIT_EMAIL" "$TPM_PUBKEY" > "$HOME/.ssh/allowed_signers"
+			chmod 600 "$HOME/.ssh/allowed_signers"
+			git config --global gpg.ssh.allowedSignersFile "$HOME/.ssh/allowed_signers"
+		fi
+	fi
+
+	# Report the agent's state anyway, so a provision that leaves signing broken says so
+	# here rather than at the first commit. The usual cause on a guest's FIRST provision is
+	# the `usermod -aG tss` above: the user manager that spawns this agent inherited its
+	# groups before that ran, so the module cannot open /dev/tpmrm0 until the next boot.
+	export SSH_AUTH_SOCK="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/ssh-agent.socket"
+	"$HOME/.local/bin/tpm-ssh-add" >/dev/null 2>&1 || true
+	# Exit status, not output: with no keys loaded `ssh-add -l` still PRINTS a line ("The
+	# agent has no identities.") on stdout, so a grep-for-anything test always passes.
+	if ssh-add -l >/dev/null 2>&1; then
+		echo 'signing: on (TPM key via ssh-agent)'
+	else
+		echo 'warning: signing is configured but ssh-agent is NOT holding the TPM key, so' >&2
+		echo '         commits will fail. On a fresh guest this is the tss group: reboot' >&2
+		echo '         (agent-vm restart) and re-run provision.' >&2
+	fi
 else
 	echo 'note: no TPM device — recreate the VM with VM_TPM=1 to enable the in-guest git key' >&2
 fi
@@ -479,8 +569,8 @@ else
 fi
 
 cd "$GITLENS_DIR"
-# No repo-local identity or gpgsign here — both are global now, set in the git identity
-# step above so every clone in the guest gets them, not just this one.
+# No repo-local identity or gpgsign here — both are set globally above, so every clone in
+# the guest gets them, not just this one.
 
 # Point the inspector's named-session dir at the persistent disk so `sign_in` survives
 # a rebuild. .vscode-test is already gitignored.
@@ -651,13 +741,6 @@ sudo chmod 644 /etc/ssh/session-display-env.sh
 # expands in lexical order, so a LOW number wins over Fedora's shipped 50-*.conf. (The
 # intuition runs backwards here — this is not "last one wins" like many config dirs.)
 #
-# SetEnv rather than PermitUserEnvironment + ~/.ssh/environment, which does the same job:
-# both were tested on the guest and behave IDENTICALLY, including the ssh -X caveat below,
-# so this is the cheaper of the two — one root-owned file instead of a per-user file whose
-# mode sshd silently rejects, and no need to switch on environment processing at all
-# (sshd_config(5) warns it "may enable users to bypass access restrictions … using
-# mechanisms such as LD_PRELOAD").
-#
 # Unconditional, NOT inside a `Match User` block: drop-ins are Included at the TOP of
 # sshd_config, so a trailing Match here would scope everything parsed after it — the whole
 # main config included. Only one human user exists in this guest anyway.
@@ -787,8 +870,9 @@ echo "repos:  $REPOS_DIR"
 echo "state:  $STATE_MNT (survives rebuild)"
 if [[ -n $TPM_PUBKEY ]]; then
 	echo
-	echo 'TPM key — add as an account SSH authentication key (github -> Settings -> SSH'
-	echo 'and GPG keys -> New SSH key, type Authentication). Never as a signing key.'
+	echo 'TPM key — register it on GitHub TWICE (Settings -> SSH and GPG keys -> New SSH'
+	echo 'key): once with type Authentication, so the guest can fetch and push, and once'
+	echo 'with type Signing, so its commits verify. Same key, two entries.'
 	echo
 	echo "  $TPM_PUBKEY"
 fi
