@@ -49,9 +49,12 @@ Hard limits (the point of this skill vs. its neighbours):
   all options inline produces one real option and two strawmen.
 - Survey **prior art** when a sibling client has solved the same capability
   (vscode-gitlens, gkcli, gitkraken-client, core-tools; first pass
-  `gh search code --owner gitkraken`). A sibling's implementation is evidence for an
-  option, not an option by itself — the lesson goes on the card, not a description of
-  what the sibling does.
+  `gh search code --owner gitkraken`). Dispatch the survey to a `general-purpose`
+  subagent per sibling so only the distilled lesson returns; kepler, vscode-gitlens,
+  gkcli and core-tools are registered in this workspace (`create_worktree`, discard
+  when done), the rest read remotely via `gh` or the GitKraken MCP. A sibling's
+  implementation is evidence for an option, not an option by itself — the lesson goes
+  on the card, not a description of what the sibling does.
 - **Card shape**, one per option, and the same shape for all:
   - *Shape*: one paragraph of how it works.
   - *Invariants touched* (from the profile's source) and any **new concept**

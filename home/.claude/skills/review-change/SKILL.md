@@ -1,6 +1,6 @@
 ---
 name: review-change
-description: Review a change in a GitKraken-owned repo (Kepler, vscode-gitlens, gkcli, …) — a PR, a branch, a commit/range, or a raw diff. Intake with existing-comment dedup (PRs), gates on the checkout, /code-review + repo-invariant pass, live verification when warranted, findings delivered as a human handoff (never posted directly to a colleague's PR). Use when asked to review a PR, branch, commit, or diff, when a task has a PR link attached for review, or for a second opinion on a merged/open change. NOT for reviewing your own in-progress diff mid-ship-issue — that loop has its own review steps.
+description: Review a change in a GitKraken-owned repo (Kepler, vscode-gitlens, gkcli, …) — a PR, a branch, a commit/range, or a raw diff. Intake with existing-comment dedup (PRs), gates on the checkout, a subagent correctness + repo-invariant pass, live verification when warranted, findings delivered as a human handoff (never posted directly to a colleague's PR). Use when asked to review a PR, branch, commit, or diff, when a task has a PR link attached for review, or for a second opinion on a merged/open change. NOT for reviewing your own in-progress diff mid-ship-issue — that loop has its own review steps.
 ---
 
 # Review a change (GitKraken repos)
@@ -62,25 +62,29 @@ of starting over:
 
 ## 3. Gates
 
-Run the profile's gates on the checkout. A failing gate is a finding that costs zero
-judgment — report it precisely (command + output), don't fix it. (Checkout-less
-targets: skipped — already flagged as a verdict caveat by step 1.)
+Run the profile's gates on the checkout, plus a scratch-merge check — `git fetch
+origin`, merge the branch into `origin/main` in a disposable worktree (`--no-commit
+--no-ff`), typecheck there, remove it — and name a failure there distinctly from the
+PR's own defects in the verdict. A failing gate is a finding that costs zero judgment — report
+it precisely (command + output), don't fix it. (Checkout-less targets: skipped —
+already flagged as a verdict caveat by step 1.)
 
 ## 4. Review
 
-- Run `/code-review high` against the target. Higher effort than ship-issue's inner
-  loop deliberately: this may be the only review the change gets from you. For
-  large or high-stakes PRs (security-adjacent, invariant-heavy, >~1k lines), run
-  `xhigh` instead — accept the extra triage noise there and only there.
+- Dispatch the review subagent in `~/.claude/skills/ship-issue/rules/fix-or-reject.md`,
+  floor **high** — above ship-issue's inner-loop floor deliberately, since this may be
+  the only review the change gets. For large or high-stakes targets
+  (security-adjacent, invariant-heavy, >~1k lines), self-escalate to `xhigh` — accept
+  the extra triage noise there and only there.
 - Make an explicit pass against the profile's invariants source — enforced and
   load-bearing rules first (the ones with residual tests are cheap to check; the
   ones without are where a reviewer earns their keep).
 - Walk the spec from step 1 (acceptance criteria, or the stated intent): is each
   part demonstrably met by this diff? Unmet or silently-narrowed scope is a finding.
-- Findings bar is the same one ship-issue holds its own work to: a concrete failure
-  scenario (specific input/state → wrong output), not "could theoretically". Do not
-  nitpick style a colleague's repo conventions permit, and do not re-raise anything
-  from the existing discussion (step 1).
+- Findings bar is that file's: a concrete failure scenario (specific input/state →
+  wrong output), not "could theoretically". Do not nitpick style a colleague's repo
+  conventions permit, and do not re-raise anything from the existing discussion
+  (step 1).
 
 ## 5. Live verification (when warranted)
 
@@ -97,8 +101,8 @@ event-flow, terminal/agent paths) and look-and-feel judgment matters to the verd
 `AskUserQuestion` to offer it ("Do a live UI pass" / "Skip, static review is
 enough") rather than assuming either way. High level:
 
-1. Launch the change live (Kepler: `pnpm serve:isolate` in this worktree) and
-   print the Remote access URL to chat.
+1. Launch the change live and hand over the URL exactly as the profile's human
+   live run handoff specifies (Kepler: `serve:isolate` and the owner-token URL).
 2. Hand the human a walk script: the 3–5 interactions the PR claims to change, and
    the one or two places a regression would show.
 3. Fold their impressions into the verdict — anything broken is a finding like any

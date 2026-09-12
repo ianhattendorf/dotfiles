@@ -50,8 +50,9 @@ How much you must read before touching anything depends on whose diff it is:
   from the diff alone — the diff is what's being disputed.
 - **Take-over** (a colleague's or another agent's PR): pushing to the branch
   adopts its defects as yours. Read the full diff and the entire discussion
-  first, then run `/code-review medium` on the whole PR — its findings join the
-  ledger like any reviewer comment. Check for the original author's unpushed
+  first, then dispatch the review subagent in
+  `~/.claude/skills/ship-issue/rules/fix-or-reject.md` (floor medium) on the whole
+  PR — its findings join the ledger like any reviewer comment. Check for the original author's unpushed
   intent (draft status, WIP markers, TODOs in the diff, a stated plan in the
   discussion) before overriding any of it. Suggest the human post a one-line
   "taking this over" comment — course-changing someone's PR silently is rude
@@ -59,8 +60,8 @@ How much you must read before touching anything depends on whose diff it is:
 
 ## 3. Checkout freshness
 
-Run ship-issue's resume freshness check, plus the PR-head check from
-/review-change: `git fetch origin`, compare `HEAD` to the PR's current head SHA
+Run `~/.claude/skills/ship-issue/rules/freshness-check.md`, plus the PR-head check
+from /review-change: `git fetch origin`, compare `HEAD` to the PR's current head SHA
 (someone may have pushed — the human, a co-author, a suggested-change commit),
 fast-forward if behind. If local and remote have diverged, stop and sort it out
 with the human before writing anything.
@@ -75,23 +76,28 @@ fixup commits are expected instead.
 
 ## 4. Triage and fix
 
-A PR comment is a finding, not an order. Ship-issue step 5's fix-or-reject rules
-apply verbatim, with one clarification for human reviewers: the
-concrete-failure-scenario bar governs *correctness* claims; an ask that enforces
-a repo convention or a profile invariant is fixable without one; pure preference
-with neither is the `decline` category — with a rationale, never silence.
+A PR comment is a finding, not an order: triage each by
+`~/.claude/skills/ship-issue/rules/fix-or-reject.md`. Its reject is this ledger's
+`decline`.
 
 - Fix `fix` rows grouped **one commit per logical concern**, not one
   "address feedback" mega-commit — the reviewer verifies each thread against
   its commit. Subjects per the profile's merge convention.
 - Red CI is a zero-judgment `fix` row: reproduce locally via the profile's
   gates, fix, done.
-- Run the profile's gates before anything is pushed. A non-trivial fix diff
-  (restructuring, new invariant surface) gets one `/code-review low` pass; a
-  UI-visible fix gets the profile's live verification, targeted at what the
-  fix claims.
-- Hold every new or edited comment in the diff to ship-issue's comment-audit
-  bar now — feedback rounds are exactly where comments accrete justifications.
+- Run the profile's gates before anything is pushed, plus a scratch-merge check:
+  `git fetch origin`, merge the branch into `origin/main` in a disposable worktree
+  (`--no-commit --no-ff`), run at least the typecheck gate there, remove it. Not a
+  rebase of the real branch.
+- Run that file's review subagent once per round. A UI-visible fix additionally
+  gets the profile's live verification, targeted at what the fix claims.
+- Before pushing, run the audit in
+  `~/.claude/skills/ship-issue/rules/comment-audit.md` scoped to every comment
+  added or edited this round (`git diff <round-start-head>..HEAD`). A round
+  spreads one rationale across the function, the file doc, the test and the
+  reply, each feeling non-obvious in isolation — which is why holding the bar
+  while writing is not the audit. Apply the verdicts, re-run the gates if
+  anything changed, then push.
 - Push only with explicit human confirmation, per the org constant.
 
 ## 5. Replies
