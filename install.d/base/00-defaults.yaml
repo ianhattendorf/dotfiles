@@ -3,3 +3,9 @@
       relink: true
       create: true
       force: true
+      # A real file sitting at a link target is renamed to
+      # <path>.dotbot-backup.<timestamp> instead of deleted. A successful backup
+      # suppresses the force/relink delete above, so this is the only thing
+      # standing between force and a file that drifted from the repo. Existing
+      # symlinks are skipped, so re-running install does not accumulate copies.
+      backup: true
