@@ -9,9 +9,30 @@ least the floor the calling skill names, self-escalating to `high`/`xhigh` when 
 subagent judges the diff warrants deeper coverage — never below the floor on a
 self-judged call.
 
+**Every round reviews the CUMULATIVE diff** (`merge-base(origin/main)..HEAD`), never
+only what changed since the last round. A round-3 fix interacting badly with round-1
+code is invisible to an incremental read, and that interaction is exactly what the
+oscillation rule exists to catch — an incremental review cannot see the oscillation it
+is supposed to report. The subagent is fresh each round, so it costs nothing to re-read
+what it has never seen.
+
+**The last round before a push runs at floor `high`,** whatever floor the calling skill
+names for its inner rounds. The pre-PR loop is the argument for not requesting bot
+reviewers, and a human reviewer is not guaranteed — so the final read is the one that
+may be the only review the change ever gets, and it gets the same floor `/review-change`
+uses for that reason.
+
 Have it reason explicitly about interleaving: for every new trigger into existing
 shared or async state (a cache, lock, in-flight guard, event subscription), what
 happens if it fires while another trigger on the same state is mid-flight.
+
+Two independent sources correlated only by an id (an RPC response and a broadcast
+event; a streamed chunk and an exit signal) can arrive in either order, and a listener
+gated on a not-yet-known id can race the event meant to fill it. A static diff read
+misses this because the code looks correct in sequence. When a change adds a new pair
+of independent async sources, walk every interleaving, and name any gap that could not
+be exercised as an UNVERIFIED risk in the PR body rather than a generic "couldn't test
+it".
 
 ## Fix or reject
 

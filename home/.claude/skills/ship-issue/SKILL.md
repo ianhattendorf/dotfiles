@@ -13,7 +13,8 @@ writes one in.
 
 Shared procedures live beside this file and are read when a step calls for them:
 `rules/freshness-check.md`, `rules/fix-or-reject.md`, `rules/comment-audit.md`,
-`feature-scale.md`, `profiles/README.md`.
+`feature-scale.md`, `profiles/README.md`. `../README.md` routes between this skill and
+its neighbours (`/investigate`, `/approach`, `/review-change`, `/address-feedback`).
 
 ## Never skip
 
@@ -25,6 +26,13 @@ The step bodies state each rule once; this list is the reminder.
   bar while writing".
 - The **branch-name check** before the first push.
 - **Two turns** for every issue/PR write; **explicit confirmation** for every push.
+- The **scratch-merge gate** against current `origin/main` before every push.
+- The **intake repro, replayed** before the PR — the acceptance criteria are not a
+  substitute for re-running what started the task.
+- **A step that could not run is blocking, not a silent skip.** Stop and say what you
+  tried; never substitute weaker verification and report the step as done. A degraded
+  step looks identical to a passed one in the final report, which is what makes this the
+  easiest rule in the list to break and the most expensive.
 
 ## Resuming
 
@@ -76,6 +84,11 @@ Org-wide constants (hold in every GK repo, no profile needed):
   path to the root cause. Dispatch this to an `Explore`/`general-purpose` subagent once
   it needs more than a couple of targeted reads, so only the root-cause note reaches
   this context. If it cannot be verified, report that and stop.
+- Before filing, search for an existing issue (`issues_get_detail` on anything the
+  source material references, plus a keyword search over open AND recently closed
+  issues). A duplicate is a comment on the original, not a second issue; a recently
+  closed one that describes this exact problem is evidence for the freshness check, not
+  a reason to stop.
 - If no GitHub issue exists, create one via `issues_create` per the write path above,
   with `assignees: ["ianhattendorf"]`. The body must include **acceptance criteria** —
   review rounds are judged against them and scope disputes are settled by them. Ask
@@ -124,6 +137,23 @@ changes scope or touches a new invariant, return to step 2 rather than improvisi
 
 Write comments to the bar in `rules/comment-audit.md` now, so step 9 is a no-op.
 
+### Prove the test covers the bug
+
+A test added for a fix **must be observed failing without the fix**. Run it against the
+pre-fix tree — `git stash push -u` the fix, or run the test at the parent commit in a
+disposable worktree — record the failure output, then confirm it passes with the fix.
+Paste both outcomes into the task note.
+
+This is the one claim in the loop that is otherwise taken on assertion. A test written
+after the fix, against the fixed code, passes whether or not it exercises the defect:
+the profile's "derive the covering set by grepping the changed identifiers" finds tests
+that BREAK, and nothing else establishes that the new test would have CAUGHT this. A
+test that passes on the pre-fix tree is not a regression test — fix the test, not the
+record.
+
+Skip only when the change has no testable surface (a comment, a doc, a string), and say
+so in one line.
+
 ### Commit strategy
 
 - **Commit at every converged boundary**: review converged (step 5), after
@@ -154,6 +184,11 @@ Each round, dispatch the review subagent in `rules/fix-or-reject.md`, floor **me
 and triage its findings by that file's rules. Skip a round only when every hunk in the
 diff is comment-only, i18n-string-only, or pure formatting.
 
+When the diff touches a **security-sensitive surface** from the profile's list — or
+adds/changes a direct dependency or the lockfile — run `/security-review` once, after
+correctness converges and before step 6. Its findings triage by the same
+`rules/fix-or-reject.md` rules as any other round.
+
 After fixing, return to step 4, then review again. **Convergence** is a round with no
 findings, or one whose findings are all rejected — cap at ~3 rounds. If rounds
 oscillate (a round re-raises what the previous fix introduced), stop patching — the fix
@@ -174,6 +209,23 @@ For any change with a user-visible surface or an event-producing path, verify li
 using the profile's method. Findings go to step 4; return to step 5 only if a fix was
 non-trivial.
 
+Run the live tool in **findings-only mode** — it reports, this loop fixes. A live tool
+that dispatches its own fix agents would put code past steps 4 and 5, and its verify
+step is not this profile's gate list.
+
+If the tool writes artifacts into the repo worktree (Kepler's `/live-exercise` writes
+`.tasks/<feature>-exercise/`), **fold them into a task note before moving on**:
+findings with their dispositions, and every "liberty taken" entry, which step 10's PR
+body needs. Those files are gitignored and worktree-local — they do not survive a
+`discard_worktree`, and a resume reads task notes, not them.
+
+### 7b. Replay the intake repro
+
+Re-run the reproduction from the step 1 note against the fixed build and record the
+result in the task note. Step 10 cites it. Acceptance criteria are checked separately
+and are not a substitute: they are what the fix was supposed to achieve, and the repro
+is what actually happened to someone.
+
 ## 8. Human live run (skippable)
 
 **Skip when** the change is backend-only with no user-visible surface and has direct
@@ -184,6 +236,13 @@ Otherwise hand the human a ready-to-test setup and stop: the app running via the
 profile's launch method, and a short script — the 3–5 interactions that exercise the
 change and the one or two places a regression would show. Wait for their report;
 findings go to step 4.
+
+**If they are not there, park — do not idle.** Commit the checkpoint, record in the task
+note that the handoff is pending and what was handed over (the URL, the script, the
+instance and how to stop it), and end the session. The same applies to any blocking
+wait in this loop, including the two-turn issue/PR confirmations: a waiting session
+burns a live context to no purpose, and the note is what lets the next one resume in one
+read.
 
 ## 9. Comment audit — final gate
 
@@ -197,7 +256,7 @@ step 3, not as a reason to skip it next time.
 - Fetch; rebase if behind `origin/main` — gates on a stale base prove nothing about
   post-merge main. Re-run gates after any rebase.
 - All gates green, the profile's extra PR checks done, step 9 actually run as a
-  subagent.
+  subagent, step 7b's repro replay recorded.
 - Changelog per the profile's convention (written-in-change: the edit is part of this
   PR; mined-at-release: write nothing).
 - Print a high-level summary to chat: at most 5 bullets of at most 2 sentences — a
@@ -213,8 +272,8 @@ step 3, not as a reason to skip it next time.
 - Open the PR via `pull_request_create` per the write path above. No assignee. The
   body covers: the problem (link the issue); the approach and why, lifted from the
   approach note with one line per rejected option — those are what a reviewer would
-  otherwise propose; invariants touched; how it was verified (gates + live + human
-  run); any noted out-of-scope findings. Describe the shipped end state, not the review
+  otherwise propose; invariants touched; how it was verified (gates + the replayed
+  intake repro + live + human run, and for a fix, the test observed failing without it); any noted out-of-scope findings. Describe the shipped end state, not the review
   process — an in-scope bug a round caught and fixed is part of the approach, not a
   callout; that narrative lives in the task notes. Only out-of-scope findings are
   named, because those ask the human for a scope decision.
@@ -222,6 +281,22 @@ step 3, not as a reason to skip it next time.
 - Slack-originated task: remind the human in chat to reply to the thread — the
   permalink from the intake note, the PR URL, and a suggested reply if useful. Do not
   post to the thread yourself; the human speaks to humans.
+
+## 11. Teardown
+
+The loop leaves running processes and disposable checkouts behind; a task that ends
+without clearing them costs the next one a port, a lock, or a confusing worktree.
+
+- Stop every live instance this task started, **using the profile's stop command** —
+  never a process-name match. Names overlap (Kepler's `kepler-serve` is a prefix of the
+  real `kepler-server` daemon), and the wrong match kills the human's own work.
+- Remove any scratch-merge worktrees; confirm none are left with `git worktree list`.
+- Confirm no background agents or background Bash processes are still running.
+- The task worktree stays — the PR is open against it. Say in the final note what was
+  left running deliberately and why.
+
+State what was torn down in one line. "Nothing was running" is a valid line; silence is
+not, because a leaked instance is invisible until it collides.
 
 **After the PR is open**, feedback rounds — reviewer comments (human or bot), CI
 failures, requested changes — run `/address-feedback`. Do not request bot reviewers —

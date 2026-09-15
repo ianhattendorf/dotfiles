@@ -4,38 +4,33 @@ Mechanics — script gotchas, `serve:isolate`, the pairing URL, Storybook — ar
 repo `CLAUDE.md`, which loads in every kepler session. This file carries only what the
 workflow adds.
 
-- **Gates**: `pnpm typecheck`; `pnpm lint` (a `const { x: _x, ...rest } = y` strip needs
-  `// oxlint-disable-next-line typescript/no-unused-vars` above it — the config ignores
-  underscore-prefixed args only, not destructured vars); `pnpm exec vitest run <the
-  tests covering the change>`; `pnpm design` if any UI was touched; `pnpm format:check`;
-  `pnpm storybook:smoke` if a component's props, mount behavior, or a `.stories.tsx`
-  changed or was deleted (CI doesn't gate on it, and nothing else catches an empty
-  render or a mount-time throw).
+- **Gates**: `pnpm check` (oxlint with type-aware rules AND TypeScript compiler diagnostics —
+  this REPLACED the old `pnpm typecheck` + `pnpm lint`, which no longer exist as scripts;
+  bare `oxlint` misses both, including `no-floating-promises`); `pnpm format:check`;
+  `pnpm design:tokens` + `pnpm design:padding` (CI enforces only these two — `pnpm design`
+  also runs `design:contrast`, a local-only gate; run all three after a UI edit anyway);
+  `pnpm exec vitest run <the tests covering the change>`; `pnpm storybook:smoke` if a
+  component's props, mount behavior, or a `.stories.tsx` changed or was deleted (CI doesn't
+  gate on it, and nothing else catches an empty render or a mount-time throw).
+  What CI actually runs in one job is
+  `pnpm check && pnpm format:check && pnpm design:tokens && pnpm design:padding && pnpm exec vitest run`,
+  plus the suite as four `--shard=N/4` jobs.
   Only the vitest gate accepts a scope, so it is the only one that can silently narrow.
   **Derive the covering set by grepping the changed identifiers** (a constant name, an
   entitlement id, an exported symbol) across all of `src/`, not from the file list a
   plan or earlier round named — a test that pins a changed value can live anywhere —
   and re-derive after each round. **Before step 10, run the literal `pnpm test` at
-  least once**: it is what CI gates on.
-- **Invariants source**: repo `CLAUDE.md` "Rules that aren't obvious from the code" +
-  `docs/ARCHITECTURE.md`.
+  least once**: it is what CI gates on. A new suite that SPAWNS a process also needs a
+  `WEIGHTS_SECONDS` entry in `scripts/vitest-sequencer.mts`, or it silently unbalances a shard.
+- **Invariants source**: the enforced-rules list in the repo `CLAUDE.md` (currently
+  under "Architecture"; it carries one line + its residual test + a pointer per rule)
+  plus the section of `docs/ARCHITECTURE.md` each one points at. Match on the content,
+  not the heading text — the heading has been renamed once already.
 - **Live verification**: `/live-exercise` against an instance launched with
-  `pnpm serve:isolate` in the task worktree. Plain `pnpm serve` only when a test
+  `pnpm serve:isolate` in the task worktree (stop it with `pnpm serve:isolate stop` — NEVER by process-name match, which also kills the real `kepler-server` daemon). Plain `pnpm serve` only when a test
   specifically needs the shared data dir's live state. Desktop-specific behavior
   (packaging, PTY, window management): the `drive-electron-mcp` skill, which needs a
   display (Xvfb on a headless VM, provisioned at the VM level).
-- **A broken live-verification tool is blocking, not a silent skip.** Stop and tell the
-  human what you tried; do not substitute weaker verification (unit tests, a single
-  human run) and report the step as done — a degraded step looks identical to a passed
-  one in the final report.
-- **Event-driven UI code needs its async interleavings reasoned through explicitly.**
-  Two independent sources correlated only by an id (an RPC response and a broadcast
-  event; a streamed chunk and an exit signal) can arrive in either order, and a
-  listener gated on a not-yet-known id can race the event meant to fill it. A static
-  diff read misses this because the code looks correct in sequence; only injecting
-  out-of-order delivery against a mounted runtime reveals it. When a change adds a new
-  pair of independent async sources, walk every interleaving in review, and name any
-  gap as an UNVERIFIED risk in the PR body rather than a generic "couldn't test the UI".
 - **Human live run handoff**: `pnpm serve:isolate -- --json-ready` in the task worktree,
   then print the **owner-token URL** built from its `KEPLER_READY` line — `pairingUrl`
   host and port with `?token=<token>`; `/live-inspect` has the one-line `jq`. Never the
@@ -60,5 +55,10 @@ workflow adds.
   default-off).
 - **Never-skip list (human live run)**: UI changes, event-flow/multi-window changes,
   anything touching the terminal or agent-session paths.
+- **Security-sensitive surfaces** (route the diff through `security-review`, per
+  SKILL.md step 5): auth tokens and account credentials, the HTTP/WebSocket transport
+  boundary and `HTTP_MAP` policy, packaging identity and Electron fuses, the renderer
+  clipboard, MCP tool identity and auto-approval, and any change to the lockfile or a
+  direct dependency.
 - **Extra PR checks**: telemetry changes mirror `TELEMETRY.md` in the same change —
   reviewers bounce the PR on it.

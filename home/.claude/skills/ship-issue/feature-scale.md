@@ -1,9 +1,11 @@
 # Feature scale
 
 When planning reveals the work spans multiple sessions or breaks into phases, the plan
-is a **durable artifact, not a plan-mode plan**: write `PLAN.md` in the task folder,
-record a pointer + approval status as a task note, and have the human review the file
-itself.
+is a **durable artifact, not a plan-mode plan**: write `PLAN.md` in the workspace task
+folder — `<workspace>/tasks/<task-id>/PLAN.md`, alongside the task's other resources,
+**never in the repo worktree** (`PLAN.md` is not gitignored there, so a repo-root copy
+is one `git add -A` away from shipping a workflow artifact into the repo) — record a
+pointer + approval status as a task note, and have the human review the file itself.
 
 ## The plan must contain
 

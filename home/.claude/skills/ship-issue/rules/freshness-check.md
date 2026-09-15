@@ -18,6 +18,16 @@ Tasks pause for days and `main` moves. Before continuing from the recorded step:
      conflicts only grow with delay. Re-run gates after; a non-trivial conflict
      resolution is a fix and gets a review round.
 
+## The premise can also die mid-step
+
+The classification above is not only for a resume. When implementation itself shows the
+premise is gone — the behavior turns out to be intended, the repro was environmental,
+the acceptance criteria cannot be met as written — stop at that point and run the same
+`AskUserQuestion` confirmation. Do not keep building to preserve the work already done,
+and do not quietly reshape the issue to fit what the branch now does: the issue is the
+agreement, and changing it is the human's call. Record the evidence in the task note
+first, so the decision is made against it rather than against a summary.
+
 Record the outcome in the running task note either way, so the next resume knows the
 last-verified baseline. An `/investigate` or `/approach` note records the baseline sha
 it was written against — check against that one.
