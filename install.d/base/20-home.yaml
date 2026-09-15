@@ -6,6 +6,7 @@
     # Per-skill, not the whole ~/.claude/skills directory, so skills installed by other
     # means stay put. The agent-vm guest reaches the same tree through a symlink in
     # profiles/agent-vm (it links ~/.claude/skills wholesale — see vm/provision.sh).
+    ~/.claude/skills/README.md: home/.claude/skills/README.md
     ~/.claude/skills/ship-issue: home/.claude/skills/ship-issue
     ~/.claude/skills/investigate: home/.claude/skills/investigate
     ~/.claude/skills/review-change: home/.claude/skills/review-change
