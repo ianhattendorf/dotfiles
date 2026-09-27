@@ -18,3 +18,7 @@ Host switch-1
       KexAlgorithms +diffie-hellman-group1-sha1
       HostKeyAlgorithms +ssh-rsa
       PubkeyAcceptedAlgorithms +ssh-rsa
+
+Host router-query
+    HostName 10.42.32.1
+    User router-query
