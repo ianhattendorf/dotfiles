@@ -124,6 +124,33 @@
   (setq-default cursor-in-non-selected-windows nil)
   (setq highlight-nonselected-windows nil))
 
+(setq tramp-verbose 6)
+
+(with-eval-after-load 'tramp-sh
+  (add-to-list
+   'tramp-sh-extra-args
+   '("bash\\.exe\\'" . "-noediting -norc -noprofile"))
+
+  ;; Replace any previous definition from our experiments.
+  (setq tramp-methods
+        (assoc-delete-all "sshwin" tramp-methods))
+
+  (add-to-list
+   'tramp-methods
+   '("sshwin"
+     (tramp-login-program "ssh")
+     (tramp-login-args
+      (("-l" "%u")
+       ("-p" "%p")
+       ("-e" "none")
+       ("-T")
+       ("-o" "RemoteCommand=\"%l\"")
+       ("%h")))
+     (tramp-async-args (("-q")))
+     (tramp-remote-shell "bash.exe")
+     (tramp-remote-shell-login ("-l"))
+     (tramp-remote-shell-args ("-c")))))
+
 ;;; Completion Framework
 
 (use-package savehist

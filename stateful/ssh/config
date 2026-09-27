@@ -22,3 +22,6 @@ Host switch-1
 Host router-query
     HostName 10.42.32.1
     User router-query
+
+Host win-vm win-vm.internal.ianhattendorf.com
+    Hostname win-vm.internal.ianhattendorf.com
