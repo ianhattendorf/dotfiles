@@ -25,7 +25,10 @@ confidence level than a full one, and the human must know which they got.
   the task is about it. Pull the PR detail AND all existing reviews/comments
   (`pull_request_get_detail`, `pull_request_get_comments`) — anything a previous
   reviewer already raised is off the findings list; read the discussion before
-  forming opinions, not after. Spec = the linked issue's acceptance criteria.
+  forming opinions, not after. Spec = the linked issue's acceptance criteria. A
+  **merged** PR's diff is its merge commit from the PR detail (squash: that commit;
+  rebase-merge: the last `commits.length` commits ending there; true merge:
+  `sha^1..sha`) — not the worktree's branch, whose diff against main is empty.
 - **Branch or commit/range**: diff is `merge-base(target-branch)..head` (or the
   given range). No discussion to dedup. Spec: a linked issue if one is referenced;
   otherwise use `AskUserQuestion` to ask what the change is meant to do — offer
@@ -37,8 +40,10 @@ confidence level than a full one, and the human must know which they got.
   Uncommitted working-tree changes are NOT this case: the dirty tree is a checkout;
   treat it as a branch.
 
-Whatever the target: establish intent before hunting defects. Flawless code solving
-the wrong problem is a finding, and often the most valuable one.
+Whatever the target: resolve it to one diff here, and every later step — gates
+checkout, the review subagent, the second-model review — reviews that diff, never the
+worktree's branch by default. Then establish intent before hunting defects. Flawless
+code solving the wrong problem is a finding, and often the most valuable one.
 
 ## 2. Checkout state (targets with a checkout)
 
@@ -48,7 +53,9 @@ the PR's current head SHA (from the PR detail) — commits may have been pushed 
 the worktree was created. If HEAD is behind, fast-forward; if the worktree is on
 some other branch entirely, say so and sort it out with the human before reviewing
 the wrong code. For a branch or commit target, run the same check against the named
-ref.
+ref. A merged PR or a commit already on `origin/main` needs only a checkout that
+contains it — HEAD will never equal a rebased-away head SHA, and that is not a
+mismatch.
 
 If a prior review note exists (step 8), this is a **re-review** — scope it instead
 of starting over:
@@ -76,6 +83,10 @@ already flagged as a verdict caveat by step 1.)
   the only review the change gets. For large or high-stakes targets
   (security-adjacent, invariant-heavy, >~1k lines), self-escalate to `xhigh` — accept
   the extra triage noise there and only there.
+- Beside it, run the second-model review in
+  `~/.claude/skills/ship-issue/rules/second-model-review.md` (effort `high`) on the
+  diff step 1 resolved, with the intent line when step 1 produced a spec and without
+  it for a cold read. Merge both finding sets before triage.
 - Make an explicit pass against the profile's invariants source — enforced and
   load-bearing rules first (the ones with residual tests are cheap to check; the
   ones without are where a reviewer earns their keep).
@@ -115,7 +126,8 @@ Skip silently when the change has no user-visible surface.
 Nothing is posted anywhere. Produce in chat:
 
 - **Verdict**: one line — approve / approve-with-nits / needs-changes, and why —
-  plus any step-1 degradation caveats (static-only, intent unverified).
+  plus any step-1 degradation caveats (static-only, intent unverified, second-model
+  review run without intent).
 - **Per finding**: TL;DR of the problem, a `file:line` link, and suggested feedback
   written to be sent as-is through whatever channel fits (PR comment, Slack reply
   to the author) — plain and direct, non-AI voice (no "Great work overall!", no

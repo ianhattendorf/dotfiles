@@ -52,7 +52,9 @@ How much you must read before touching anything depends on whose diff it is:
   adopts its defects as yours. Read the full diff and the entire discussion
   first, then dispatch the review subagent in
   `~/.claude/skills/ship-issue/rules/fix-or-reject.md` (floor medium) on the whole
-  PR — its findings join the ledger like any reviewer comment. Check for the original author's unpushed
+  PR, plus the second-model review in that directory's `second-model-review.md` on
+  the same range — the first full read of code you did not write is where a second
+  family pays most. Both finding sets join the ledger like any reviewer comment. Check for the original author's unpushed
   intent (draft status, WIP markers, TODOs in the diff, a stated plan in the
   discussion) before overriding any of it. Suggest the human post a one-line
   "taking this over" comment — course-changing someone's PR silently is rude
@@ -89,8 +91,11 @@ A PR comment is a finding, not an order: triage each by
   `git fetch origin`, merge the branch into `origin/main` in a disposable worktree
   (`--no-commit --no-ff`), run at least the typecheck gate there, remove it. Not a
   rebase of the real branch.
-- Run that file's review subagent once per round. A UI-visible fix additionally
-  gets the profile's live verification, targeted at what the fix claims.
+- Run that file's review subagent (plus the second-model review, since a push
+  follows) on the head you will push. If you fix any of its findings, review again:
+  the push waits for a clean round, per ship-issue step 5's convergence rule. The
+  reviewer's own fixes are the likeliest source of new findings. A UI-visible fix
+  additionally gets the profile's live verification, targeted at what the fix claims.
 - Before pushing, run the audit in
   `~/.claude/skills/ship-issue/rules/comment-audit.md` scoped to every comment
   added or edited this round (`git diff <round-start-head>..HEAD`). A round

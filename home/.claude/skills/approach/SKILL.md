@@ -10,10 +10,16 @@ decision note good enough that planning starts from a settled direction and no l
 session or review round re-litigates it. This skill ends at the decision. It plans
 nothing, implements nothing, and does not re-derive the *what*.
 
+Normally entered **from `/ship-issue` step 2**, which checks whether the approach is
+contested and calls this skill when it is; an upstream verdict note never routes here
+directly. Invoke it by hand only when the human wants direction settled before an
+issue is filed — the one case where the choice changes the acceptance criteria.
+
 Hard limits (the point of this skill vs. its neighbours):
 
 - **No re-investigation.** The inputs are a verified problem (an `/investigate` note or
-  a ship-issue step 1 note) or a stated feature intent, plus acceptance criteria. If
+  a ship-issue step 1 note) or a stated feature intent (an `/explore` note, or the
+  human in chat), plus acceptance criteria. If
   the problem is unverified, stop and say so — this skill would be choosing between
   ways of building the wrong thing. If no issue exists yet, take the intent and
   criteria from the human in chat and record them in the note; ship-issue step 1
@@ -39,9 +45,13 @@ Hard limits (the point of this skill vs. its neighbours):
 
 ## 2. Enumerate
 
-- Produce **two or three credible options**. If only one is credible, this skill has
-  nothing to decide: record a one-line "single credible approach: <shape>" note so
-  ship-issue step 2 can skip cleanly, and stop.
+- **Dispatch the second-model option generation first**
+  (`~/.claude/skills/ship-issue/rules/second-model-review.md`, option form), blind to
+  anything below, and enumerate while it runs. Its options join the cards per that
+  file's triage before you recommend.
+- Produce **two or three credible options**. If only one is credible, and Codex found
+  no second one either, this skill has nothing to decide: record a one-line "single
+  credible approach: <shape>" note so ship-issue step 2 can skip cleanly, and stop.
 - **Every option needs a genuine advocate.** When the choice is contested — you cannot
   say in one sentence why one option wins — sketch each option with a separate
   fresh-context `Plan` subagent, given only the frame from step 1 and the invariants,
@@ -55,7 +65,8 @@ Hard limits (the point of this skill vs. its neighbours):
   when done), the rest read remotely via `gh` or the GitKraken MCP. A sibling's
   implementation is evidence for an option, not an option by itself — the lesson goes
   on the card, not a description of what the sibling does.
-- **Card shape**, one per option, and the same shape for all:
+- **Card shape**, one per option, and the same shape for all (the option form in
+  `second-model-review.md` asks Codex for these fields; change them together):
   - *Shape*: one paragraph of how it works.
   - *Invariants touched* (from the profile's source) and any **new concept**
     introduced — an event, a table or migration, a setting, a flag, a wire route.
@@ -64,6 +75,9 @@ Hard limits (the point of this skill vs. its neighbours):
   - *Hinges on*: the unknown that would flip the verdict, if any — this is what
     becomes a feasibility spike in step 3.
 - A card running past ~10 lines is turning into a plan. Cut it back to altitude.
+- **When the options differ in what the user sees or does**, show them on one `/design`
+  canvas, one artboard per option, before asking
+  (`~/.claude/skills/ship-issue/rules/design-canvas.md`). Each card names its artboard.
 
 ## 3. Recommend and decide
 
@@ -89,7 +103,7 @@ shape — this is the interface ship-issue step 2 consumes. All seven parts, in 
    chosen**. The rejected options are the load-bearing part — they are what stops a
    later review round or session from re-proposing them.
 3. **Decision**: the chosen option and why, in the human's words if they overrode the
-   recommendation.
+   recommendation. If a `/design` canvas was used, its URL and the picked artboard.
 4. **Consequences**: the invariants the plan must respect, the new concepts introduced,
    what is foreclosed, and the out-of-scope items that surfaced (these go to the plan's
    backlog, never into the MVP as defensive code).

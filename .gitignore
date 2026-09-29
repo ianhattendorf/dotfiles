@@ -1,1 +1,3 @@
 .profile-lock
+# Claude Code's org-synced managed-skills cache; lands here because the guest links ~/.claude/skills into the repo.
+profiles/agent-vm/home/.claude/skills/synced/

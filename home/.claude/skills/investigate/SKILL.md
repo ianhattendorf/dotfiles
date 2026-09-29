@@ -63,9 +63,12 @@ record it as a task note (`add_task_note`). The note's shape is the interface
    noticed but not chased.
 6. **Baseline**: repo, commit sha investigated at, and the date — ship-issue's
    freshness check re-validates against this before an issue is filed on it.
-7. **Next step**: usually "invoke /ship-issue; intake note exists — start at issue
-   creation", or "invoke /approach first — more than one credible way to build this"
-   (say what the fork is), or "reply to the reporter asking for X", or "no action".
+7. **Next step**: "invoke /ship-issue; intake note exists — start at issue
+   creation", or "reply to the reporter asking for X", or "no action". Never "invoke
+   /approach first": ship-issue step 2 decides whether the approach is contested and
+   runs `/approach` itself. If you saw more than one credible way to build the fix,
+   record the fork and its options under **Approach fork** in the note — that is what
+   step 2 reads to decide — and still route to `/ship-issue`.
 
 If the verdict is `real — worth an issue` and the human says to proceed, that is
 `/ship-issue` from here on — this skill does not continue into it.

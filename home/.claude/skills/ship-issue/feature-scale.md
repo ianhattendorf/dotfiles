@@ -5,7 +5,8 @@ is a **durable artifact, not a plan-mode plan**: write `PLAN.md` in the workspac
 folder — `<workspace>/tasks/<task-id>/PLAN.md`, alongside the task's other resources,
 **never in the repo worktree** (`PLAN.md` is not gitignored there, so a repo-root copy
 is one `git add -A` away from shipping a workflow artifact into the repo) — record a
-pointer + approval status as a task note, and have the human review the file itself.
+pointer + approval status as a task note, and have the human review the file itself
+once the second-model plan review (ship-issue step 2) has run on it.
 
 ## The plan must contain
 

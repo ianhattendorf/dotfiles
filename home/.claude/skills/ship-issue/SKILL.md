@@ -12,8 +12,8 @@ inherits the session model — no pinned models or effort overrides except where
 writes one in.
 
 Shared procedures live beside this file and are read when a step calls for them:
-`rules/freshness-check.md`, `rules/fix-or-reject.md`, `rules/comment-audit.md`,
-`feature-scale.md`, `profiles/README.md`. `../README.md` routes between this skill and
+`rules/freshness-check.md`, `rules/fix-or-reject.md`, `rules/second-model-review.md`,
+`rules/comment-audit.md`, `feature-scale.md`, `profiles/README.md`. `../README.md` routes between this skill and
 its neighbours (`/investigate`, `/approach`, `/review-change`, `/address-feedback`).
 
 ## Never skip
@@ -22,10 +22,13 @@ The step bodies state each rule once; this list is the reminder.
 
 - The **freshness check** on every resume, however short the pause felt.
 - **Review is a fresh subagent**, never an inline read of your own diff.
+- The **second-model review on every plan before approval and on the final pre-push
+  round**; a Codex run that could not run is blocking, not skipped.
 - The **comment audit is a fresh subagent** before the first push, never "I held the
   bar while writing".
 - The **branch-name check** before the first push.
 - **Two turns** for every issue/PR write; **explicit confirmation** for every push.
+- **Every human decision goes through `AskUserQuestion`**, never a question in prose.
 - The **scratch-merge gate** against current `origin/main` before every push.
 - The **intake repro, replayed** before the PR — the acceptance criteria are not a
   substitute for re-running what started the task.
@@ -66,8 +69,22 @@ Org-wide constants (hold in every GK repo, no profile needed):
   is not already in chat, print it first; never fold the two turns into one.
 - Pushes go over SSH and always need explicit human confirmation — a permission rule,
   not a capability limit; a successful `git push` is not evidence it was pre-approved.
-- Issues are assigned to `ianhattendorf`; PRs are never assigned. Project-board status
-  cannot be set by tooling — ask the human.
+- **A decision that is the human's to make is posed with `AskUserQuestion`** — the
+  named ones above, and equally any that arises mid-loop and is not covered by a step.
+  Never as a question in chat prose: prose does not block, so the loop reads the next
+  instruction as an answer and decides by default. The same holds when a step routes
+  the decision elsewhere (step 2 sends a contested approach to `/approach`) — take that
+  route, and if there is a reason not to, the choice between routes is itself a
+  question for the human, asked with the tool.
+- **Anything the human must read before answering goes in a message that ends the
+  turn**, never in text written just before the question in the same turn. Kepler's
+  transcript can hold back text written before a tool call and show only the question
+  card, so a card that says "the URLs above" can refer to text the human never saw. A
+  card that asks within one turn must stand on its own: its question and option text
+  carry everything needed to answer.
+- Issues are assigned to `ianhattendorf` — on a pre-existing issue that means checking
+  the assignee at intake, not only setting it at creation. PRs are never assigned.
+  Project-board status cannot be set by tooling — ask the human.
 - Task workspace tooling (worktrees, task notes, `attach_link`) works identically in
   every repo.
 
@@ -77,7 +94,10 @@ Org-wide constants (hold in every GK repo, no profile needed):
   freshness check against its baseline sha, then start at issue creation below (the
   note carries a draft title). A task carrying an `/approach` note but no issue: the
   problem statement and acceptance criteria come from that note — file the issue from
-  them, then step 2 plans against the same note.
+  them, then step 2 plans against the same note. A task carrying an `/explore` note
+  with a `commit` verdict is the same case: its "Done looks like" list is the
+  acceptance criteria, its "Not this" list is the scope you decided not to touch, and
+  its "Approach fork" is what step 2 reads.
 - Pull the source material into context directly: GitKraken MCP tools for issue
   detail, Slack tools for threads. Do not work from a paraphrase.
 - Verify the problem is real before anything else: reproduce it, or trace the code
@@ -89,6 +109,14 @@ Org-wide constants (hold in every GK repo, no profile needed):
   issues). A duplicate is a comment on the original, not a second issue; a recently
   closed one that describes this exact problem is evidence for the freshness check, not
   a reason to stop.
+- When the issue already exists, check its assignee in the `issues_get_detail` result.
+  If it is unassigned or assigned to someone else, stop and ask with `AskUserQuestion`
+  before any implementation work — options "Self-assign and continue" (recommended),
+  "Continue without assigning", and, when someone else holds it, "Stop — it's theirs".
+  Someone else's assignment is a signal they may already be working it, and an
+  unassigned issue shipped to a PR leaves no record of who took it. On "self-assign",
+  write the assignee through the GitKraken MCP; if no tool there can set it, hand the
+  human the exact change to make instead of substituting a comment.
 - If no GitHub issue exists, create one via `issues_create` per the write path above,
   with `assignees: ["ianhattendorf"]`. The body must include **acceptance criteria** —
   review rounds are judged against them and scope disputes are settled by them. Ask
@@ -125,6 +153,14 @@ Then plan in **plan mode** so the human approves before implementation:
 - Name: the files/seams to change, **which repo invariants the change touches**, which
   gates apply, and the intended test surface (test files, extra gates, what live
   verification covers).
+- **A UI change names its visual target**: the `/design` artboard an explore or
+  approach note picked, or, when no note settled the visual shape, one produced now
+  (`rules/design-canvas.md`). A change the existing components already dictate needs
+  none; say so.
+- **Before asking for approval, run the second-model plan review**
+  (`rules/second-model-review.md`, plan-review form) and triage it per that file; the
+  plan you present carries its outcome. A revision re-runs it only when it changes the
+  files, seams or invariants the plan names.
 - Refinement happens in the approval loop, *within* the decided approach. Feedback that
   questions the approach itself goes back to `/approach` with the feedback as
   evidence, not into a plan revision. No implementation without approval.
@@ -190,10 +226,17 @@ correctness converges and before step 6. Its findings triage by the same
 `rules/fix-or-reject.md` rules as any other round.
 
 After fixing, return to step 4, then review again. **Convergence** is a round with no
-findings, or one whose findings are all rejected — cap at ~3 rounds. If rounds
+findings, or one whose findings are all rejected, **on the head you will push**. A
+round whose findings you fixed has not converged, however small the fixes. Its fixes
+are unreviewed code and get one more round. The same applies to anything that changes
+code after convergence: step 6, step 8's fixes, a pre-push nit. The exception is
+step 9's comment-only edits, which need only the format gate. Cap at ~3 rounds. Hitting
+the cap without a clean round is the oscillation signal below, not permission to push.
+If rounds
 oscillate (a round re-raises what the previous fix introduced), stop patching — the fix
-shape is wrong. Escalate one more review subagent to `xhigh` (optionally a different
-model) to characterise what the shape cannot accommodate, then take it to `/approach`
+shape is wrong. Escalate one more review subagent to `xhigh` and, beside it, the
+second-model review (`rules/second-model-review.md`, effort `xhigh`) to characterise
+what the shape cannot accommodate, then take it to `/approach`
 with the failed shape recorded as a rejected option and the findings as evidence, and
 re-plan (step 2) before writing more code.
 
@@ -201,17 +244,18 @@ re-plan (step 2) before writing more code.
 
 After correctness converges (never inside the loop), run `/simplify` a single time to
 collapse what the fix rounds accreted — code and comments alike. Re-run the gates.
-Only if it restructured something substantial, run step 5's subagent once more.
+If it changed code, run one more step 5 round. Step 5's convergence rule applies.
 
 ## 7. Automated live verification
 
 For any change with a user-visible surface or an event-producing path, verify live
-using the profile's method. Findings go to step 4; return to step 5 only if a fix was
-non-trivial.
+using the profile's method. Findings go to step 4, and a code fix goes back through
+step 5 (its convergence rule covers fixes made after convergence).
 
-Run the live tool in **findings-only mode** — it reports, this loop fixes. A live tool
-that dispatches its own fix agents would put code past steps 4 and 5, and its verify
-step is not this profile's gate list.
+**Ask the live tool for findings only, explicitly, in the invocation** — the profile's
+live-verification entry gives the exact form. It reports; this loop fixes. These tools default to
+fixing what they find, and fixes dispatched from inside one bypass steps 4 and 5 and
+are gated against its list rather than the profile's. Unasked, it will fix.
 
 If the tool writes artifacts into the repo worktree (Kepler's `/live-exercise` writes
 `.tasks/<feature>-exercise/`), **fold them into a task note before moving on**:
@@ -234,7 +278,8 @@ decision and reason in one line.
 
 Otherwise hand the human a ready-to-test setup and stop: the app running via the
 profile's launch method, and a short script — the 3–5 interactions that exercise the
-change and the one or two places a regression would show. Wait for their report;
+change and the one or two places a regression would show. If the plan names a
+`/design` artboard, link it so the human can compare the build against it. Wait for their report;
 findings go to step 4.
 
 **If they are not there, park — do not idle.** Commit the checkpoint, record in the task
