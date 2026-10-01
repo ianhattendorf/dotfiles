@@ -28,7 +28,7 @@ once the second-model plan review (ship-issue step 2) has run on it.
 
 Steps 3–7 run once per phase, not once per feature. Each phase ends with gates green,
 review converged, a checkpoint commit, and a task note recording phase status + what's
-next. Run `/simplify` at each phase boundary — a multi-day diff simplified only at the
+next. Run `rules/simplify.md` at each phase boundary — a multi-day diff simplified only at the
 end is too late. The human live run (step 8) happens at the demo-able milestone AND
 before the final PR. Review findings that are real but deferred go into the plan's
 backlog with a note, same as rejected findings.

@@ -1,57 +1,34 @@
 #!/usr/bin/env python3
-"""Print the Codex model every second-model dispatch passes as `-m`.
-
-Exit 0: stdout is the slug.
-Exit 2: the pinned model is no longer listed, or Codex offers an upgrade path for it.
-Exit 3: Codex lists a model that was not listed when the pin was last chosen.
-"""
+"""Print the user-selected Astra model; exit 2 when a readable catalog lacks it."""
 import json
+import os
 import sys
 from pathlib import Path
 
 PIN = "gpt-6-astra"
-KNOWN = {
-    "gpt-6-sol",
-    "gpt-6-astra",
-    "gpt-6-luna",
-    "gpt-5.6-sol",
-    "gpt-5.6-terra",
-    "gpt-5.6-luna",
-    "gpt-5.5",
-}
-
-cache = Path.home() / ".codex" / "models_cache.json"
-try:
-    models = {m["slug"]: m for m in json.loads(cache.read_text())["models"]}
-except (OSError, ValueError, KeyError) as e:
-    print(f"warning: cannot read {cache} ({e}); {PIN} is unchecked", file=sys.stderr)
-    print(PIN)
-    sys.exit(0)
-
-listed = {slug: m for slug, m in models.items() if m.get("visibility") == "list"}
 
 
-def show_listed():
-    for slug, m in sorted(listed.items(), key=lambda kv: kv[1].get("priority", 99)):
-        print(f"  {slug}: {m.get('description', '')}", file=sys.stderr)
+def select_model(cache):
+    try:
+        models = json.loads(cache.read_text())["models"]
+        slugs = {model["slug"] for model in models}
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print(f"warning: cannot read {cache} ({error}); {PIN} is unchecked", file=sys.stderr)
+        return PIN
+    if PIN not in slugs:
+        print(f"unavailable: {PIN} is not in {cache}; no fallback selected", file=sys.stderr)
+        return None
+    return PIN
 
 
-pin = listed.get(PIN)
-if pin is None or pin.get("upgrade"):
-    upgrade = (pin or {}).get("upgrade") or {}
-    reason = "is no longer listed" if pin is None else f"has an upgrade to {upgrade.get('model')}"
-    print(f"stale: {PIN} {reason}", file=sys.stderr)
-    if upgrade.get("migration_markdown"):
-        print(f"  {upgrade['migration_markdown']}", file=sys.stderr)
-    print("listed now:", file=sys.stderr)
-    show_listed()
-    sys.exit(2)
+def main():
+    config_dir = Path(os.environ.get("CODEX_HOME") or Path.home() / ".codex")
+    model = select_model(config_dir / "models_cache.json")
+    if model is None:
+        return 2
+    print(model)
+    return 0
 
-new = sorted(set(listed) - KNOWN)
-if new:
-    print(f"new since the pin was chosen: {', '.join(new)}", file=sys.stderr)
-    print("listed now:", file=sys.stderr)
-    show_listed()
-    sys.exit(3)
 
-print(PIN)
+if __name__ == "__main__":
+    sys.exit(main())

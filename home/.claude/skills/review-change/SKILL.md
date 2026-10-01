@@ -5,14 +5,16 @@ description: Review a change in a GitKraken-owned repo (Kepler, vscode-gitlens, 
 
 # Review a change (GitKraken repos)
 
+Read [../ship-issue/rules/host-runtime.md](../ship-issue/rules/host-runtime.md) first for host invocation, questions, planning, and fresh-agent dispatch. Workflow-internal references resolve from the containing document; repository-source pointers resolve from the target checkout. Profiles retain the conventions described in host-runtime.md.
+
+
 Produce a review of a change — a PR, a branch, a commit/range, or a raw diff:
 verdict + findings, delivered to the human. You are a reviewer, not a fixer — this
-skill changes nothing in the target and posts nothing anywhere. All work inherits
-the session model.
+skill changes nothing in the target and posts nothing anywhere. Work inherits the session model except the explicit reviewer selections in the shared rules.
 
 **Resolve the repo profile first**, exactly as ship-issue does: Read
-`~/.claude/skills/ship-issue/profiles/<repo>.md` (derive and write one if missing —
-the procedure is in `~/.claude/skills/ship-issue/SKILL.md`). The review consumes the
+`../ship-issue/profiles/<repo>.md` (derive and write one if missing —
+the procedure is in `../ship-issue/SKILL.md`). The review consumes the
 profile's gates, invariants source, and live verification method.
 
 ## 1. Resolve the target
@@ -31,7 +33,7 @@ confidence level than a full one, and the human must know which they got.
   `sha^1..sha`) — not the worktree's branch, whose diff against main is empty.
 - **Branch or commit/range**: diff is `merge-base(target-branch)..head` (or the
   given range). No discussion to dedup. Spec: a linked issue if one is referenced;
-  otherwise use `AskUserQuestion` to ask what the change is meant to do — offer
+  otherwise use the host question mechanism to ask what the change is meant to do — offer
   "Cold read only (correctness + invariants, no stated intent)" as an option
   alongside "Other" for the human to describe it — and say which you got in the
   verdict.
@@ -78,13 +80,13 @@ already flagged as a verdict caveat by step 1.)
 
 ## 4. Review
 
-- Dispatch the review subagent in `~/.claude/skills/ship-issue/rules/fix-or-reject.md`,
+- Dispatch the review subagent in `../ship-issue/rules/fix-or-reject.md`,
   floor **high** — above ship-issue's inner-loop floor deliberately, since this may be
   the only review the change gets. For large or high-stakes targets
   (security-adjacent, invariant-heavy, >~1k lines), self-escalate to `xhigh` — accept
   the extra triage noise there and only there.
 - Beside it, run the second-model review in
-  `~/.claude/skills/ship-issue/rules/second-model-review.md` (effort `high`) on the
+  `../ship-issue/rules/second-model-review.md` (effort `high`) on the
   diff step 1 resolved, with the intent line when step 1 produced a spec and without
   it for a cold read. Merge both finding sets before triage.
 - Make an explicit pass against the profile's invariants source — enforced and
@@ -109,7 +111,7 @@ claims to do and the one or two places a regression would show, not a full audit
 Offer this when the change touches anything on the profile's never-skip list (UI,
 event-flow, terminal/agent paths) and look-and-feel judgment matters to the verdict
 — a reviewer approving UI they never saw is signing someone else's work. Use
-`AskUserQuestion` to offer it ("Do a live UI pass" / "Skip, static review is
+the host question mechanism to offer it ("Do a live UI pass" / "Skip, static review is
 enough") rather than assuming either way. High level:
 
 1. Launch the change live and hand over the URL exactly as the profile's human

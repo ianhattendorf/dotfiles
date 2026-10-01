@@ -1,24 +1,20 @@
-# Second-model review — Codex as an independent reader
+# Second-model review — an independent model family
 
-A fresh Claude subagent removes the writing session's context but not the model
-family's blind spots. Codex is a reader from a different family that reads the same repo
-rules (Kepler's `AGENTS.md` is a symlink to `CLAUDE.md`; `codex exec review`'s built-in
-prompt reads and cites the applicable instruction file per finding). It is **read-only
-and advisory**: it never edits, never runs inside inner review rounds, never implements,
-and never decides. What it returns enters the calling step's triage like any other
-reviewer's findings or advocate's case.
+A fresh same-family reviewer removes the writer's context; a second family provides
+an independent read. Both are read-only and advisory. The parent triages findings,
+implements fixes, and owns decisions. Read `host-runtime.md` for host mechanics.
 
 ## When it runs
 
-- The **last correctness round before a push** (`fix-or-reject.md`), beside the Claude
+- The **last correctness round before a push** (`fix-or-reject.md`), beside the primary
   subagent — review form, effort `high`.
-- The **oscillation escalation** in ship-issue step 5, beside the `xhigh` Claude
+- The **oscillation escalation** in ship-issue step 5, beside the `xhigh` primary
   subagent — review form, effort `xhigh`.
 - `/review-change` step 4 — review form, effort `high`; without the intent line when no
   spec exists.
 - **Every plan before the human approves it** (ship-issue step 2, and a feature-scale
   `PLAN.md`) — plan-review form, effort `high`.
-- **`/approach` option generation**, blind, beside Claude's own enumeration — option
+- **`/approach` option generation**, blind, beside the writer's own enumeration — option
   form, effort `high`.
 - The **qualitative comment audit** (`comment-audit.md`) may be dispatched to it —
   comment-audit form, effort `high`.
@@ -26,101 +22,114 @@ reviewer's findings or advocate's case.
 A run that fails to start or exceeds ~15 minutes is a **step that could not run**:
 blocking under ship-issue's never-skip rule, never a silent skip.
 
-**The sandbox stays read-only.** That was not what limited it on kepler#3127: its runs
-there only read files and diffs, and never tried a command that the sandbox refused.
-Its false finding in the later `/review-change` came from a wrong code comment, and
-that run came from an interactive Codex session that could run tests (237 passed).
-Running tests would not have caught it. What it needs is the primary sources
-(`fix-or-reject.md`, "What the dispatch prompt carries"). The Claude side proves a
-Codex suspicion empirically during triage, with a scratch repro in its own scratchpad.
-A writable sandbox is `workspace-write`, which can edit the very worktree under review.
+Reviewer tools stay read-only. The writer investigates suspicions empirically during
+triage; inability to execute a test inside the reviewer is not a reason to grant it
+write access. Give it primary sources, not just the writer's paraphrase.
 
-## Model
+## Model selection — all forms
 
-Every form passes `-m` with the slug `codex-model.py` (beside this file) prints. The
-pin is Codex's frontier tier because the Claude side runs the frontier tier too; the
-unpinned default is the workhorse tier (`gpt-6-sol` as of codex-cli 0.157.0). The
-script is the only place the slug is written. It checks the pin against
-`~/.codex/models_cache.json`, which the CLI refreshes on every run:
+| Writing host | Second reviewer |
+| --- | --- |
+| Claude | Codex Astra, `gpt-6-astra` |
+| Codex | Claude Opus, explicit `--model opus` |
 
-- **Exit 0**: stdout is the slug. Dispatch.
-- **Exit 2, stale**: the pin is no longer listed, or Codex carries an upgrade path for
-  it (the retirement notice is printed). Blocking. Ask the human with `AskUserQuestion`
-  which model replaces it, the upgrade target first and "(Recommended)".
-- **Exit 3, new**: Codex lists a model that was not listed when the pin was chosen.
-  Ask the human with `AskUserQuestion` whether to switch, "Keep <pin>" and "Switch to
-  <new>" with each one's listed description.
+This applies to diff, plan, option, escalation, and comment-audit forms. Never use
+an unpinned default or a different tier as fallback. These flags do not change the
+writing session or global configuration.
 
-After either question, edit the script: `PIN` to the chosen slug and `KNOWN` to the
-set it just printed, so the same release is not asked about twice. Then dispatch. A
-missing cache prints a warning and exits 0; the run itself then fails loudly on a bad
-slug.
+For Codex, `codex-model.py` beside this file is the single executable pin. Exit 0
+prints Astra; exit 2 means the cache explicitly lacks the pin, and dispatch blocks.
+Unrelated new models and upgrade suggestions do not change the user's selection.
+An unreadable cache warns and attempts the explicit pin; a CLI rejection still
+blocks. For Claude, the installed CLI supports the `opus` alias. Capture its actual
+model ID from the JSON result's model usage when available. Authentication errors,
+model rejection, timeouts, and permission denials needed for the review block the
+step. Report them; changing the selected model requires a user decision.
 
-## Invocation
+## Prepare the review
 
-Resolve the target's diff before dispatching — it is an input to the prompt, not
-something the template derives. For ship-issue's own branch that is
-`merge-base(origin/main, HEAD)...HEAD`; for a merged PR it is the merge commit from the
-PR detail (`gh pr view N --json mergeCommit,commits`: a squash is that one commit, a
-rebase-merge is the last `commits.length` commits ending there, a true merge is
-`sha^1..sha`), never the checked-out branch; a commit is `sha^..sha`; a range is as given.
+Resolve the target before dispatch: branch `merge-base(origin/main, HEAD)...HEAD`,
+commit `sha^..sha`, explicit range as given, merged PR's actual merge/rebased range,
+or the dirty working tree. Never accidentally review the current branch for an
+unrelated target. Materialize dirty/untracked changes when the CLI cannot express
+the exact scope. Record the baseline and include all relevant added files.
 
-```
-model=$(python3 ~/.claude/skills/ship-issue/rules/codex-model.py) || exit $?
+Resolve the directory containing this rule to an absolute `rules_dir` and the
+review brief to an absolute `brief` path. Run from the target repository so its
+instructions load. The brief contains the exact scope, intent, acceptance criteria,
+primary-source pointers and the form below. Do not include the writer's transcript.
+Use distinct scratch files per run; do not put review artifacts in the tracked diff.
+
+Run through the host's background/session execution facility and poll to completion,
+with a 15-minute deadline. Record the session or launch PID for cleanup; stop only
+that owned run on timeout. Read output only after checking completion and status.
+The CLI needs network/auth access and writable runtime state outside the worktree.
+If the parent sandbox denies those, request the host's scoped execution escalation
+with a reason, keeping the reviewer's read-only/tool restrictions intact. Never
+disable the reviewer's restrictions to solve a parent sandbox failure. A rejected
+escalation or policy forbidding it leaves the review blocked.
+
+## Claude writer → Codex Astra
+
+```sh
+model=$(python3 "$rules_dir/codex-model.py") || exit $?
 out=$(mktemp -t codex-review-XXXXXX.md)
 codex exec review --ephemeral -m "$model" -c sandbox_mode='"read-only"' \
-  -c model_reasoning_effort='"high"' -o "$out" "$(cat <<EOF
-Review the change \`git diff <resolved diff spec>\`.
-Intent and acceptance criteria: <from the issue / task note, verbatim; omit this line for
-a cold read>.
-Report only findings with a concrete failure scenario: a specific input or state
-leading to a specific wrong output. Do not report style, formatting, or pre-existing
-issues.
-For every new trigger into existing shared or async state (a cache, lock, in-flight
-guard, event subscription), reason about what happens if it fires while another trigger
-on the same state is mid-flight. For any new pair of independent sources correlated
-only by an id, walk each arrival order.
-EOF
-)" < /dev/null
+  -c model_reasoning_effort='"high"' -o "$out" "$(cat "$brief")" < /dev/null
 ```
 
-Facts the flags encode — each was checked against codex-cli 0.155.1, `-m` against
-0.157.0:
+For a plan, options, comment audit, or a prepared diff file, use plain `codex exec`
+with the same flags. `review` supplies built-in diff-review guidance; do not use it
+for a plan. Do not combine `--base` or `--commit` with a prompt. For dirty changes,
+prefer a prepared diff and plain exec when intent must accompany the review.
 
-- **The prompt is three parts and nothing else**: diff range, intent, the interleaving
-  directive lifted from `fix-or-reject.md`. Do not restate repo invariants or the
-  generic finding bar — the built-in system prompt already reads the instruction file,
-  cites it per finding, excludes style and pre-existing bugs, and tags findings
-  `[P0]`–`[P3]`. Restating pushes it toward generic findings.
-- **`--base` and `--commit` are never used.** Each is mutually exclusive with a prompt,
-  neither can express a range, and a prompt without the intent line already gets the
-  built-in review guidelines — which is all a cold read needs. The one exception is a
-  dirty working tree, where `--uncommitted` (no prompt) is the honest form.
-- **Effort is pinned because the review subcommand's default is `none`**, not the
-  model's `medium`. `xhigh` at the oscillation escalation. The inner quotes are
-  required: the value is parsed as TOML. Do not set this or the model in `config.toml`
-  — it would change every interactive Codex session too.
-- **`< /dev/null` is required**: `codex exec` reads stdin whenever it is not a TTY,
-  even with a prompt argument, so a backgrounded run with stdin left open prints
-  "Reading additional input from stdin..." and hangs forever (seen 2026-09-28, kepler#3228).
-- **`--ephemeral`** writes no rollout under `~/.codex/sessions`. Kepler discovers
-  external Codex sessions by walking that directory, so a non-ephemeral run would appear
-  in the task's session list as a resumable conversation. `--thread-source` labels a
-  persisted thread only; with `--ephemeral` there is nothing to label — do not add it.
-- **`-o` holds the last message as plain text**: prose on an empty review, tagged
-  findings otherwise. Read it; never parse it as JSON. `mktemp` because two reviews can
-  overlap (a round still running while the next is dispatched, or two tasks in one
-  machine).
-- **`sandbox_mode` is pinned because `review` has no `-s` flag and a trusted project
-  (every GK repo is, per `~/.codex/config.toml`) defaults it to `workspace-write`**,
-  which lets the reviewer edit the worktree. Read-only is what makes it advisory.
+Use `xhigh` for escalation. Explicit read-only is required even for trusted repos.
+Closing stdin avoids a background invocation waiting for more input. `-o` is plain
+text, not JSON. Ephemeral runs do not persist a resumable rollout, although hooks
+may still produce a terminated external-session row in Kepler. Read the output and
+check the exit status; absence of findings is not proof the command succeeded.
 
-### The other forms
+## Codex writer → Claude Opus
 
-Plain `codex exec`, not `review`: the review subcommand's built-in prompt is written for
-a diff. Same `-m`, `--ephemeral`, `sandbox_mode`, effort, `-o` and `< /dev/null`, run from the
-repo worktree so the instruction file loads. Dispatch it in the background and carry on
-with the Claude side; the calling step waits for it before its triage.
+Prepare the diff as a file and name it in the brief: this reviewer has no shell to
+run git. Include the repo instruction paths, `fix-or-reject.md`, and any required
+plan/source files. Put scratch inputs in one directory and pass it as `inputs_dir`.
+Only add other directories when a referenced source lies outside the repo/inputs.
+
+```sh
+out=$(mktemp -t claude-review-XXXXXX.json)
+claude --print --model opus --effort high --restricted \
+  --tools Read,Glob,Grep --allowedTools Read,Glob,Grep \
+  --permission-mode dontAsk --strict-mcp-config --mcp-config '{"mcpServers":{}}' \
+  --settings '{"disableAllHooks":true}' --no-session-persistence \
+  --add-dir "$inputs_dir" "$rules_dir" --output-format json "$(cat "$brief")" < /dev/null > "$out"
+```
+
+This allowlist excludes shell, edits, writes, agent spawning and MCP mutations.
+Restricted mode ignores ordinary settings/plugins, confines file tools to working
+and explicitly added directories, and hooks are disabled for this review process.
+Do not add a fallback model or bypass-permissions flag. If these flags are not
+supported by the installed CLI, the review blocks until a supported read-only
+runner is available; do not drop the restrictions to get it running.
+
+Check exit status, `is_error`, `permission_denials`, and `result`; retain
+`modelUsage` as evidence of the selected model. A denial of a source needed for the
+review is a blocked step, not a clean finding set. Use xhigh for escalation. For
+all other forms, change the brief, not the model or tool restrictions.
+
+The same restricted CLI procedures can supply a primary reviewer when the native
+fresh-agent tool cannot enforce read-only access. In that case use the primary
+review brief and the same family as the writer; the independent second review
+still runs in the other family.
+
+## Briefs
+
+**Diff form**: name the resolved range or prepared diff file and original intent.
+For Claude/plain exec, also request the repo's applicable instruction files and
+`fix-or-reject.md`. Report only introduced concrete failure scenarios, with
+file/line, specific input/state, wrong output, and severity; exclude style and
+pre-existing defects. For each new trigger into shared async state, reason through
+interleavings; for independent sources correlated by ID, walk each arrival order.
 
 **Comment-audit form**: given `comment-audit.md`'s "The bar" section, the diff range,
 and the instruction to return per-comment keep / delete / trim verdicts with a one-line
@@ -144,7 +153,7 @@ it leads to. If a gap can only be closed by a different approach, say so in one 
 instead of designing the alternative. No style, wording, or alternative plans.
 ```
 
-**Option form**: given only `/approach` step 1's frame, never Claude's options or its
+**Option form**: given only `/approach` step 1's frame, never the writer's options or its
 leaning — an option list it has seen anchors it:
 
 ```
@@ -165,28 +174,15 @@ The option fields mirror `/approach`'s card shape; change them together.
 ## Triage
 
 - **Review and comment-audit output** goes through `fix-or-reject.md` unchanged. A
-  Codex-only finding gets the same concrete-scenario bar, not deference; a finding both
-  reviewers raise is near-certain and is recorded as such.
+  second-reviewer-only finding gets the same concrete-scenario bar, not deference; agreement is supporting evidence, not proof; verify accepted findings against primary sources.
 - **Plan-review findings** meet the same bar, applied to a plan: a named gap with repo
   evidence, checked against the repo before it changes anything. An accepted finding
   revises the plan; a rejected one gets a one-line reason. The plan put to the human
   carries a short "Second-model plan review" list of both, because the human is the one
   approving it and a rejected finding is theirs to overrule. A gap only a different
   approach can close goes back to `/approach` under step 2's rule, not into a revision.
-- **Codex options** join `/approach`'s cards on equal terms. One materially distinct
-  from every Claude option becomes its own card, cut to the card limit; it needs no
-  `Plan`-subagent advocate, since the prompt already asked for its strongest case. One
-  that matches a Claude option merges into that card, with any cost only one side named.
-  A credible Codex option also closes the single-credible-option exit.
-
-## Verified behavior
-
-2026-09-22, kepler commit b30b60e01, 374 lines: both review forms cite the repo
-instruction file per finding without being told to (`AGENTS.md#L84` from a run without
-intent, `CLAUDE.md:90` from one with it), so the prompt needs no pointer to it. Two
-concurrent runs wrote distinct `mktemp` files and left the rollout count unchanged.
-
-2026-09-24, kepler#3118: an ephemeral run still appears in Kepler as a terminated
-"Codex (external)" session, because the user-level hooks fire regardless of
-`--ephemeral`. That is expected and fine: do not add `--ignore-user-config` to suppress
-it, since review runs must load the user's Codex config.
+- **Second-reviewer options** join `/approach`'s cards on equal terms. One materially distinct
+  from every writer option becomes its own card, cut to the card limit; it needs no
+  planning-subagent advocate, since the prompt already asked for its strongest case. One
+  that matches a writer option merges into that card, with any cost only one side named.
+  A credible independent option also closes the single-credible-option exit.

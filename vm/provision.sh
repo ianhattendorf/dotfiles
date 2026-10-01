@@ -638,6 +638,13 @@ if [[ -d $DOTFILES_DIR/.git ]]; then
 	link_dotfile .claude/CLAUDE.md profiles/agent-vm/home/.claude/CLAUDE.md
 	link_dotfile .claude/settings.json profiles/agent-vm/home/.claude/settings.json
 	link_dotfile .claude/skills profiles/agent-vm/home/.claude/skills
+	link_dotfile .agents/skills/README.md home/.claude/skills/README.md
+	link_dotfile .agents/skills/ship-issue home/.claude/skills/ship-issue
+	link_dotfile .agents/skills/investigate home/.claude/skills/investigate
+	link_dotfile .agents/skills/review-change home/.claude/skills/review-change
+	link_dotfile .agents/skills/address-feedback home/.claude/skills/address-feedback
+	link_dotfile .agents/skills/approach home/.claude/skills/approach
+	link_dotfile .agents/skills/explore home/.claude/skills/explore
 
 	[[ -d $preadopt ]] && echo "note: pre-existing files preserved under $preadopt" >&2
 	echo "linked from $DOTFILES_DIR"

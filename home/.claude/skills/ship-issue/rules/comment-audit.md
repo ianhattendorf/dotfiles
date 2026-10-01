@@ -29,8 +29,8 @@ surrounding file context to judge, and this file; it returns per-comment verdict
    and skeptically. This catches what per-comment judgment misses: several comments
    each true and non-obvious, restating one fact.
 2. **Qualitative pass** against the bar above, same tie-break: when unsure, delete or
-   trim, never keep. This pass may be dispatched to Codex instead
-   (`second-model-review.md`, comment-audit form, effort `high`): a Claude subagent is
+   trim, never keep. This pass may be dispatched to the other model family instead
+   (`second-model-review.md`, comment-audit form, effort `high`): a same-family subagent is
    fresh in context but shares the habits that wrote the comments, and a different
    family is a colder reader. The mechanical pass stays with the subagent either way;
    the verdict format is the same.

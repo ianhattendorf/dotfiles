@@ -2,12 +2,12 @@
 
 ## The review subagent
 
-Dispatch a fresh `Agent` subagent to review the diff — never review inline. The session
-that wrote the diff shares its blind spots, and `/code-review` runs in the calling
-session rather than a subagent, so don't invoke it directly. `model: "opus"`, effort at
-least the floor the calling skill names, self-escalating to `high`/`xhigh` when the
-subagent judges the diff warrants deeper coverage — never below the floor on a
-self-judged call.
+Dispatch a fresh, read-only reviewer through `host-runtime.md` — never review
+inline or give it the writer's transcript. Claude uses an Opus subagent; Codex uses
+its supported fresh-agent interface with the session model. Use at least the effort
+floor the calling step names, escalating to high/xhigh when needed and supported.
+If the host cannot enforce read-only review, use the restricted CLI route for that
+family in `second-model-review.md`; inability to dispatch is a blocked review.
 
 **Every round reviews the CUMULATIVE diff** — the full diff the calling skill resolved
 for its target (ship-issue's own branch: `merge-base(origin/main)..HEAD`), never

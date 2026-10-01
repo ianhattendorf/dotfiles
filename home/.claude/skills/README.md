@@ -4,6 +4,18 @@ Six skills cover one pipeline. They hand off through **durable task notes**, so 
 one starts from a settled answer instead of re-deriving it, and any of them can be
 resumed in a later session by reading the note.
 
+## Claude and Codex
+
+The tables below use Claude's `/name` spelling. In Codex invoke `$name` (or choose
+it through `/skills`); in Kepler the `/` picker also finds Codex skills and inserts
+`$name`. Both catalogs link to these same sources. Read
+`ship-issue/rules/host-runtime.md` for host-specific execution.
+
+The host installer and VM provisioner expose only these six skills and this README
+under `~/.agents/skills`. Inspect installation collisions first; preserve unrelated
+skills and installer backups. Restart a session if its catalog is stale. Rollback
+removes only these managed Codex links, not the containing skills directory.
+
 ## Which one
 
 | You have | Skill | It ends at |
@@ -48,11 +60,11 @@ Every arrow is optional and every one is a note, not a conversation:
 - `profiles/<repo>.md` — the per-repo facts every skill consumes (gates, invariants
   source, live verification, merge and changelog conventions, security-sensitive
   surfaces). **Resolve the profile first, in every skill.**
-- `rules/fix-or-reject.md` — the review subagent, and what makes a finding fixable.
-- `rules/comment-audit.md` — the comment bar and the cold-reader audit.
-- `rules/freshness-check.md` — run on every resume, in every skill.
-- `rules/design-canvas.md` — when and how /explore, /approach and /ship-issue use `/design`, and the handoff when it is unavailable.
-- `feature-scale.md` — when the work outgrows a plan-mode plan.
+- `ship-issue/rules/fix-or-reject.md` — the review subagent, and what makes a finding fixable.
+- `ship-issue/rules/comment-audit.md` — the comment bar and the cold-reader audit.
+- `ship-issue/rules/freshness-check.md` — run on every resume, in every skill.
+- `ship-issue/rules/design-canvas.md` — when and how /explore, /approach and /ship-issue use `/design`, and the handoff when it is unavailable.
+- `ship-issue/feature-scale.md` — when the work outgrows a plan-mode plan.
 
 ## Two rules that hold everywhere
 
@@ -61,5 +73,5 @@ are drafted and handed over, never posted. Issue and PR writes are confirmed in 
 turns. Pushes need explicit confirmation every time.
 
 **The dependency runs one way.** These skills read the repos; no repo file references
-this directory. See `profiles/README.md` for why, and for what a repo skill does when
+this directory. See `ship-issue/profiles/README.md` for why, and for what a repo skill does when
 it needs something only an outer workflow can supply.

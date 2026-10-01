@@ -5,6 +5,9 @@ description: Investigate a reported or suspected problem in a GitKraken-owned re
 
 # Investigate (GitKraken repos)
 
+Read [../ship-issue/rules/host-runtime.md](../ship-issue/rules/host-runtime.md) first for host invocation, questions, planning, and fresh-agent dispatch. Workflow-internal references resolve from the containing document; repository-source pointers resolve from the target checkout. Profiles retain the conventions described in host-runtime.md.
+
+
 Answer one question — **is this real, and what is it?** — and leave behind a note
 good enough that a future `/ship-issue` session never re-derives the answer. This
 skill ends at the verdict. It files nothing, plans nothing, fixes nothing.
@@ -28,7 +31,7 @@ Hard limits (the point of this skill vs. ship-issue):
 - If the investigation centers on an existing GitHub issue or PR, attach it to the
   task (`attach_link`). A Slack thread's permalink goes in the note instead.
 - If repro needs a running app or the code, read the repo profile
-  (`~/.claude/skills/ship-issue/profiles/<repo>.md`) for the **live verification
+  (`../ship-issue/profiles/<repo>.md`) for the **live verification
   method** and use only that section — the rest of the profile (merge, changelog,
   PR checks) is ship-issue's concern. Prefer the task's existing worktree; create
   one only if repro requires it, and say in the note whether it should be kept for

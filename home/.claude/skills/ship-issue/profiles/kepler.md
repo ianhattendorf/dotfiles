@@ -63,8 +63,19 @@ workflow adds.
   printed `Remote access URL`: its bootstrap token is single-use and short-lived. The
   owner token is reusable, so one URL serves the agent's sweep and the human's run; the
   human opens it in their own browser. `/live-pair` for interactive iteration. Only
-  desktop-shell behavior (packaging, tray/protocol handlers, OpenPGP signing, clipboard)
-  needs the fallback: human runs `ssh -X agent-vm` + `pnpm dev`, unisolated. Never remove
+  desktop-shell behavior (packaging, tray, OpenPGP signing, clipboard) needs the fallback:
+  human runs `ssh -X agent-vm` + `pnpm dev`, unisolated. **Protocol handlers
+  (`kepler-<channel>://` deep links) are the exception, on the VM and on local Linux
+  alike:** an unpackaged Linux `electron .` has no `.desktop` file, so no x-scheme-handler
+  is registered and a browser's redirect goes nowhere (`xdg-mime query default
+  x-scheme-handler/kepler-source` prints nothing). Deliver the URL by hand as a second
+  instance: `./node_modules/.bin/electron . '<scheme>://auth/callback?code=…'` from the
+  worktree, with the dev app running (add `--user-data-dir=<dir>` for a `dev:isolate`
+  profile) — the single-instance lock forwards it like the OS would (verified
+  2026-09-30, kepler#3228). A remote-bound window runs its daemon's renderer, so testing a
+  renderer change there needs the daemon on this build: `rm -rf out/ui out/renderer &&
+  pnpm create:remote:linux:x64`, then reconnect (kepler#3279: the bundle otherwise packs a
+  stale `out/ui`). Never remove
   a live PID stamp in any data dir, isolated or shared; if a non-isolated instance is
   already running and this task needs the shared dir specifically, coordinate with the
   human. (`dev:remote` develops Kepler's remote-window feature; it is not a

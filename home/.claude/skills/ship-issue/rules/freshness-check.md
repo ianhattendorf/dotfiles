@@ -8,7 +8,7 @@ Tasks pause for days and `main` moves. Before continuing from the recorded step:
 2. **Nothing relevant landed** → proceed from the recorded step.
 3. **Relevant commits landed** → read them and classify:
    - **Premise gone** (the bug was fixed, the feature shipped another way): stop, report
-     the evidence, and confirm with `AskUserQuestion` before acting — e.g. "Close the
+     the evidence, and confirm with the host question mechanism before acting — e.g. "Close the
      issue and abandon the branch" (recommended) / "Keep the branch, I want to look
      closer" / "Something else". Do not keep implementing to salvage sunk work while
      waiting on the answer.
@@ -23,7 +23,7 @@ Tasks pause for days and `main` moves. Before continuing from the recorded step:
 The classification above is not only for a resume. When implementation itself shows the
 premise is gone — the behavior turns out to be intended, the repro was environmental,
 the acceptance criteria cannot be met as written — stop at that point and run the same
-`AskUserQuestion` confirmation. Do not keep building to preserve the work already done,
+confirmation through the host question mechanism. Do not keep building to preserve the work already done,
 and do not quietly reshape the issue to fit what the branch now does: the issue is the
 agreement, and changing it is the human's call. Record the evidence in the task note
 first, so the decision is made against it rather than against a summary.

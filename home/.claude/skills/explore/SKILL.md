@@ -5,6 +5,9 @@ description: Explore a feature idea for a GitKraken-owned repo BEFORE it is a pr
 
 # Explore (GitKraken repos)
 
+Read [../ship-issue/rules/host-runtime.md](../ship-issue/rules/host-runtime.md) first for host invocation, questions, planning, and fresh-agent dispatch. Workflow-internal references resolve from the containing document; repository-source pointers resolve from the target checkout. Profiles retain the conventions described in host-runtime.md.
+
+
 Answer one question — **what is this, and do I still want it?** — and leave behind a
 note that a future session can pick up without re-having the conversation. This skill
 ends at the verdict. It files nothing, chooses no approach, plans nothing, builds nothing.
@@ -37,7 +40,7 @@ Hard limits (the point of this skill vs. its neighbours):
 - Take the idea in the human's own words and write it back in one line. If it will not
   compress to one line, that is the first thing to discuss.
 - Read the **invariants source** section of the repo profile
-  (`~/.claude/skills/ship-issue/profiles/<repo>.md`) — that section only — so that an
+  (`../ship-issue/profiles/<repo>.md`) — that section only — so that an
   idea colliding with a load-bearing rule is noticed here, not at plan time.
 
 ## 2. Ground
@@ -80,12 +83,12 @@ in whatever order the conversation reaches them:
   carrying the feature, what it forecloses, what it duplicates. If the case for
   dropping is stronger than the case for building, say so plainly. The human decides.
 
-Use `AskUserQuestion` only for a genuine forced choice with named options; open
+Use the host question mechanism only for a genuine forced choice with named options; open
 questions go in prose.
 
 **When talk stalls, probe.** A discussion stuck on "would this even feel right" or "is
 this even possible" is not going to be settled by more talk. For a UI idea the first
-probe is a `/design` canvas (`~/.claude/skills/ship-issue/rules/design-canvas.md`): it
+probe is a `/design` canvas (`../ship-issue/rules/design-canvas.md`): it
 shows several options and touches no code. A throwaway Storybook story, or a read-only
 feasibility spike under ~30 minutes, is the probe when the canvas is unavailable or the
 question is about behavior. Revert code probes before the session ends; what any probe

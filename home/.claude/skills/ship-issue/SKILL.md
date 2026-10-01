@@ -5,6 +5,9 @@ description: End-to-end loop for shipping a change in a GitKraken-owned repo (Ke
 
 # Ship an issue (GitKraken repos)
 
+Read [rules/host-runtime.md](rules/host-runtime.md) first for host invocation, questions, planning, and fresh-agent dispatch. Workflow-internal references resolve from the containing document; repository-source pointers resolve from the target checkout. Profiles retain the conventions described in host-runtime.md.
+
+
 Carry one issue from intake to an open PR. The sequence below is the contract — the
 skip criteria and convergence rules are part of it. The sequence is repo-agnostic;
 the repo-specific facts each step consumes come from the **repo profile**. All work
@@ -23,12 +26,12 @@ The step bodies state each rule once; this list is the reminder.
 - The **freshness check** on every resume, however short the pause felt.
 - **Review is a fresh subagent**, never an inline read of your own diff.
 - The **second-model review on every plan before approval and on the final pre-push
-  round**; a Codex run that could not run is blocking, not skipped.
+  round**; a second-model run that could not run is blocking, not skipped.
 - The **comment audit is a fresh subagent** before the first push, never "I held the
   bar while writing".
 - The **branch-name check** before the first push.
 - **Two turns** for every issue/PR write; **explicit confirmation** for every push.
-- **Every human decision goes through `AskUserQuestion`**, never a question in prose.
+- **Every human decision goes through the host question mechanism**, with an actual answer before dependent work (see `rules/host-runtime.md`).
 - The **scratch-merge gate** against current `origin/main` before every push.
 - The **intake repro, replayed** before the PR — the acceptance criteria are not a
   substitute for re-running what started the task.
@@ -46,7 +49,7 @@ the current step whenever a session might end between steps.
 
 ## Repo profile — resolve first
 
-Read `~/.claude/skills/ship-issue/profiles/<repo>.md` for the target repo only. Do not
+Read `./profiles/<repo>.md` for the target repo only. Do not
 proceed from memory: profiles for different repos contain opposite instructions (squash
 vs. merge-preserving, changelog in-PR vs. mined-at-release). No profile? Derive and
 write one per `profiles/README.md`.
@@ -61,7 +64,7 @@ Org-wide constants (hold in every GK repo, no profile needed):
 - Every issue/PR write is confirmed in **two turns, in this order**. First, a chat
   message carrying the draft: the title on its own line, then the body, all inside one
   fenced code block (a longer fence than any inside) so the human can copy the raw
-  markdown to edit it. Second, `AskUserQuestion` with a one-sentence question pointing
+  markdown to edit it. Second, the host question mechanism with a one-sentence question pointing
   back at the draft — "File the issue drafted above?" / "Open the PR drafted above?" —
   and two options, e.g. "File it as drafted" (recommended) / "Let me edit it first".
   The question and option text never carry the title or body: that field renders
@@ -69,13 +72,10 @@ Org-wide constants (hold in every GK repo, no profile needed):
   is not already in chat, print it first; never fold the two turns into one.
 - Pushes go over SSH and always need explicit human confirmation — a permission rule,
   not a capability limit; a successful `git push` is not evidence it was pre-approved.
-- **A decision that is the human's to make is posed with `AskUserQuestion`** — the
-  named ones above, and equally any that arises mid-loop and is not covered by a step.
-  Never as a question in chat prose: prose does not block, so the loop reads the next
-  instruction as an answer and decides by default. The same holds when a step routes
-  the decision elsewhere (step 2 sends a contested approach to `/approach`) — take that
-  route, and if there is a reason not to, the choice between routes is itself a
-  question for the human, asked with the tool.
+- **Human decisions use the host question mechanism** from `rules/host-runtime.md`.
+  A question returning before the user answers is still pending. If a required
+  question cannot use a tool under the host's rules, end the turn with the question
+  and wait. Honor prior user authorization; never interpret silence as agreement.
 - **Anything the human must read before answering goes in a message that ends the
   turn**, never in text written just before the question in the same turn. Kepler's
   transcript can hold back text written before a tool call and show only the question
@@ -101,7 +101,7 @@ Org-wide constants (hold in every GK repo, no profile needed):
 - Pull the source material into context directly: GitKraken MCP tools for issue
   detail, Slack tools for threads. Do not work from a paraphrase.
 - Verify the problem is real before anything else: reproduce it, or trace the code
-  path to the root cause. Dispatch this to an `Explore`/`general-purpose` subagent once
+  path to the root cause. Dispatch this to a fresh investigation subagent once
   it needs more than a couple of targeted reads, so only the root-cause note reaches
   this context. If it cannot be verified, report that and stop.
 - Before filing, search for an existing issue (`issues_get_detail` on anything the
@@ -110,7 +110,7 @@ Org-wide constants (hold in every GK repo, no profile needed):
   closed one that describes this exact problem is evidence for the freshness check, not
   a reason to stop.
 - When the issue already exists, check its assignee in the `issues_get_detail` result.
-  If it is unassigned or assigned to someone else, stop and ask with `AskUserQuestion`
+  If it is unassigned or assigned to someone else, stop and ask with the host question mechanism
   before any implementation work — options "Self-assign and continue" (recommended),
   "Continue without assigning", and, when someone else holds it, "Stop — it's theirs".
   Someone else's assignment is a signal they may already be working it, and an
@@ -135,7 +135,7 @@ in the profile's invariants source. Say so, and why, in one line.
 
 A plan bakes in an approach — by the time it names files and seams, the how has been
 chosen by whichever seam was found first — and plan approval is a yes/no on one plan,
-the wrong shape for a choice between approaches. Before plan mode, check the task for
+the wrong shape for a choice between approaches. Before planning, check the task for
 an **approach decision note** (from `/approach`):
 
 - **A note exists** → plan against it. Its rejected options are settled.
@@ -146,7 +146,8 @@ an **approach decision note** (from `/approach`):
   decision"; or the human asked to settle direction first.
 - **Otherwise** → say in one line that the approach is uncontested and what it is.
 
-Then plan in **plan mode** so the human approves before implementation:
+Then draft the plan and obtain human approval before implementation. Use plan mode
+when the host permits it; otherwise present the plan and wait per `rules/host-runtime.md`:
 
 - Start from the verification note (and the approach note) — plan the *how*, do not
   re-investigate the *what* or re-decide the approach.
@@ -221,7 +222,7 @@ and triage its findings by that file's rules. Skip a round only when every hunk 
 diff is comment-only, i18n-string-only, or pure formatting.
 
 When the diff touches a **security-sensitive surface** from the profile's list — or
-adds/changes a direct dependency or the lockfile — run `/security-review` once, after
+adds/changes a direct dependency or the lockfile — run `rules/security-review.md` once, after
 correctness converges and before step 6. Its findings triage by the same
 `rules/fix-or-reject.md` rules as any other round.
 
@@ -242,7 +243,7 @@ re-plan (step 2) before writing more code.
 
 ## 6. Simplify — once
 
-After correctness converges (never inside the loop), run `/simplify` a single time to
+After correctness converges (never inside the loop), run `rules/simplify.md` a single time to
 collapse what the fix rounds accreted — code and comments alike. Re-run the gates.
 If it changed code, run one more step 5 round. Step 5's convergence rule applies.
 

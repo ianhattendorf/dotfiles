@@ -5,6 +5,13 @@ options to claude.ai as an artifact, the human picks and tweaks one, and the pic
 the visual target for the implementation. It is a way of *looking at* a UI question, so
 it belongs wherever a UI question is still open, and nowhere else.
 
+## Host availability
+
+Claude Design is a Claude-only capability. In Codex, prepare the grounded brief
+and use the terminal handoff below, or ask for the existing text/Storybook alternative.
+Changing Claude settings does not add Design to Codex. Do not imitate the artifact
+or silently skip a visual decision already required by the plan.
+
 ## When
 
 - **/explore**: the discussion is stuck on "would this even feel right" for a UI idea.
@@ -42,7 +49,7 @@ cloud-provider session, or organization policy.
 
 Say which in one line, then offer:
 
-1. **Kepler ACP, fix in place**: add `"env": { "CLAUDE_CODE_ARTIFACT": "1" }` to
+1. **Claude in Kepler ACP, fix in place**: add `"env": { "CLAUDE_CODE_ARTIFACT": "1" }` to
    `~/.claude/settings.json` and start a new session. A human's call, since it
    applies to every Agent SDK session on the machine.
 2. **Terminal handoff**: the brief is self-contained, so a fresh terminal session needs

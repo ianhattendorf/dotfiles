@@ -5,6 +5,9 @@ description: Decide the high-level approach for a change in a GitKraken-owned re
 
 # Approach (GitKraken repos)
 
+Read [../ship-issue/rules/host-runtime.md](../ship-issue/rules/host-runtime.md) first for host invocation, questions, planning, and fresh-agent dispatch. Workflow-internal references resolve from the containing document; repository-source pointers resolve from the target checkout. Profiles retain the conventions described in host-runtime.md.
+
+
 Answer one question — **how should this be built, at altitude?** — and leave behind a
 decision note good enough that planning starts from a settled direction and no later
 session or review round re-litigates it. This skill ends at the decision. It plans
@@ -37,7 +40,7 @@ Hard limits (the point of this skill vs. its neighbours):
   the acceptance criteria are what every option is judged against and what settles
   scope disputes later.
 - Read the **invariants source** section of the repo profile
-  (`~/.claude/skills/ship-issue/profiles/<repo>.md`) — that section only; the rest is
+  (`../ship-issue/profiles/<repo>.md`) — that section only; the rest is
   ship-issue's concern. Every option is weighed against these, and an option that
   touches one must say which.
 - A direction the human named in the prompt becomes one option and gets the same card
@@ -46,27 +49,27 @@ Hard limits (the point of this skill vs. its neighbours):
 ## 2. Enumerate
 
 - **Dispatch the second-model option generation first**
-  (`~/.claude/skills/ship-issue/rules/second-model-review.md`, option form), blind to
+  (`../ship-issue/rules/second-model-review.md`, option form), blind to
   anything below, and enumerate while it runs. Its options join the cards per that
   file's triage before you recommend.
-- Produce **two or three credible options**. If only one is credible, and Codex found
+- Produce **two or three credible options**. If only one is credible, and the second reviewer found
   no second one either, this skill has nothing to decide: record a one-line "single
   credible approach: <shape>" note so ship-issue step 2 can skip cleanly, and stop.
 - **Every option needs a genuine advocate.** When the choice is contested — you cannot
   say in one sentence why one option wins — sketch each option with a separate
-  fresh-context `Plan` subagent, given only the frame from step 1 and the invariants,
+  fresh-context planning subagent, given only the frame from step 1 and the invariants,
   and asked to make the strongest case for its option *including* its costs. Sketching
   all options inline produces one real option and two strawmen.
 - Survey **prior art** when a sibling client has solved the same capability
   (vscode-gitlens, gkcli, gitkraken-client, core-tools; first pass
-  `gh search code --owner gitkraken`). Dispatch the survey to a `general-purpose`
+  `gh search code --owner gitkraken`). Dispatch the survey to a fresh investigation
   subagent per sibling so only the distilled lesson returns; kepler, vscode-gitlens,
   gkcli and core-tools are registered in this workspace (`create_worktree`, discard
   when done), the rest read remotely via `gh` or the GitKraken MCP. A sibling's
   implementation is evidence for an option, not an option by itself — the lesson goes
   on the card, not a description of what the sibling does.
 - **Card shape**, one per option, and the same shape for all (the option form in
-  `second-model-review.md` asks Codex for these fields; change them together):
+  `second-model-review.md` asks the second reviewer for these fields; change them together):
   - *Shape*: one paragraph of how it works.
   - *Invariants touched* (from the profile's source) and any **new concept**
     introduced — an event, a table or migration, a setting, a flag, a wire route.
@@ -77,12 +80,12 @@ Hard limits (the point of this skill vs. its neighbours):
 - A card running past ~10 lines is turning into a plan. Cut it back to altitude.
 - **When the options differ in what the user sees or does**, show them on one `/design`
   canvas, one artboard per option, before asking
-  (`~/.claude/skills/ship-issue/rules/design-canvas.md`). Each card names its artboard.
+  (`../ship-issue/rules/design-canvas.md`). Each card names its artboard.
 
 ## 3. Recommend and decide
 
 - Recommend one option, with the reason in two or three sentences. Then put the choice
-  to the human with `AskUserQuestion` — the recommendation first and labelled
+  to the human with the host question mechanism — the recommendation first and labelled
   "(Recommended)", each option's description being its card's one-line trade-off. The
   human picks; "Other" is theirs.
 - If the chosen option **hinges on an unknown**, name the spike: what to probe, the

@@ -5,15 +5,17 @@ description: Address feedback on a PR in a GitKraken-owned repo that you authore
 
 # Address PR feedback (GitKraken repos)
 
+Read [../ship-issue/rules/host-runtime.md](../ship-issue/rules/host-runtime.md) first for host invocation, questions, planning, and fresh-agent dispatch. Workflow-internal references resolve from the containing document; repository-source pointers resolve from the target checkout. Profiles retain the conventions described in host-runtime.md.
+
+
 Carry one feedback round from "the PR has comments" to "every thread has a
 disposition, fixes are pushed, replies are drafted." You own the branch — this
 skill changes code, unlike /review-change — but you do not own the conversation:
-replies to humans are handed to the human, never posted. All work inherits the
-session model.
+replies to humans are handed to the human, never posted. Work inherits the session model except the explicit reviewer selections in the shared rules.
 
 **Resolve the repo profile first**, exactly as ship-issue does: Read
-`~/.claude/skills/ship-issue/profiles/<repo>.md` (derive and write one if missing —
-the procedure is in `~/.claude/skills/ship-issue/SKILL.md`). This skill consumes the
+`../ship-issue/profiles/<repo>.md` (derive and write one if missing —
+the procedure is in `../ship-issue/SKILL.md`). This skill consumes the
 profile's gates, invariants source, live verification method, and merge convention.
 Org-wide constants from ship-issue hold here too: writes via the GitKraken MCP,
 pushes need explicit human confirmation every time, project-board status is the
@@ -51,7 +53,7 @@ How much you must read before touching anything depends on whose diff it is:
 - **Take-over** (a colleague's or another agent's PR): pushing to the branch
   adopts its defects as yours. Read the full diff and the entire discussion
   first, then dispatch the review subagent in
-  `~/.claude/skills/ship-issue/rules/fix-or-reject.md` (floor medium) on the whole
+  `../ship-issue/rules/fix-or-reject.md` (floor medium) on the whole
   PR, plus the second-model review in that directory's `second-model-review.md` on
   the same range — the first full read of code you did not write is where a second
   family pays most. Both finding sets join the ledger like any reviewer comment. Check for the original author's unpushed
@@ -62,7 +64,7 @@ How much you must read before touching anything depends on whose diff it is:
 
 ## 3. Checkout freshness
 
-Run `~/.claude/skills/ship-issue/rules/freshness-check.md`, plus the PR-head check
+Run `../ship-issue/rules/freshness-check.md`, plus the PR-head check
 from /review-change: `git fetch origin`, compare `HEAD` to the PR's current head SHA
 (someone may have pushed — the human, a co-author, a suggested-change commit),
 fast-forward if behind. If local and remote have diverged, stop and sort it out
@@ -79,7 +81,7 @@ fixup commits are expected instead.
 ## 4. Triage and fix
 
 A PR comment is a finding, not an order: triage each by
-`~/.claude/skills/ship-issue/rules/fix-or-reject.md`. Its reject is this ledger's
+`../ship-issue/rules/fix-or-reject.md`. Its reject is this ledger's
 `decline`.
 
 - Fix `fix` rows grouped **one commit per logical concern**, not one
@@ -97,7 +99,7 @@ A PR comment is a finding, not an order: triage each by
   reviewer's own fixes are the likeliest source of new findings. A UI-visible fix
   additionally gets the profile's live verification, targeted at what the fix claims.
 - Before pushing, run the audit in
-  `~/.claude/skills/ship-issue/rules/comment-audit.md` scoped to every comment
+  `../ship-issue/rules/comment-audit.md` scoped to every comment
   added or edited this round (`git diff <round-start-head>..HEAD`). A round
   spreads one rationale across the function, the file doc, the test and the
   reply, each feeling non-obvious in isolation — which is why holding the bar

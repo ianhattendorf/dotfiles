@@ -13,6 +13,13 @@
     ~/.claude/skills/address-feedback: home/.claude/skills/address-feedback
     ~/.claude/skills/approach: home/.claude/skills/approach
     ~/.claude/skills/explore: home/.claude/skills/explore
+    ~/.agents/skills/README.md: home/.claude/skills/README.md
+    ~/.agents/skills/ship-issue: home/.claude/skills/ship-issue
+    ~/.agents/skills/investigate: home/.claude/skills/investigate
+    ~/.agents/skills/review-change: home/.claude/skills/review-change
+    ~/.agents/skills/address-feedback: home/.claude/skills/address-feedback
+    ~/.agents/skills/approach: home/.claude/skills/approach
+    ~/.agents/skills/explore: home/.claude/skills/explore
     ~/.emacs.d/early-init.el: home/emacs.d/early-init.el
     ~/.emacs.d/init.el: home/emacs.d/init.el
     ~/.emacs.d/straight/versions/default.el: home/emacs.d/straight/versions/default.el

@@ -230,7 +230,8 @@ gitconfig sets `tag.forceSignAnnotated`.
 
 A **curated subset** of the host dotfiles is symlinked into the guest by provisioning:
 `~/.vimrc`, `~/.vim`, `~/.gitignore`, the tmux config plus the four `tmux-*` scripts its
-status line and bindings call, and the Claude config from `profiles/agent-vm/`.
+status line and bindings call, the Claude config from `profiles/agent-vm/`, and the six
+shared workflow skills plus their README under `~/.agents/skills` for Codex.
 
 The guest never runs `./install`. That repo's dotbot base is desktop-shaped (sway, i3,
 waybar, weechat, plasma) and cannot be subsetted — a profile can override a base link but
